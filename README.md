@@ -25,6 +25,13 @@ Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pila
 * Dependencia 2 - Banco de dados PostgresSQL
 * Dependencia 3 - Android Studio Markeet
 
+## Instalação de Requisitos
+
+### Banco  de Dados PostgresSQL
+
+`` sudo apt install postgresql ``
+
+
 ## Integrantes do Grupo
 
 * Saulo Adones
