@@ -29,3 +29,5 @@ Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pila
 [Notion](https://www.notion.so/Sistema-de-Ouvidoria-do-SENAC-1a6cf81c640d8080b6d3f4cd051740fa?pvs=4) - Documentação de Requisitos
 
 [Trello](https://trello.com/invite/b/67ec3fa72b0388fbbbc61382/ATTI65e83e7e71fbc4b6e05d9965b82e2f0fDD78737D/projeto-integrador) - Ferramenta de Gerenciamento
+
+[Figma](https://www.figma.com/design/hzO79KFKydvrj3Y4NApAbE/Projeto-do-Grupo-4?node-id=2-6) - Prototipação de Alto Nivel
