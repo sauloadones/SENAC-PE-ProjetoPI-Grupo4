@@ -25,6 +25,12 @@ Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pila
 * Dependencia 2 - Banco de dados PostgresSQL
 * Dependencia 3 - Android Studio Markeet
 
+## Integrantes do Grupo
+
+* Saulo Adones
+* Matheus
+* Joao Marcos
+
 ## Links
 [Notion](https://www.notion.so/Sistema-de-Ouvidoria-do-SENAC-1a6cf81c640d8080b6d3f4cd051740fa?pvs=4) - Documentação de Requisitos
 
