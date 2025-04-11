@@ -33,10 +33,13 @@ Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pila
 
 
 ## Integrantes do Grupo
-
-* Saulo Adones
-* Matheus
-* Joao Marcos
+* Andrey Rodrigo Barbosa da Silva
+* Carlos Eduardo Paulino Vilaça
+* Joao Marcos de Melo Carneiro da Cunha Silva
+* Lucas Gabriel Lima do Nascimento
+* Matheus de Souza Moura
+* Saulo Adones Gabriel Guimarães da Silveira
+* Vitor Luiz de Oliveira Correia
 
 ## Links
 [Notion](https://www.notion.so/Sistema-de-Ouvidoria-do-SENAC-1a6cf81c640d8080b6d3f4cd051740fa?pvs=4) - Documentação de Requisitos
