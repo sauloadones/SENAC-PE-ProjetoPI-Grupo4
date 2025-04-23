@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_popup"
+    android:padding="24dp"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/logo"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="Logo" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/editTextId"
+        android:layout_width="280dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:hint="ID"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#EAEAEA"
+        android:backgroundTint="#1F1F1F"
+        android:background="@drawable/rounded_input"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:id="@+id/editTextSenha"
+        android:layout_width="280dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:hint="Senha"
+        android:inputType="textPassword"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#EAEAEA"
+        android:backgroundTint="#1F1F1F"
+        android:background="@drawable/rounded_input"
+        android:layout_gravity="center_horizontal" />
+
+    <CheckBox
+        android:id="@+id/checkBoxLembrar"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:text="Lembrar acesso"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/buttonEntrar"
+        android:layout_width="280dp"
+        android:layout_height="48dp"
+        android:text="Entrar"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#164773"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/roudend_button"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/textEsqueceuSenha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Esqueceu sua senha?"
+        android:textColor="#89D99D"
+        android:textSize="14sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+
