@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#2C2C2C"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp">
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:src="@drawable/logo"
+        android:contentDescription="Logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Ícone de notificação -->
+    <ImageView
+        android:id="@+id/notificationIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_notification"
+        android:contentDescription="Notificação"
+        app:tint="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Badge de notificação -->
+    <View
+        android:id="@+id/notificationBadge"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/badge_red_circle"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/notificationIcon"
+        app:layout_constraintTop_toTopOf="@id/notificationIcon"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

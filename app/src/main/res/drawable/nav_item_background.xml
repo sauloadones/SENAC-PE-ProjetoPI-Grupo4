@@ -1,0 +1,23 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#252525"/>
+                </shape>
+            </item>
+            <item
+                android:top="0dp"
+                android:bottom="52dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#3CA6A6" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#252525"/>
+        </shape>
+    </item>
+</selector>

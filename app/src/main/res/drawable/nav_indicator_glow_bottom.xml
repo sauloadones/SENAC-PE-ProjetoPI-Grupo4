@@ -1,0 +1,23 @@
+<!-- res/drawable/nav_indicator_glow_bottom.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Glow branco levemente desfocado abaixo -->
+    <item android:top="4dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#80FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="90" />
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+    <!-- Barrinha azul principal -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#3CA6A6" />
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+
+</layer-list>

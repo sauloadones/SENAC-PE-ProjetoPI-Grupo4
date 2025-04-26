@@ -12,6 +12,13 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <style name="BottomNavActiveIndicator">
+        <item name="android:color">#3CA6A6</item>
+        <item name="android:shape">rectangle</item>
+        <item name="android:height">4dp</item>
+    </style>
+
+
 </resources>
 
 

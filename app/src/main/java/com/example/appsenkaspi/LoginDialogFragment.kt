@@ -1,6 +1,7 @@
 package com.example.appsenkaspi
 
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -26,7 +27,12 @@ class LoginDialogFragment : DialogFragment() {
         buttonEntrar.setOnClickListener {
             val id = editTextId.text.toString()
             val senha = editTextSenha.text.toString()
-            dismiss()
+
+            // Inicia a Activity CriarPilares
+            val intent = Intent(requireContext(), TelaPrincipalActivity::class.java)
+            startActivity(intent)
+
+            dismiss() // fecha o dialogo atual
         }
 
         textEsqueceu.setOnClickListener {

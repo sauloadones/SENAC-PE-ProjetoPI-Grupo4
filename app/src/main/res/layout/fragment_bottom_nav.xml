@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/customBottomNav"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#252525"
+    android:paddingVertical="8dp"
+    android:elevation="8dp">
+
+    <LinearLayout
+        android:id="@+id/navItemsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingHorizontal="12dp">
+
+        <!-- Relatório -->
+        <LinearLayout
+            android:id="@+id/nav_relatorio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingVertical="4dp">
+
+
+            <View
+                android:id="@+id/indicator_relatorio"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/bg_indicador"
+                android:layout_marginBottom="4dp"
+                android:visibility="invisible"/>
+
+
+            <ImageView
+                android:id="@+id/icon_relatorio"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/nav_relatorio_icon"
+                android:contentDescription="Relatório"
+                app:tint="@color/nav_text_selector" />
+
+            <TextView
+                android:id="@+id/text_relatorio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Relatório"
+                android:textColor="@color/nav_text_selector"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Dashboard -->
+        <LinearLayout
+            android:id="@+id/nav_dashboard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingVertical="4dp">
+
+            <View
+                android:id="@+id/indicator_dashboard"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/bg_indicador"
+                android:layout_marginBottom="4dp"
+                android:visibility="invisible"/>
+
+
+            <ImageView
+                android:id="@+id/icon_dashboard"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/nav_dashboard_icon"
+                android:contentDescription="Dashboard"
+                app:tint="@color/nav_text_selector" />
+
+            <TextView
+                android:id="@+id/text_dashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textColor="@color/nav_text_selector"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingVertical="4dp">
+
+            <View
+                android:id="@+id/indicator_home"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/bg_indicador"
+                android:layout_marginBottom="4dp"
+                android:visibility="invisible"/>
+
+
+            <ImageView
+                android:id="@+id/icon_home"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/nav_home_icon"
+                android:contentDescription="Início"
+                app:tint="@color/nav_text_selector" />
+
+            <TextView
+                android:id="@+id/text_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Início"
+                android:textColor="@color/nav_text_selector"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Perfil -->
+        <LinearLayout
+            android:id="@+id/nav_perfil"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingVertical="4dp">
+
+
+            <View
+                android:id="@+id/indicator_perfil"
+                android:layout_width="30dp"
+                android:layout_height="4dp"
+                android:background="@drawable/bg_indicador"
+                android:layout_marginBottom="4dp"
+                android:visibility="invisible"/>
+
+            <ImageView
+                android:id="@+id/icon_perfil"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/nav_perfil_icon"
+                android:contentDescription="Perfil"
+                app:tint="@color/nav_text_selector" />
+
+            <TextView
+                android:id="@+id/text_perfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Perfil"
+                android:textColor="@color/nav_text_selector"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

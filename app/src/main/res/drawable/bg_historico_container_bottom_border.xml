@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fundo escuro completo -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1E2123" />
+        </shape>
+    </item>
+
+    <!-- Borda inferior sutil -->
+    <item android:top="-1dp"> <!-- faz com que só apareça a linha embaixo -->
+        <shape android:shape="rectangle">
+            <size android:height="1dp" />
+            <solid android:color="#1E2123" />
+        </shape>
+    </item>
+
+</layer-list>
+

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2C2C2C"
+    android:padding="8dp"
+    tools:context=".HomeFragment">
+
+    <!-- Header reutilizável -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- CONTAINER PRINCIPAL COM BORDA ARREDONDADA -->
+    <LinearLayout
+        android:id="@+id/container_historico"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_historico_box"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- RETÂNGULO INTERNO (BOTÃO HISTÓRICO) -->
+        <LinearLayout
+            android:id="@+id/box_historico"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_historico_container"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/icon_historico"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Ícone Histórico"
+                android:src="@drawable/ic_history"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/texto_historico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif"
+                android:text="Histórico"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- LISTA DE PILARES -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pilaresRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:contentDescription="@string/descricao_lista_pilares"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        app:layout_constraintTop_toBottomOf="@id/container_historico"
+        app:layout_constraintBottom_toTopOf="@id/addButtonWrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- BOTÃO DE ADIÇÃO "+" -->
+    <FrameLayout
+        android:id="@+id/addButtonWrapper"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:minHeight="48dp"
+        android:background="@drawable/bg_pillar_button_plus"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.35"> <!-- agora 40% da largura -->
+
+        <ImageView
+            android:id="@+id/iconAdd"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add_white"
+            android:contentDescription="Adicionar"
+            app:tint="@android:color/white" />
+    </FrameLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">AppSenkasPI</string>
     <string name="login">Login</string>
+    <string name="logo">Logo</string>
+    <string name="criar_novo_pilar">Criar novo pilar</string>
+    <string name="mais">+</string>
+    <string name="dashboard">DashBoard</string>
+    <string name="home">Home</string>
+    <string name="perfil">Perfil</string>
+    <string name="relat_rio">Relatório</string>
+    <string name="descricao_lista_pilares">Lista de pilares exibida na tela</string>
+    <string name="historico_icon">Ícone de acesso ao histórico</string>
+
+
+
 </resources>
