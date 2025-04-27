@@ -9,31 +9,26 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class HomeFragment : Fragment() {
+class RecyclerViewPilar : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var buttonAddPilar: View
     private lateinit var adapter: PilarAdapter
-
-    private val homeViewModel: HomeViewModel by activityViewModels {
-        HomeViewModelFactory((requireActivity().application as App).database.pilarDao())
-    }
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        return inflater.inflate(R.layout.fragment_recycler_view_pilar, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
-        buttonAddPilar = view.findViewById(R.id.cardAdicionarPilar)
-
         adapter = PilarAdapter { pilar ->
-            // Aqui você pode colocar uma ação quando clicar em um pilar
+            // ação quando clicar no botão do Pilar
+            // exemplo: Toast.makeText(requireContext(), pilar.nome, Toast.LENGTH_SHORT).show()
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -41,13 +36,6 @@ class HomeFragment : Fragment() {
 
         homeViewModel.listaPilaresLiveData.observe(viewLifecycleOwner) { pilares ->
             adapter.submitList(pilares)
-        }
-
-        buttonAddPilar.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.main_container, CriarPilarFragment())
-                .addToBackStack(null)
-                .commit()
         }
     }
 }
