@@ -10,6 +10,11 @@ import kotlinx.coroutines.launch
 
 class FuncionarioViewModel(application: Application) : AndroidViewModel(application) {
     // Em qualquer lugar do seu código (por ex no ViewModel ou num objeto utilitário)
+
+    private val funcionarioDao = AppDatabase.getDatabase(application).funcionarioDao()
+    val listaFuncionarios: LiveData<List<FuncionarioEntity>> =
+        funcionarioDao.listarTodosFuncionarios()
+
     val funcionariosTeste = listOf(
         FuncionarioEntity(
             nomeCompleto = "Ana Beatriz Souza",
@@ -43,14 +48,11 @@ class FuncionarioViewModel(application: Application) : AndroidViewModel(applicat
 
 
 
-    private val funcionarioDao = AppDatabase.getDatabase(application).funcionarioDao()
-    val listaFuncionarios: LiveData<List<FuncionarioEntity>> =
-        funcionarioDao.listarTodosFuncionarios()
+
 
     init {
-        // Na primeira vez que abrir, popula se estiver vazio
         viewModelScope.launch {
-            val atuais = listasFuncionarios.value
+            val atuais = listaFuncionarios.value
             if (atuais.isNullOrEmpty()) {
                 funcionarioDao.inserirTodos(funcionariosTeste)
             }
