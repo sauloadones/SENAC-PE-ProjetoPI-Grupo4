@@ -16,6 +16,8 @@ class TelaPrincipalActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             // Tela inicial = HomeFragment (ou seja, Home da navegação)
+            supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
             supportFragmentManager.beginTransaction()
                 .replace(R.id.main_container, HomeFragment())  // <- carrega o conteúdo principal aqui
                 .commit()

@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.kapt") // <- Escreve isso direto, sem alias
+    id("org.jetbrains.kotlin.plugin.parcelize")
+
+
 }
 
 
@@ -49,7 +52,6 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
-
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

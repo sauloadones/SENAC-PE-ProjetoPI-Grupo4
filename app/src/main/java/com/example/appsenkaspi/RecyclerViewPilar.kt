@@ -13,10 +13,12 @@ class RecyclerViewPilar : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PilarAdapter
-    private val homeViewModel: HomeViewModel by activityViewModels()
+
+    private val pilarViewModel: PilarViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.fragment_recycler_view_pilar, container, false)
@@ -27,15 +29,26 @@ class RecyclerViewPilar : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         adapter = PilarAdapter { pilar ->
-            // ação quando clicar no botão do Pilar
-            // exemplo: Toast.makeText(requireContext(), pilar.nome, Toast.LENGTH_SHORT).show()
+            abrirTelaDoPilar(pilar.id)
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        homeViewModel.listaPilaresLiveData.observe(viewLifecycleOwner) { pilares ->
+        pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { pilares ->
             adapter.submitList(pilares)
         }
+    }
+
+    private fun abrirTelaDoPilar(pilarId: Int) {
+        parentFragmentManager.beginTransaction()
+            .replace(
+                R.id.main_container,
+                TelaPilarFragment().apply {
+                    arguments = Bundle().apply { putInt("pilarId", pilarId) }
+                }
+            )
+            .addToBackStack(null)
+            .commit()
     }
 }

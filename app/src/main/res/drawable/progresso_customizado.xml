@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fundo -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#D3D3D3" /> <!-- Cinza claro de fundo -->
+        </shape>
+    </item>
+
+    <!-- Barra de progresso preenchida -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="16dp" />
+                <solid android:color="#2ECC71" /> <!-- Verde para progresso -->
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

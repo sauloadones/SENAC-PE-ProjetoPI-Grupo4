@@ -9,6 +9,6 @@ data class PilarEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nome: String,
     val descricao: String,
-    val dataPrazo: Date? = null // Agora é Date no banco!
+    val dataInicio: Date,
+    val dataPrazo: Date
 )
-

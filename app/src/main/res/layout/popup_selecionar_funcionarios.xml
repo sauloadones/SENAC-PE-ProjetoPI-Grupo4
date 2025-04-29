@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#2C2C2C">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecione os Responsáveis"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDialogFuncionarios"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:clipToPadding="false"/>
+
+    <Button
+        android:id="@+id/buttonConfirmarSelecao"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Confirmar"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#164773"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
