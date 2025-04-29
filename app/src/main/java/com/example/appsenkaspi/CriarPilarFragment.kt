@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appsenkaspi.Converters.StatusPilar
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -107,7 +108,10 @@ class CriarPilarFragment : Fragment() {
                     nome       = nome,
                     descricao  = descricao,
                     dataInicio = Date(),
-                    dataPrazo  = prazo
+                    dataPrazo  = prazo,
+                    status      = StatusPilar.VENCIDO,
+                    dataCriacao = Date()
+
                 )
             )
             val novoId = idLong.toInt()
