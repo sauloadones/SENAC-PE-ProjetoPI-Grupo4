@@ -49,17 +49,38 @@ interface AcaoDao {
     suspend fun inserirRetornandoId(acao: AcaoEntity): Long
 
 
+
     @Query("""
-  SELECT
-    a.*,
-    (SELECT COUNT(*) FROM atividades WHERE acaoId = a.id) AS totalAtividades,
-    (SELECT COUNT(*) FROM atividades WHERE acaoId = a.id AND concluida = 1) AS ativasConcluidas
-  FROM acoes AS a
-  WHERE a.pilarId = :pilarId
+    SELECT
+      a.id,
+      a.nome,
+      a.descricao,
+      a.dataInicio,
+      a.dataPrazo,    
+      a.pilarId,    
+      a.status,
+      a.criado_por,
+      a.data_criacao  ,
+      COUNT(at.id)    AS totalAtividades,
+      SUM(
+        CASE WHEN at.status = 'concluida' THEN 1 
+             ELSE 0 
+        END
+      ) AS ativasConcluidas
+    FROM acoes AS a
+    LEFT JOIN atividades AS at
+      ON at.acaoId = a.id
+    WHERE a.pilarId = :pilarId
+    GROUP BY a.id
 """)
     fun listarPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>>
 
-
-
-
 }
+
+
+
+
+
+
+
+

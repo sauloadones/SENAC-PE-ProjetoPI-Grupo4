@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appsenkaspi.Converters.StatusAcao
 import com.example.appsenkaspi.databinding.FragmentCriarAcaoBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -128,7 +129,11 @@ class CriarAcaoFragment : Fragment() {
                     descricao  = descricao,
                     dataInicio = Date(),
                     dataPrazo  = dataPrazoSelecionada!!,
-                    pilarId    = pilarId
+                    pilarId    = pilarId,
+                    status      = StatusAcao.PLANEJADA,
+                    criadoPor   = 1, // <- pegue o ID real do usuário logado
+                    dataCriacao = Date()
+
                 )
             )
             // relaciona cada funcionário à ação

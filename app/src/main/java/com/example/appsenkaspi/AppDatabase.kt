@@ -16,10 +16,11 @@ import androidx.room.TypeConverters
         AcaoFuncionarioEntity::class,
         AtividadeFuncionarioEntity::class,
     ],
-    version = 2, // ou 3 se já atualizou
+    version = 3, // ou 3 se já atualizou
     exportSchema = false
 )
 @TypeConverters(Converters::class)
+
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun pilarDao(): PilarDao
