@@ -30,8 +30,9 @@ class EsqueciSenhaDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+        val density = resources.displayMetrics.density
         dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
+            (320 * density).toInt(), // Altere esse valor conforme necessário
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
