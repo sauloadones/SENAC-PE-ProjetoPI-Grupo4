@@ -38,6 +38,8 @@
         android:hint="ID"
         android:textColor="#FFFFFF"
         android:textColorHint="#EAEAEA"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:background="@drawable/rounded_input"
         android:layout_gravity="center_horizontal" />
 
@@ -47,7 +49,7 @@
         android:layout_height="48dp"
         android:text="Entrar"
         android:layout_marginTop="24dp"
-        android:background="@drawable/roudend_button"
+        android:backgroundTint="#164773"
         android:textColor="#FFFFFF"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>
