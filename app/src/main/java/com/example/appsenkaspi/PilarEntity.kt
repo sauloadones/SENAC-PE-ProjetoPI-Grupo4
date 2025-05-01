@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.Converters.StatusPilar
 import java.util.Date
 
@@ -14,11 +13,11 @@ import java.util.Date
             ForeignKey(
                 entity = FuncionarioEntity::class,
                 parentColumns = ["id"],
-                childColumns = ["criado_por"],
+                childColumns = ["criadoPor"],
                 onDelete = ForeignKey.CASCADE
             )
             ],
-        indices = [Index(value = ["criado_por"])]
+        indices = [Index(value = ["criadoPor"])]
 )
 data class PilarEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -27,9 +26,9 @@ data class PilarEntity(
     val dataInicio: Date,
     val dataPrazo: Date,
     val dataCriacao: Date,
-    val criadoPor: Int,
+    val criadoPor: Int.Companion,
 
     @ColumnInfo(name = "status") val status: StatusPilar,
 
 
-)
+    )
