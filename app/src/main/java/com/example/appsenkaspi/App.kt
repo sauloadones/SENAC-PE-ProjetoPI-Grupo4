@@ -15,6 +15,7 @@ class App : Application() {
             applicationContext,
             AppDatabase::class.java,
             "appsenkaspi-db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 }

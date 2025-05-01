@@ -16,8 +16,8 @@ class PilarAdapter(
         private val textNomePilar: TextView = itemView.findViewById(R.id.textNomePilar)
         private val cardPilar: CardView = itemView.findViewById(R.id.cardPilar)
 
-        fun bind(pilar: PilarEntity) {
-            textNomePilar.text = pilar.nome
+        fun bind(pilar: PilarEntity, position: Int) {
+            textNomePilar.text = "${position + 1}º Pilar" // ✅ Agora mostra no estilo 1º, 2º, 3º
             cardPilar.setOnClickListener {
                 onClickPilar(pilar)
             }
@@ -31,6 +31,6 @@ class PilarAdapter(
     }
 
     override fun onBindViewHolder(holder: PilarViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position)
     }
 }

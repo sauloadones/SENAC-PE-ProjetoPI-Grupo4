@@ -5,112 +5,145 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.fragment.app.Fragment
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.appsenkaspi.Converters.StatusPilar
+import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class CriarPilarFragment : Fragment() {
 
-    private lateinit var inputNomePilar: EditText
-    private lateinit var inputDescricao: EditText
-    private lateinit var buttonPickDate: Button
-    private lateinit var buttonAddSubpilar: LinearLayout
-    private lateinit var confirmarButtonWrapper: FrameLayout
-    private lateinit var recyclerViewSubpilares: RecyclerView
+    private var _binding: FragmentCriarPilarBinding? = null
+    private val binding get() = _binding!!
+
+    private val pilarViewModel: PilarViewModel        by activityViewModels()
+    private val subpilarViewModel: SubpilarViewModel  by activityViewModels()
+
+    private var dataPrazoSelecionada: Date? = null
+    private val calendario = Calendar.getInstance()
 
     private val listaSubpilares = mutableListOf<String>()
     private lateinit var subpilarAdapter: SubpilarAdapter
 
-    private var dataSelecionada: Date? = null
-    private val calendario = Calendar.getInstance()
-
-    private val homeViewModel: HomeViewModel by activityViewModels {
-        HomeViewModelFactory((requireActivity().application as App).database.pilarDao())
-    }
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_criar_pilar, container, false)
+        _binding = FragmentCriarPilarBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        inputNomePilar = view.findViewById(R.id.inputNomePilar)
-        inputDescricao = view.findViewById(R.id.inputDescricao)
-        buttonPickDate = view.findViewById(R.id.buttonPickDate)
-        buttonAddSubpilar = view.findViewById(R.id.buttonAddSubpilar)
-        confirmarButtonWrapper = view.findViewById(R.id.confirmarButtonWrapper)
-        recyclerViewSubpilares = view.findViewById(R.id.recyclerViewSubpilares)
-
-        configurarRecyclerView()
-
-        buttonPickDate.setOnClickListener {
-            abrirDatePicker()
+        // configura RecyclerView de subpilares
+        subpilarAdapter = SubpilarAdapter(listaSubpilares)
+        binding.recyclerViewSubpilares.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            adapter = subpilarAdapter
         }
 
-        buttonAddSubpilar.setOnClickListener {
-            val prazoSelecionado = dataSelecionada
-            if (prazoSelecionado != null) {
-                val dialog = AdicionarSubpilarDialogFragment(prazoSelecionado)
-                dialog.show(parentFragmentManager, "AdicionarSubpilarDialog")
-            } else {
-                buttonPickDate.error = "Escolha primeiro um prazo para o Pilar"
-            }
-        }
+        // listeners
+        binding.buttonPickDate.setOnClickListener { abrirDatePicker() }
+        binding.buttonAddSubpilar.setOnClickListener { abrirDialogAdicionarSubpilar() }
+        binding.confirmarButtonWrapper.setOnClickListener { confirmarCriacaoPilar() }
 
-        confirmarButtonWrapper.setOnClickListener {
-            confirmarCriacaoPilar()
-        }
-
-        parentFragmentManager.setFragmentResultListener("novoSubpilar", viewLifecycleOwner) { _, bundle ->
-            val nomeSubpilar = bundle.getString("nomeSubpilar")
-            if (nomeSubpilar != null) {
-                listaSubpilares.add(nomeSubpilar)
+        // recebe subpilar criado no diálogo
+        childFragmentManager.setFragmentResultListener("novoSubpilar", viewLifecycleOwner) { _, bundle ->
+            bundle.getString("nomeSubpilar")?.let { nome ->
+                listaSubpilares.add(nome)
                 subpilarAdapter.notifyItemInserted(listaSubpilares.size - 1)
             }
         }
     }
 
-    private fun configurarRecyclerView() {
-        subpilarAdapter = SubpilarAdapter(listaSubpilares)
-        recyclerViewSubpilares.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerViewSubpilares.adapter = subpilarAdapter
-    }
-
     private fun abrirDatePicker() {
-        val datePicker = DatePickerDialog(
+        DatePickerDialog(
             requireContext(),
-            { _, year, month, dayOfMonth ->
-                calendario.set(year, month, dayOfMonth)
-                dataSelecionada = calendario.time
-                val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                buttonPickDate.text = formato.format(dataSelecionada!!)
+            { _, year, month, day ->
+                calendario.set(year, month, day)
+                dataPrazoSelecionada = calendario.time
+                val fmt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                binding.buttonPickDate.text = fmt.format(dataPrazoSelecionada!!)
             },
             calendario.get(Calendar.YEAR),
             calendario.get(Calendar.MONTH),
             calendario.get(Calendar.DAY_OF_MONTH)
-        )
-        datePicker.show()
+        ).show()
+    }
+
+    private fun abrirDialogAdicionarSubpilar() {
+        dataPrazoSelecionada?.let { prazo ->
+            AdicionarSubpilarDialogFragment.newInstance(-1, prazo)
+                .show(childFragmentManager, "AdicionarSubpilarDialog")
+        } ?: run {
+            binding.buttonPickDate.error = "Escolha primeiro um prazo"
+        }
     }
 
     private fun confirmarCriacaoPilar() {
-        val nome = inputNomePilar.text.toString().trim()
-        val descricao = inputDescricao.text.toString().trim()
+        val nome      = binding.inputNomePilar.text.toString().trim()
+        val descricao = binding.inputDescricao.text.toString().trim()
+        val prazo     = dataPrazoSelecionada
 
         if (nome.isEmpty()) {
-            inputNomePilar.error = "Nome obrigatório"
+            binding.inputNomePilar.error = "Digite o nome do Pilar"
+            return
+        }
+        if (prazo == null) {
+            binding.buttonPickDate.error = "Escolha um prazo"
             return
         }
 
-        homeViewModel.adicionarPilar(nome, descricao, dataSelecionada)
+        viewLifecycleOwner.lifecycleScope.launch {
+            // insere pilar e obtém ID
+            val idLong = pilarViewModel.inserirRetornandoId(
+                PilarEntity(
+                    nome       = nome,
+                    descricao  = descricao,
+                    dataInicio = Date(),
+                    dataPrazo  = prazo,
+                    status      = StatusPilar.VENCIDO,
+                    dataCriacao = Date()
 
-        parentFragmentManager.popBackStack()
+                )
+            )
+            val novoId = idLong.toInt()
+
+            // insere subpilares
+            listaSubpilares.forEach { subNome ->
+                subpilarViewModel.inserir(
+                    SubpilarEntity(
+                        nome       = subNome,
+                        descricao  = null,
+                        dataInicio = Date(),
+                        dataPrazo  = prazo,
+                        pilarId    = novoId
+                    )
+                )
+            }
+
+            // navega para TelaPilarFragment
+            parentFragmentManager.beginTransaction()
+                .replace(
+                    R.id.main_container,
+                    TelaPilarFragment().apply {
+                        arguments = Bundle().apply { putInt("pilarId", novoId) }
+                    }
+                )
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
