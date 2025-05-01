@@ -8,6 +8,9 @@ import androidx.room.*
 @Dao
 interface FuncionarioDao {
 
+    @Query("SELECT * FROM funcionarios WHERE nomeUsuario = :usuario AND senha = :senha LIMIT 1")
+    suspend fun autenticar(usuario: String, senha: String): FuncionarioEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirFuncionario(funcionario: FuncionarioEntity)
 

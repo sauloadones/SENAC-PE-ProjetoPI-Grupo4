@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -105,13 +104,13 @@ class CriarPilarFragment : Fragment() {
             // insere pilar e obtém ID
             val idLong = pilarViewModel.inserirRetornandoId(
                 PilarEntity(
-                    nome       = nome,
-                    descricao  = descricao,
+                    nome = nome,
+                    descricao = descricao,
                     dataInicio = Date(),
-                    dataPrazo  = prazo,
-                    status      = StatusPilar.VENCIDO,
-                    dataCriacao = Date()
-
+                    dataPrazo = prazo,
+                    status = StatusPilar.VENCIDO,
+                    dataCriacao = Date(),
+                    criadoPor = Int
                 )
             )
             val novoId = idLong.toInt()
