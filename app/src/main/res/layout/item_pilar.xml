@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardPilar"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="12dp"
+    card_view:cardElevation="4dp"
+    card_view:cardBackgroundColor="#164773"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp">
 
     <TextView
-        android:id="@+id/nomePilar"
-        android:layout_width="wrap_content"
+        android:id="@+id/textNomePilar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pilar"
-        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:text="Nome do Pilar"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
-        android:layout_gravity="center"/>
-</FrameLayout>
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center" />
+
+</androidx.cardview.widget.CardView>
+
+

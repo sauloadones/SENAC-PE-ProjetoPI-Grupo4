@@ -1,7 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.kapt") // <- Escreve isso direto, sem alias
+    id("org.jetbrains.kotlin.plugin.parcelize")
+
+
 }
+
+
 
 android {
     namespace = "com.example.appsenkaspi"
@@ -27,11 +33,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11 // ou 17
+        targetCompatibility = JavaVersion.VERSION_11 // ou 17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "11" // ou 17
     }
     buildFeatures {
         viewBinding = true
@@ -39,14 +45,27 @@ android {
 }
 
 dependencies {
-
+    // AndroidX e Material
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.fragment.ktx)
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+
+    // ViewModel e Lifecycle
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Testes
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
 }
+

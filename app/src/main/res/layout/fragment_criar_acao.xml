@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2C2C2C"
+    android:padding="16dp">
+
+    <!-- TopBar -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_bar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Nome da Ação -->
+    <TextView
+        android:id="@+id/tituloNomeAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome da Ação"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <EditText
+        android:id="@+id/inputNomeAcao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Digite o nome da ação"
+        android:background="@drawable/bg_input_box"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#CCCCCC"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tituloNomeAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Descrição da Ação -->
+    <TextView
+        android:id="@+id/tituloDescricaoAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descrição"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/inputNomeAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <EditText
+        android:id="@+id/inputDescricaoAcao"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:hint="Digite a descrição da ação"
+        android:background="@drawable/bg_input_box"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#CCCCCC"
+        android:padding="12dp"
+        android:gravity="start|top"
+        app:layout_constraintTop_toBottomOf="@id/tituloDescricaoAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Prazo da Ação -->
+    <TextView
+        android:id="@+id/tituloDataPrazoAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data de prazo da ação"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/inputDescricaoAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/buttonPickDateAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="Selecionar Prazo"
+        android:backgroundTint="#8D8D8D"
+        android:textColor="#000000"
+        android:drawableEnd="@drawable/ic_calendar"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tituloDataPrazoAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Selecionar Responsáveis -->
+    <LinearLayout
+        android:id="@+id/buttonAddAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/buttonPickDateAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/textSelecionarFuncionario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Responsáveis (Opcional)"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/iconSelecionarFuncionario"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_add_circle_custom"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
+
+    <!-- Lista de Responsáveis Selecionados -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFuncionariosSelecionados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/buttonAddAcao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/box_perfil"/>
+
+    <!-- Botão Confirmar Ação -->
+    <FrameLayout
+        android:id="@+id/buttonConfirmacaoAcao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:background="@drawable/bg_button_confirmar"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/recyclerViewFuncionariosSelecionados"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp">
+
+        <TextView
+            android:id="@+id/textConfirmarAcao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Confirmar Ação"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"/>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
