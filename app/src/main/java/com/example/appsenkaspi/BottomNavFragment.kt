@@ -24,8 +24,10 @@ class BottomNavFragment : Fragment() {
         setupClickListeners()
 
         // Inicializa com Home selecionado
-        updateIndicator(R.id.nav_home)
-        navigateTo(HomeFragment())
+        binding.root.post {
+            updateIndicator(R.id.nav_home)
+            navigateTo(HomeFragment())
+        }
     }
 
     private fun setupClickListeners() {
@@ -48,18 +50,37 @@ class BottomNavFragment : Fragment() {
     }
 
     private fun updateIndicator(selectedId: Int) {
-        binding.indicatorRelatorio.visibility = if (selectedId == R.id.nav_relatorio) View.VISIBLE else View.INVISIBLE
-        binding.indicatorDashboard.visibility = if (selectedId == R.id.nav_dashboard) View.VISIBLE else View.INVISIBLE
-        binding.indicatorHome.visibility = if (selectedId == R.id.nav_home) View.VISIBLE else View.INVISIBLE
-        binding.indicatorPerfil.visibility = if (selectedId == R.id.nav_perfil) View.VISIBLE else View.INVISIBLE
+        val itemViews = mapOf(
+            R.id.nav_relatorio to binding.navRelatorio,
+            R.id.nav_dashboard to binding.navDashboard,
+            R.id.nav_home to binding.navHome,
+            R.id.nav_perfil to binding.navPerfil
+        )
 
-        // ATUALIZA SELEÇÃO VISUAL
-        binding.iconRelatorio.isSelected = (selectedId == R.id.nav_relatorio)
-        binding.iconDashboard.isSelected = (selectedId == R.id.nav_dashboard)
-        binding.iconHome.isSelected = (selectedId == R.id.nav_home)
-        binding.iconPerfil.isSelected = (selectedId == R.id.nav_perfil)
+        val icons = mapOf(
+            R.id.nav_relatorio to binding.iconRelatorio,
+            R.id.nav_dashboard to binding.iconDashboard,
+            R.id.nav_home to binding.iconHome,
+            R.id.nav_perfil to binding.iconPerfil
+        )
+
+        val selectedView = itemViews[selectedId] ?: return
+        val indicator = binding.indicatorSlider
+
+        selectedView.post {
+            // Calcula o centro do item e centraliza o indicador com base nisso
+            val targetX = selectedView.left + selectedView.width / 2 - indicator.width / 2
+            indicator.animate()
+                .translationX(targetX.toFloat())
+                .setDuration(250)
+                .start()
+        }
+
+        // Atualiza ícones selecionados
+        icons.forEach { (id, icon) ->
+            icon.isSelected = (id == selectedId)
+        }
     }
-
 
     private fun navigateTo(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction()
