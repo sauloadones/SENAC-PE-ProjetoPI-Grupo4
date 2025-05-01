@@ -37,7 +37,7 @@
         android:layout_marginTop="16dp"
         android:hint="ID"
         android:textColor="#FFFFFF"
-        android:textColorHint="#EAEAEA"
+        android:textColorHint="#B4B4B4"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:background="@drawable/rounded_input"
