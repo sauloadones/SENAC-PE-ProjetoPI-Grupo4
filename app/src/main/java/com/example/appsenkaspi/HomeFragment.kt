@@ -9,8 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 
 class HomeFragment : Fragment() {
 
@@ -31,11 +29,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        activity?.window?.statusBarColor = ContextCompat.getColor(requireContext(), R.color.graybar)
-        activity?.window?.let { window ->
-            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
-        }
 
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
