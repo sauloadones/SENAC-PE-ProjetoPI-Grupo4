@@ -1,11 +1,18 @@
 package com.example.appsenkaspi
 
-import androidx.lifecycle.LiveData
+
 import androidx.room.*
 import com.example.appsenkaspi.data.AcaoComStatus
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 @Dao
 interface AcaoDao {
+
+
 
     /**
      * Insere uma Ação no banco e retorna o ID gerado.
@@ -38,12 +45,16 @@ interface AcaoDao {
     @Query("SELECT * FROM acoes WHERE id = :id")
     suspend fun buscarAcaoPorId(id: Int): AcaoEntity?
 
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    fun getAcaoById(id: Int): LiveData<AcaoEntity?>
+
+
+
     /**
      * Retorna a Ação junto com os Funcionários relacionados.
      */
     @Transaction
-    @Query("SELECT * FROM acoes WHERE id = :acaoId")
-    fun buscarAcaoComFuncionarios(acaoId: Int): LiveData<AcaoComFuncionarios>
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirRetornandoId(acao: AcaoEntity): Long

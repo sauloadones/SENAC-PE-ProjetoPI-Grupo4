@@ -26,7 +26,7 @@ data class PilarEntity(
     val dataInicio: Date,
     val dataPrazo: Date,
     val dataCriacao: Date,
-    val criadoPor: Int.Companion,
+    val criadoPor: Int,
 
     @ColumnInfo(name = "status") val status: StatusPilar,
 

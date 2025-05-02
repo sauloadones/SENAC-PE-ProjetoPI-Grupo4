@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -12,8 +13,15 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class LoginDialogFragment : DialogFragment() {
+
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = LayoutInflater.from(context).inflate(R.layout.login_popup, null)
 
@@ -25,39 +33,62 @@ class LoginDialogFragment : DialogFragment() {
 
         // Lógica de mostrar/ocultar senha
         var senhaVisivel = false
-        editTextSenha.setOnTouchListener { _, event ->
+        editTextSenha.setOnTouchListener { v, event ->
             val DRAWABLE_END = 2
-            if (event.action == MotionEvent.ACTION_UP &&
-                event.rawX >= (editTextSenha.right - editTextSenha.compoundDrawables[DRAWABLE_END].bounds.width())) {
-
-                senhaVisivel = !senhaVisivel
-
-                if (senhaVisivel) {
-                    editTextSenha.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                    editTextSenha.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_open_eye, 0)
-                } else {
-                    editTextSenha.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                    editTextSenha.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_closed_eye, 0)
+            val drawable = editTextSenha.compoundDrawables[DRAWABLE_END]
+            if (drawable != null && event.action == MotionEvent.ACTION_UP) {
+                val touchAreaStart = editTextSenha.right - drawable.bounds.width() - 20
+                if (event.rawX >= touchAreaStart) {
+                    senhaVisivel = !senhaVisivel
+                    if (senhaVisivel) {
+                        editTextSenha.inputType =
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                        editTextSenha.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_open_eye, 0)
+                    } else {
+                        editTextSenha.inputType =
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        editTextSenha.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_closed_eye, 0)
+                    }
+                    editTextSenha.setSelection(editTextSenha.text.length)
+                    v.performClick()
+                    return@setOnTouchListener true
                 }
-
-                // Mantém o cursor no final do texto
-                editTextSenha.setSelection(editTextSenha.text.length)
-
-                true
-            } else {
-                false
             }
+            false
         }
 
         buttonEntrar.setOnClickListener {
-            val id = editTextId.text.toString()
-            val senha = editTextSenha.text.toString()
+            val idAcesso = editTextId.text.toString().trim().toIntOrNull()
+            val senha = editTextSenha.text.toString().trim()
 
-            // Inicia a TelaPrincipalActivity
-            val intent = Intent(requireContext(), TelaPrincipalActivity::class.java)
-            startActivity(intent)
+            if (idAcesso == null || senha.isEmpty()) {
+                Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            dismiss()
+            // Executa a verificação em background
+            lifecycleScope.launch {
+                val dao = AppDatabase.getDatabase(requireContext()).funcionarioDao()
+                val funcionario = dao.autenticar(idAcesso, senha)
+
+                if (funcionario != null) {
+                    // 1. Salva o ID no SharedPreferences
+                    val prefs = requireContext().getSharedPreferences("loginPrefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putInt("funcionarioId", funcionario.id).apply()
+                    prefs.edit().putBoolean("lembrarLogin", checkBox.isChecked).apply()
+
+
+
+                    // 2. Salva no ViewModel (sessão atual)
+                    funcionarioViewModel.logarFuncionario(funcionario)
+
+                    // 3. Navega para a tela principal
+                    startActivity(Intent(requireContext(), TelaPrincipalActivity::class.java))
+                    dismiss()
+                } else {
+                    Toast.makeText(context, "Usuário ou senha inválidos", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         textEsqueceu.setOnClickListener {

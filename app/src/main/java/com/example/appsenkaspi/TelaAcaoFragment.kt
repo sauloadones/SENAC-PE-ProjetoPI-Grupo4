@@ -1,6 +1,7 @@
 package com.example.appsenkaspi
 
 import android.animation.ObjectAnimator
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.transition.AutoTransition
@@ -9,31 +10,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.appsenkaspi.databinding.FragmentTelaPilarBinding
+import androidx.lifecycle.lifecycleScope
+import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class TelaPilarFragment : Fragment() {
+class TelaAcaoFragment : Fragment() {
 
-    private var _binding: FragmentTelaPilarBinding? = null
+    private var _binding: FragmentTelaAcaoBinding? = null
     private val binding get() = _binding!!
 
     private val pilarViewModel: PilarViewModel by activityViewModels()
     private val acaoViewModel: AcaoViewModel by activityViewModels()
-
-    private var pilarId: Int = -1
-    private lateinit var acaoAdapter: AcaoAdapter
+    private val atividadeViewModel: AtividadeViewModel by activityViewModels()
+    private var acaoId: Int = -1
+    private lateinit var atividadeAdapter: AtividadeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTelaPilarBinding.inflate(inflater, container, false)
+        _binding = FragmentTelaAcaoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,57 +44,59 @@ class TelaPilarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
 
-        // 1) Recupera o ID
-        pilarId = arguments?.getInt("pilarId") ?: -1
-        if (pilarId == -1) {
-            Toast.makeText(requireContext(), "Pilar inválido!", Toast.LENGTH_SHORT).show()
+        acaoId = arguments?.getInt("acaoId") ?: -1
+        if (acaoId == -1) {
+            Toast.makeText(requireContext(), "Acao Invalida!", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
             return
         }
 
-        // 2) OBSERVA o LiveData do ViewModel
-        pilarViewModel.getPilarById(pilarId)
-            .observe(viewLifecycleOwner) { pilar ->
-                if (pilar != null) {
-                    preencherCamposComPilar(pilar)
+        acaoViewModel.getAcaoById(acaoId)
+            .observe(viewLifecycleOwner) { acao ->
+                if (acao != null) {
+                    preencherCamposComAcao(acao)
                 } else {
-                    Toast.makeText(requireContext(), "Pilar não encontrado!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Ação não encontrada!", Toast.LENGTH_SHORT).show()
                     parentFragmentManager.popBackStack()
                 }
             }
 
-        configurarRecycler()
         configurarBotoes()
         binding.iconeMenu.setOnClickListener { toggleSobre() }
-        observarAcoes()
+        observarAtividades()
     }
 
-    private fun preencherCamposComPilar(pilar: PilarEntity) {
-        binding.tituloPilar.text = "${pilar.id}° Pilar"
-        binding.subtituloPilar.apply {
-            text = pilar.nome.ifBlank { "Sem nome" }
-            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        }
+    private fun preencherCamposComAcao(acao: AcaoEntity) {
+        binding.tituloAcao.text = acao.nome.ifBlank { "Ação sem nome" }
+
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
-        binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
+        binding.dataPrazoPilar.text = "Prazo: ${sdf.format(acao.dataPrazo)}"
+
+        binding.textoSobre.text = acao.descricao.ifBlank { "Nenhuma descrição adicionada." }
+
         animarProgresso(0)
     }
 
     private fun configurarBotoes() {
-        binding.cardEditarPilar.setOnClickListener {
+        binding.cardEditarAcao.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main_container, EditarPilarFragment().apply {
-                    arguments = Bundle().apply { putInt("pilarId", pilarId) }
-                })
+                .replace(
+                    R.id.main_container,
+                    EditarPilarFragment().apply {
+                        arguments = Bundle().apply { putInt("acaoId", acaoId) }
+                    }
+                )
                 .addToBackStack(null)
                 .commit()
         }
-        binding.cardAdicionarAcoes.setOnClickListener {
+        binding.cardAdicionarAtividade.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main_container, CriarAcaoFragment().apply {
-                    arguments = Bundle().apply { putInt("pilarId", pilarId) }
-                })
+                .replace(
+                    R.id.main_container,
+                    CriarAcaoFragment().apply {
+                        arguments = Bundle().apply { putInt("acaoId", acaoId) }
+                    }
+                )
                 .addToBackStack(null)
                 .commit()
         }
@@ -112,44 +117,30 @@ class TelaPilarFragment : Fragment() {
     }
 
     private fun animarProgresso(target: Int) {
-        ObjectAnimator.ofInt(binding.progressoPilar, "progress", target).apply {
+        ObjectAnimator.ofInt(binding.progressoAcao, "progress", target).apply {
             duration = 500
             start()
         }
         binding.percentual.text = "$target%"
     }
 
-    private fun configurarRecycler() {
-        binding.recyclerAcoes.layoutManager = LinearLayoutManager(requireContext())
-        acaoAdapter = AcaoAdapter { acao -> abrirTelaAcao(acao) }
-        binding.recyclerAcoes.adapter = acaoAdapter
-    }
-
-
-    private fun observarAcoes() {
-        val recycler = binding.recyclerAcoes
+    private fun observarAtividades() {
+        val recycler = binding.recyclerAtividades
         val emptyView = binding.emptyStateView
 
-        acaoViewModel.listarPorPilar(pilarId).observe(viewLifecycleOwner) { lista ->
-            if (lista.isNullOrEmpty()) {
+        atividadeAdapter = AtividadeAdapter()
+        recycler.adapter = atividadeAdapter
+
+        atividadeViewModel.listarAtividadesPorAcao(acaoId).observe(viewLifecycleOwner) { atividades ->
+            if (atividades.isNullOrEmpty()) {
                 recycler.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
             } else {
                 recycler.visibility = View.VISIBLE
                 emptyView.visibility = View.GONE
-                acaoAdapter.submitList(lista)
+                atividadeAdapter.submitList(atividades)
             }
         }
-    }
-
-    private fun abrirTelaAcao(acao: AcaoEntity) {
-        val fragment = TelaAcaoFragment().apply {
-            arguments = Bundle().apply { putInt("acaoId", acao.id) }
-        }
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.main_container, fragment)
-            .addToBackStack(null)
-            .commit()
     }
 
     override fun onDestroyView() {

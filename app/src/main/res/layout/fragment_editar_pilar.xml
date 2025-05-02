@@ -37,9 +37,9 @@
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_more_vert"
         android:contentDescription="Menu"
-        android:tint="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="#FFFFFF" />
 
     <!-- Campo Nome -->
     <EditText

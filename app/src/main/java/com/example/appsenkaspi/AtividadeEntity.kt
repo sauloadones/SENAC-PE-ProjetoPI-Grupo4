@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.appsenkaspi.Converters.PrioridadeAtividade
 import com.example.appsenkaspi.Converters.StatusAcao
 import com.example.appsenkaspi.Converters.StatusAtividade
 import java.util.Date
@@ -42,6 +43,7 @@ data class AtividadeEntity(
     val acaoId: Int,
     val funcionarioId: Int, // 🔵 NOVO: quem é o responsável por esta atividade
     @ColumnInfo(name = "status") val status: StatusAtividade,
+    @ColumnInfo(name = "prioridade") val prioridade: PrioridadeAtividade,
 
     @ColumnInfo(name = "criado_por")
     val criadoPor: Int,

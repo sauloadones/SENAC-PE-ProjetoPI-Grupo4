@@ -1,9 +1,15 @@
 package com.example.appsenkaspi
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.appsenkaspi.Converters.Cargo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(
     entities = [
@@ -38,18 +44,59 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: android.content.Context): AppDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_database"
+                    "appsenkaspi.db"
                 )
-                    .fallbackToDestructiveMigration()  // Atualiza sem crash se mudar estrutura
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            // Executado apenas na criação do banco
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val dao = getDatabase(context).funcionarioDao()
+                                dao.inserirTodos(listOf(
+                                    FuncionarioEntity(
+                                        nomeCompleto = "Ana Beatriz Souza",
+                                        email = "ana.souza@example.com",
+                                        cargo = Cargo.COORDENADOR,
+                                        fotoPerfil = "https://i.pravatar.cc/150?img=1",
+                                        nomeUsuario = "ana.souza",
+                                        senha = "senha123",
+                                        idAcesso = 1
+                                    ),
+                                    FuncionarioEntity(
+                                        nomeCompleto = "Fernanda Oliveira",
+                                        email = "fernanda.oliveira@example.com",
+                                        cargo = Cargo.APOIO,
+                                        fotoPerfil = "https://i.pravatar.cc/150?img=3",
+                                        nomeUsuario = "fernanda.oliveira",
+                                        senha = "senha123",
+                                        idAcesso = 3
+                                    ),
+                                    FuncionarioEntity(
+                                        nomeCompleto = "Carlos Eduardo Silva",
+                                        email = "carlos.silva@example.com",
+                                        cargo = Cargo.GESTOR,
+                                        fotoPerfil = "https://i.pravatar.cc/150?img=2",
+                                        nomeUsuario = "carlos.silva",
+                                        senha = "senha123",
+                                        idAcesso = 2
+                                    ),
+                                    // adicione quantos quiser…
+                                )
+                                    // outros funcionários...
+                                )
+                            }
+                        }
+                    })
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
     }
+
 }
