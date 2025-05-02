@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+@Suppress("DEPRECATION")
 class HomeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
