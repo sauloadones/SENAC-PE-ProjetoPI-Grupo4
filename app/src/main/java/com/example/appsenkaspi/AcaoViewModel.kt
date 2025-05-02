@@ -14,6 +14,9 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
         return acaoDao.listarAcoesPorPilar(pilarId)
     }
 
+    fun getAcaoById(id: Int): LiveData<AcaoEntity?> =
+        acaoDao.getAcaoById(id)
+
     fun inserir(acao: AcaoEntity) = viewModelScope.launch {
         acaoDao.inserirAcao(acao)
     }

@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 
 class AtividadeViewModel(application: Application) : AndroidViewModel(application) {
 
+
+
     private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
 
     fun listarAtividadesPorAcao(acaoId: Int): LiveData<List<AtividadeEntity>> {
@@ -25,4 +27,5 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
     fun deletar(atividade: AtividadeEntity) = viewModelScope.launch {
         atividadeDao.deletarAtividade(atividade)
     }
+
 }

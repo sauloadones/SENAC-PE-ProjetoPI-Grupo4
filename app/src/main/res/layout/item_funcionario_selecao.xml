@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:padding="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#24527B">
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:background="#164773">
+
+    <ImageView
+        android:id="@+id/imageViewFotoPerfil"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_perfil_circular"
+        android:padding="4dp" />
 
     <CheckBox
         android:id="@+id/checkFuncionario"
@@ -13,5 +23,6 @@
         android:layout_height="wrap_content"
         android:text="Nome do Funcionário"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium" />
 </LinearLayout>

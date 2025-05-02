@@ -1,5 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_deletar_pilar"
-        android:title="Deletar Pilar"/>
+        android:id="@+id/action_deletar"
+        android:title="Deletar"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="always" />
 </menu>

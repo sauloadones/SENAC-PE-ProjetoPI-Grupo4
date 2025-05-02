@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.Converters.StatusPilar
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
+import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,6 +42,8 @@ class CriarPilarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        configurarBotaoVoltar(view)
 
         // configura RecyclerView de subpilares
         subpilarAdapter = SubpilarAdapter(listaSubpilares)
@@ -86,6 +90,8 @@ class CriarPilarFragment : Fragment() {
         }
     }
 
+
+
     private fun confirmarCriacaoPilar() {
         val nome      = binding.inputNomePilar.text.toString().trim()
         val descricao = binding.inputDescricao.text.toString().trim()
@@ -99,6 +105,12 @@ class CriarPilarFragment : Fragment() {
             binding.buttonPickDate.error = "Escolha um prazo"
             return
         }
+        val prefs = requireContext().getSharedPreferences("loginPrefs", android.content.Context.MODE_PRIVATE)
+        val funcionarioId = prefs.getInt("funcionarioId", -1)
+        if (funcionarioId == -1) {
+            Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
+            return
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             // insere pilar e obtém ID
@@ -110,7 +122,7 @@ class CriarPilarFragment : Fragment() {
                     dataPrazo = prazo,
                     status = StatusPilar.VENCIDO,
                     dataCriacao = Date(),
-                    criadoPor = Int
+                    criadoPor = funcionarioId
                 )
             )
             val novoId = idLong.toInt()

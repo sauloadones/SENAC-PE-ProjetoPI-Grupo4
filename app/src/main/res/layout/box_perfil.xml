@@ -8,25 +8,21 @@
     android:gravity="center_vertical"
     android:background="#164773">
 
-    <!-- Foto de perfil circular -->
     <ImageView
         android:id="@+id/imageViewFotoPerfil"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:scaleType="centerCrop"
-
+        android:layout_marginEnd="12dp"
         android:background="@drawable/bg_perfil_circular"
-        android:padding="4dp"
-        android:layout_marginEnd="12dp" />
+        android:padding="4dp" />
 
-    <!-- Nome do Responsável -->
     <TextView
         android:id="@+id/textViewNomeFuncionario"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nome do Funcionario"
+        android:text="Nome do Funcionário"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:fontFamily="sans-serif-medium" />
-
 </LinearLayout>

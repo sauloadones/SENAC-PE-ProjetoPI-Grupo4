@@ -71,7 +71,7 @@
                                 android:orientation="vertical">
 
                                 <TextView
-                                    android:id="@+id/tituloPilar"
+                                    android:id="@+id/tituloAcao"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="1° Pilar"
@@ -79,15 +79,6 @@
                                     android:textSize="18sp"
                                     android:fontFamily="sans-serif-medium"
                                     android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/subtituloPilar"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Titulo Pilar"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="16sp"
-                                    android:fontFamily="sans-serif" />
 
                                 <TextView
                                     android:id="@+id/dataPrazoPilar"
@@ -119,7 +110,7 @@
                             android:layout_marginTop="16dp">
 
                             <ProgressBar
-                                android:id="@+id/progressoPilar"
+                                android:id="@+id/progressoAcao"
                                 style="@android:style/Widget.ProgressBar.Horizontal"
                                 android:layout_width="0dp"
                                 android:layout_height="16dp"
@@ -169,7 +160,7 @@
                             android:textSize="14sp"
                             android:layout_marginTop="8dp" />
 
-                        <!-- Botões Ações -->
+                        <!-- Botões Acoes -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -179,7 +170,7 @@
                             android:weightSum="2">
 
                             <androidx.cardview.widget.CardView
-                                android:id="@+id/cardEditarPilar"
+                                android:id="@+id/cardEditarAcao"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -196,14 +187,14 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="Editar Pilar"
+                                    android:text="Editar Ação"
                                     android:textColor="#FFFFFF"
                                     android:textSize="16sp"
                                     android:padding="16dp"/>
                             </androidx.cardview.widget.CardView>
 
                             <androidx.cardview.widget.CardView
-                                android:id="@+id/cardAdicionarAcoes"
+                                android:id="@+id/cardAdicionarAtividade"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -220,7 +211,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="Adicionar Ações"
+                                    android:text="Adicionar Atividade"
                                     android:textColor="#FFFFFF"
                                     android:textSize="16sp"
                                     android:padding="16dp"/>
@@ -234,12 +225,12 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Lista de Ações -->
+            <!-- Lista de Atividades-->
             <TextView
                 android:id="@+id/emptyStateView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nenhuma ação adicionada ainda."
+                android:text="Nenhuma atividade adicionada ainda."
                 android:textColor="#CCCCCC"
                 android:gravity="center"
                 android:padding="32dp"
@@ -247,14 +238,13 @@
                 android:visibility="visible" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerAcoes"
+                android:id="@+id/recyclerAtividades"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:clipToPadding="false"
-                android:paddingHorizontal="16dp"
-                />
+                android:visibility="visible"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="32dp"
+                tools:listitem="@layout/item_atividade" />
 
         </LinearLayout>
     </ScrollView>
