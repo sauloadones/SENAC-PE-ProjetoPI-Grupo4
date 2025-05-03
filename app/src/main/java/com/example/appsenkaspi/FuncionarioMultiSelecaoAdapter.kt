@@ -47,6 +47,8 @@ class FuncionarioMultiSelecaoAdapter(
         holder.bind(getItem(position))
     }
 
+
+
     class DiffCallback : DiffUtil.ItemCallback<FuncionarioEntity>() {
         override fun areItemsTheSame(a: FuncionarioEntity, b: FuncionarioEntity) = a.id == b.id
         override fun areContentsTheSame(a: FuncionarioEntity, b: FuncionarioEntity) = a == b

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.appsenkaspi.data.AcaoComStatus
 
 class AcaoAdapter(
+    // ✅ Callback correto para clique na ação
     private val onClick: (AcaoEntity) -> Unit
 ) : ListAdapter<AcaoComStatus, AcaoAdapter.ViewHolder>(AcaoDiffCallback()) {
 
@@ -35,7 +36,11 @@ class AcaoAdapter(
             progresso.progress = pct
 
             seta.setColorFilter(Color.GREEN)
-            itemView.setOnClickListener { onClick(acao) }
+
+            // ✅ Clique no card chama o callback passado no construtor
+            itemView.setOnClickListener {
+                onClick(acao)
+            }
         }
     }
 
@@ -46,6 +51,7 @@ class AcaoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         holder.bind(getItem(position))
     }
 }

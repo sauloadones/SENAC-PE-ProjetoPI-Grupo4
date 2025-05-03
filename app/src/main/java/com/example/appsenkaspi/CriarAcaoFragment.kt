@@ -55,7 +55,7 @@ class CriarAcaoFragment : Fragment() {
         binding.buttonPickDateAcao.setOnClickListener { abrirDatePicker() }
         binding.iconSelecionarFuncionario
             .setOnClickListener {
-                SelecionarFuncionariosDialogFragment()
+                SelecionarResponsavelDialogFragment()
                     .show(childFragmentManager, "SelecionarFuncionariosDialog")
             }
         binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
@@ -99,7 +99,7 @@ class CriarAcaoFragment : Fragment() {
 
     private fun abrirDialogSelecionarFuncionarios() {
         // **AGORA** usa childFragmentManager
-        SelecionarFuncionariosDialogFragment()
+        SelecionarResponsavelDialogFragment()
             .show(childFragmentManager, "SelecionarFuncionariosDialog")
     }
 
