@@ -8,16 +8,17 @@ import androidx.room.Index
 import com.example.appsenkaspi.Converters.StatusPilar
 import java.util.Date
 
-@Entity(tableName = "pilares",
-        foreignKeys = [
-            ForeignKey(
-                entity = FuncionarioEntity::class,
-                parentColumns = ["id"],
-                childColumns = ["criadoPor"],
-                onDelete = ForeignKey.CASCADE
-            )
-            ],
-        indices = [Index(value = ["criadoPor"])]
+@Entity(
+    tableName = "pilares",
+    foreignKeys = [
+        ForeignKey(
+            entity = FuncionarioEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["criado_por"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["criado_por"])]
 )
 data class PilarEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -26,6 +27,7 @@ data class PilarEntity(
     val dataInicio: Date,
     val dataPrazo: Date,
     val dataCriacao: Date,
+    @ColumnInfo(name = "criado_por")
     val criadoPor: Int,
 
     @ColumnInfo(name = "status") val status: StatusPilar,

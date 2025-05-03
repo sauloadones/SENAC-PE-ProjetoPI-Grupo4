@@ -39,6 +39,9 @@ interface AcaoDao {
     @Query("SELECT * FROM acoes WHERE pilarId = :pilarId")
     fun listarAcoesPorPilar(pilarId: Int): LiveData<List<AcaoEntity>>
 
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getAcaoByIdNow(id: Int): AcaoEntity?
+
     /**
      * Busca uma Ação pelo ID.
      */

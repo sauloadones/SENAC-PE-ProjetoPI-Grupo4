@@ -17,6 +17,10 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     fun getAcaoById(id: Int): LiveData<AcaoEntity?> =
         acaoDao.getAcaoById(id)
 
+    suspend fun getAcaoByIdNow(id: Int): AcaoEntity? {
+        return acaoDao.getAcaoByIdNow(id)
+    }
+
     fun inserir(acao: AcaoEntity) = viewModelScope.launch {
         acaoDao.inserirAcao(acao)
     }

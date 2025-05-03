@@ -9,6 +9,10 @@
         <color name="green">#22AA44</color>
         <color name="graybar">#232323</color>
         <color name="graycont">#1E2123</color>
+        <color name="selecionado">#335D8E</color> <!-- Azul claro semi-transparente -->
+        <color name="nao_selecionado">#1E1E1E</color> <!-- Cor original do card -->
+        <color name="cinza_claro">#CCCCCC</color>
+
 
         <color name="gray">#808080</color>
         <color name="light_gray">#CCCCCC</color>

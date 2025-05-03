@@ -18,11 +18,11 @@ import kotlinx.coroutines.launch
         AcaoEntity::class,
         AtividadeEntity::class,
         FuncionarioEntity::class,
-
+        ChecklistItemEntity:: class,
         AcaoFuncionarioEntity::class,
         AtividadeFuncionarioEntity::class,
     ],
-    version = 3, // ou 3 se já atualizou
+    version = 2, // ou 3 se já atualizou
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -34,6 +34,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun acaoDao(): AcaoDao
     abstract fun atividadeDao(): AtividadeDao
     abstract fun funcionarioDao(): FuncionarioDao
+    abstract fun checklistDao(): ChecklistDao
+
 
 
 

@@ -92,7 +92,7 @@ class Converters {
         try {
             PrioridadeAtividade.valueOf(value)
         } catch (e: IllegalArgumentException) {
-            PrioridadeAtividade.BAIXA
+            PrioridadeAtividade.MEDIA
         }
 }
 

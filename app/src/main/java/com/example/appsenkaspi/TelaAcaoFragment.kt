@@ -14,6 +14,7 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
@@ -82,18 +83,19 @@ class TelaAcaoFragment : Fragment() {
             parentFragmentManager.beginTransaction()
                 .replace(
                     R.id.main_container,
-                    EditarPilarFragment().apply {
+                    EditarAcaoFragment().apply {
                         arguments = Bundle().apply { putInt("acaoId", acaoId) }
                     }
                 )
                 .addToBackStack(null)
                 .commit()
         }
+
         binding.cardAdicionarAtividade.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(
                     R.id.main_container,
-                    CriarAcaoFragment().apply {
+                    CriarAtividadeFragment().apply {
                         arguments = Bundle().apply { putInt("acaoId", acaoId) }
                     }
                 )
@@ -128,10 +130,23 @@ class TelaAcaoFragment : Fragment() {
         val recycler = binding.recyclerAtividades
         val emptyView = binding.emptyStateView
 
-        atividadeAdapter = AtividadeAdapter()
+        atividadeAdapter = AtividadeAdapter { atividadeComFuncionarios ->
+            val fragment = TelaAtividadeFragment().apply {
+                arguments = Bundle().apply {
+                    putInt("atividadeId", atividadeComFuncionarios.atividade.id)
+                }
+            }
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.main_container, fragment) // Altere para o ID correto do seu container
+                .addToBackStack(null)
+                .commit()
+        }
+
+        recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = atividadeAdapter
 
-        atividadeViewModel.listarAtividadesPorAcao(acaoId).observe(viewLifecycleOwner) { atividades ->
+        atividadeViewModel.listarAtividadesComFuncionariosPorAcao(acaoId).observe(viewLifecycleOwner) { atividades ->
             if (atividades.isNullOrEmpty()) {
                 recycler.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
