@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <!-- Header fixo no topo -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Título encostado nas bordas -->
+    <TextView
+        android:id="@+id/tituloAtividade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:text="Identificação dos Riscos"
+        android:textColor="#FFFFFF"
+        android:background="#1E4B78"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textAlignment="center" />
+
+    <!-- Conteúdo scrollável com padding -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Descrição com ícone (bg_card aplicado) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="top"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_card">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_text"
+                    android:layout_marginEnd="8dp"
+                    app:tint="#FFFFFF"/>
+
+                <TextView
+                    android:id="@+id/descricaoAtividade"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Descrição detalhada da atividade."
+                    android:textColor="#CCCCCC"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Linha divisória -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#555555"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Barra de prioridade (bg_card já incluso como bg_prioridade) -->
+            <LinearLayout
+                android:id="@+id/layoutPrioridade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_prioridade">
+
+                <ImageView
+                    android:id="@+id/iconPrioridade"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_priority"
+                    android:layout_marginEnd="8dp"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/textPrioridade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prioridade Alta"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Responsáveis (bg_card aplicado) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_card"
+                android:weightSum="1">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_person"
+                    android:layout_marginEnd="8dp"
+                    app:tint="#FFFFFF" />
+
+                <LinearLayout
+                    android:id="@+id/containerResponsaveis"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:orientation="horizontal" />
+            </LinearLayout>
+
+            <!-- Datas (bg_card aplicado) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_card">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_clock"
+                        android:layout_marginEnd="8dp"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/textDataInicio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Data de início: ..."
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textDataPrazo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prazo até: ..."
+                    android:textColor="#CCCCCC"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Botão Adicionar Item -->
+            <Button
+                android:id="@+id/btnAdicionarItemChecklist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adicionar"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#3C82F6"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:drawableStart="@drawable/ic_checklist"
+                android:drawablePadding="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerChecklist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Botões de ação -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btnEditar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Editar atividade"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#3C82F6"
+                    android:layout_marginEnd="16dp" />
+
+                <Button
+                    android:id="@+id/btnDeletar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Deletar"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#E74C3C" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

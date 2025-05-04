@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    android:padding="24dp">
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".MainActivity">
 
     <!-- Logo centralizada no topo -->
     <ImageView
@@ -15,11 +17,22 @@
         android:layout_height="180dp"
         android:src="@drawable/logo"
         android:contentDescription="Logo"
-        tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="60dp" />
+
+    <!-- RippleTouchView deve ser o último para estar por cima -->
+    <com.example.appsenkaspi.RippleTouchView
+        android:id="@+id/rippleView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:clickable="false"
+        android:focusable="false" />
 
     <!-- Botão login na parte inferior centralizado -->
     <Button
@@ -35,5 +48,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="40dp" />
 
+<<<<<<< Updated upstream
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+=======
+</androidx.constraintlayout.widget.ConstraintLayout>
+>>>>>>> Stashed changes
