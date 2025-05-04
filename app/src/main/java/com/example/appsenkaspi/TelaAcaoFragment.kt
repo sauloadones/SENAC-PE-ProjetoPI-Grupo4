@@ -2,22 +2,18 @@ package com.example.appsenkaspi
 
 import android.animation.ObjectAnimator
 import android.graphics.Color
-import android.graphics.Paint
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.cardview.widget.CardView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,19 +48,20 @@ class TelaAcaoFragment : Fragment() {
             return
         }
 
-        acaoViewModel.getAcaoById(acaoId)
-            .observe(viewLifecycleOwner) { acao ->
-                if (acao != null) {
-                    preencherCamposComAcao(acao)
-                } else {
-                    Toast.makeText(requireContext(), "Ação não encontrada!", Toast.LENGTH_SHORT).show()
-                    parentFragmentManager.popBackStack()
-                }
+        acaoViewModel.getAcaoById(acaoId).observe(viewLifecycleOwner) { acao ->
+            if (acao != null) {
+                preencherCamposComAcao(acao)
+            } else {
+                Toast.makeText(requireContext(), "Ação não encontrada!", Toast.LENGTH_SHORT).show()
+                parentFragmentManager.popBackStack()
             }
+        }
 
         configurarBotoes()
         binding.iconeMenu.setOnClickListener { toggleSobre() }
         observarAtividades()
+        acaoViewModel.atualizarStatusAcaoAutomaticamente(acaoId)
+
     }
 
     private fun preencherCamposComAcao(acao: AcaoEntity) {
@@ -75,7 +72,8 @@ class TelaAcaoFragment : Fragment() {
 
         binding.textoSobre.text = acao.descricao.ifBlank { "Nenhuma descrição adicionada." }
 
-        animarProgresso(0)
+        // Removido: atualizarProgressoAcao()
+        // A atualização agora ocorre automaticamente com base no observer das atividades
     }
 
     private fun configurarBotoes() {
@@ -138,7 +136,7 @@ class TelaAcaoFragment : Fragment() {
             }
 
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main_container, fragment) // Altere para o ID correto do seu container
+                .replace(R.id.main_container, fragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -146,16 +144,24 @@ class TelaAcaoFragment : Fragment() {
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = atividadeAdapter
 
-        atividadeViewModel.listarAtividadesComFuncionariosPorAcao(acaoId).observe(viewLifecycleOwner) { atividades ->
-            if (atividades.isNullOrEmpty()) {
-                recycler.visibility = View.GONE
-                emptyView.visibility = View.VISIBLE
-            } else {
-                recycler.visibility = View.VISIBLE
-                emptyView.visibility = View.GONE
-                atividadeAdapter.submitList(atividades)
+        atividadeViewModel.listarAtividadesComFuncionariosPorAcao(acaoId)
+            .observe(viewLifecycleOwner) { atividades ->
+                if (atividades.isNullOrEmpty()) {
+                    recycler.visibility = View.GONE
+                    emptyView.visibility = View.VISIBLE
+                    animarProgresso(0)
+                } else {
+                    recycler.visibility = View.VISIBLE
+                    emptyView.visibility = View.GONE
+                    atividadeAdapter.submitList(atividades)
+
+                    // 🎯 Calcular progresso da barra da tela
+                    val total = atividades.size
+                    val concluidas = atividades.count { it.atividade.status.name == "CONCLUIDA" }
+                    val progresso = if (total > 0) (concluidas * 100 / total) else 0
+                    animarProgresso(progresso)
+                }
             }
-        }
     }
 
     override fun onDestroyView() {

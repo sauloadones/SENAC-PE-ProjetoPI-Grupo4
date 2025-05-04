@@ -9,8 +9,7 @@ import kotlinx.coroutines.launch
 class AtividadeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
-    private val atividadeFuncionarioDao =
-        AppDatabase.getDatabase(application).atividadeFuncionarioDao()
+    private val atividadeFuncionarioDao = AppDatabase.getDatabase(application).atividadeFuncionarioDao()
 
     fun deletarAtividadePorId(id: Int) = viewModelScope.launch {
         atividadeDao.deletarPorId(id)
@@ -20,8 +19,9 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
         return atividadeDao.listarAtividadesPorAcao(acaoId)
     }
 
-    fun inserir(atividade: AtividadeEntity) = viewModelScope.launch {
-        atividadeDao.inserirAtividade(atividade)
+    fun inserir(atividade: AtividadeEntity, onComplete: (Int) -> Unit = {}) = viewModelScope.launch {
+        val id = atividadeDao.inserirComRetorno(atividade).toInt()
+        onComplete(id)
     }
 
     fun listarAtividadesComFuncionariosPorAcao(acaoId: Int): LiveData<List<AtividadeComFuncionarios>> {
@@ -36,25 +36,31 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
         return atividadeDao.getAtividadeComFuncionariosPorId(id)
     }
 
-
-    fun inserirRelacaoFuncionario(relacao: AtividadeFuncionarioEntity) {
-        viewModelScope.launch {
-            atividadeFuncionarioDao.inserirAtividadeFuncionario(relacao)
-        }
+    fun getAtividadeById(id: Int): LiveData<AtividadeEntity> {
+        return atividadeDao.getAtividadeById(id)
     }
 
+    fun contarTotalPorAcao(acaoId: Int): LiveData<Int> {
+        return atividadeDao.contarTotalPorAcao(acaoId)
+    }
 
+    fun contarConcluidasPorAcao(acaoId: Int): LiveData<Int> {
+        return atividadeDao.contarConcluidasPorAcao(acaoId)
+    }
 
-
-
+    fun inserirRelacaoFuncionario(relacao: AtividadeFuncionarioEntity) = viewModelScope.launch {
+        atividadeFuncionarioDao.inserirAtividadeFuncionario(relacao)
+    }
 
     fun atualizar(atividade: AtividadeEntity) = viewModelScope.launch {
-            atividadeDao.atualizarAtividade(atividade)
-        }
+        atividadeDao.atualizarAtividade(atividade)
+    }
 
-        fun deletar(atividade: AtividadeEntity) = viewModelScope.launch {
-            atividadeDao.deletarAtividade(atividade)
-        }
+    fun deletar(atividade: AtividadeEntity) = viewModelScope.launch {
+        atividadeDao.deletarAtividade(atividade)
+    }
 
-
+    suspend fun deletarRelacoesPorAtividade(atividadeId: Int) {
+        atividadeFuncionarioDao.deletarPorAtividade(atividadeId)
+    }
 }
