@@ -19,4 +19,8 @@ interface AtividadeFuncionarioDao {
 
     @Query("SELECT atividadeId FROM atividades_funcionarios WHERE funcionarioId = :funcionarioId")
     fun listarAtividadesPorFuncionario(funcionarioId: Int): LiveData<List<Int>>
+
+    @Query("DELETE FROM atividades_funcionarios WHERE atividadeId = :atividadeId")
+    suspend fun deletarPorAtividade(atividadeId: Int)
+
 }

@@ -26,6 +26,7 @@ class CriarAtividadeFragment : Fragment() {
 
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ NOVO
 
     private var dataInicio: Date? = null
     private var dataFim: Date? = null
@@ -44,7 +45,14 @@ class CriarAtividadeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        // Recebe responsáveis selecionados
+
+        acaoId = arguments?.getInt("acaoId") ?: -1
+        if (acaoId == -1) {
+            Toast.makeText(requireContext(), "Erro: ação inválida!", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.popBackStack()
+            return
+        }
+
         parentFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
             val selecionados = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: return@setFragmentResultListener
             funcionariosSelecionados.clear()
@@ -55,15 +63,6 @@ class CriarAtividadeFragment : Fragment() {
             binding.textResponsaveis.text = nomes
         }
 
-        // Recupera o ID da ação associada
-        acaoId = arguments?.getInt("acaoId") ?: -1
-        if (acaoId == -1) {
-            Toast.makeText(requireContext(), "Erro: ação inválida!", Toast.LENGTH_SHORT).show()
-            parentFragmentManager.popBackStack()
-            return
-        }
-
-        // Clique para abrir diálogos
         binding.areaPrioridade.setOnClickListener {
             EscolherPrioridadeDialogFragment().show(parentFragmentManager, "EscolherPrioridade")
         }
@@ -79,7 +78,6 @@ class CriarAtividadeFragment : Fragment() {
             confirmarCriacaoAtividade()
         }
 
-        // Prioridade selecionada
         setFragmentResultListener("prioridadeSelecionada") { _, bundle ->
             val valor = bundle.getString("valor")
             prioridadeSelecionada = PrioridadeAtividade.values().find { it.name == valor }
@@ -197,7 +195,7 @@ class CriarAtividadeFragment : Fragment() {
             dataInicio = dataInicio!!,
             dataPrazo = dataFim!!,
             acaoId = acaoId,
-            funcionarioId = funcionariosSelecionados.first().id, // pode representar o principal
+            funcionarioId = funcionariosSelecionados.first().id,
             status = StatusAtividade.PENDENTE,
             prioridade = prioridadeSelecionada!!,
             criadoPor = funcionarioCriador.id,
@@ -215,6 +213,9 @@ class CriarAtividadeFragment : Fragment() {
                 atividadeViewModel.inserirRelacaoFuncionario(relacao)
             }
 
+            // ✅ Atualiza o status da ação após criar nova atividade
+            acaoViewModel.atualizarStatusAcaoAutomaticamente(acaoId)
+
             Toast.makeText(requireContext(), "Atividade criada com sucesso!", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
         }
@@ -225,3 +226,4 @@ class CriarAtividadeFragment : Fragment() {
         _binding = null
     }
 }
+

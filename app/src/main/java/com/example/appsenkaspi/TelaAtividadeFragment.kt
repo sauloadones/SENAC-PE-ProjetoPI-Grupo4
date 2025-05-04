@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.example.appsenkaspi.Converters.PrioridadeAtividade
+import com.example.appsenkaspi.Converters.StatusAtividade
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
@@ -26,22 +27,21 @@ class TelaAtividadeFragment : Fragment() {
     private val binding get() = _binding!!
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val checklistViewModel: ChecklistViewModel by activityViewModels()
+    private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ Novo
     private var atividadeId: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTelaAtividadeBinding.inflate(inflater, container, false)
-
-        // ✅ Corrigido: usar a variável da classe
         atividadeId = arguments?.getInt("atividadeId") ?: -1
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+
         if (atividadeId == -1) {
             Toast.makeText(requireContext(), "Erro: atividade inválida.", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
@@ -56,14 +56,11 @@ class TelaAtividadeFragment : Fragment() {
                 parentFragmentManager.popBackStack()
             }
         }
+
         val checklistAdapter = ChecklistAdapter(
             itens = emptyList(),
-            onItemCheckedChanged = { itemAtualizado, _ ->
-                checklistViewModel.atualizar(itemAtualizado)
-            },
-            onDeleteItem = { item ->
-                checklistViewModel.deletar(item)
-            }
+            onItemCheckedChanged = { itemAtualizado, _ -> checklistViewModel.atualizar(itemAtualizado) },
+            onDeleteItem = { item -> checklistViewModel.deletar(item) }
         )
 
         binding.recyclerChecklist.apply {
@@ -75,11 +72,10 @@ class TelaAtividadeFragment : Fragment() {
             checklistAdapter.atualizarLista(itens)
         }
 
-
         binding.btnEditar.setOnClickListener {
             val args = Bundle().apply { putInt("atividadeId", atividadeId) }
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main_container, CriarAtividadeFragment::class.java, args)
+                .replace(R.id.main_container, EditarAtividadeFragment::class.java, args)
                 .addToBackStack(null)
                 .commit()
         }
@@ -130,8 +126,22 @@ class TelaAtividadeFragment : Fragment() {
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.WHITE)
             }
 
-
             dialog.show()
+        }
+
+        binding.cardConfirmarAtividade.setOnClickListener {
+            atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->
+                if (atividade != null) {
+                    val atividadeAtualizada = atividade.copy(status = StatusAtividade.CONCLUIDA)
+                    atividadeViewModel.atualizar(atividadeAtualizada)
+
+                    // ✅ Atualiza o status da ação vinculada
+                    acaoViewModel.atualizarStatusAcaoAutomaticamente(atividade.acaoId)
+
+                    Toast.makeText(requireContext(), "Atividade marcada como concluída!", Toast.LENGTH_SHORT).show()
+                    parentFragmentManager.popBackStack()
+                }
+            }
         }
     }
 
@@ -178,7 +188,14 @@ class TelaAtividadeFragment : Fragment() {
             .setMessage("Você tem certeza de que deseja deletar a atividade \"${binding.tituloAtividade.text}\"?")
             .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Confirmar") { _, _ ->
-                atividadeViewModel.deletarAtividadePorId(atividadeId)
+                atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->
+                    if (atividade != null) {
+                        atividadeViewModel.deletarAtividadePorId(atividadeId)
+
+                        // ✅ Atualiza o status da ação após deletar a atividade
+                        acaoViewModel.atualizarStatusAcaoAutomaticamente(atividade.acaoId)
+                    }
+                }
                 Toast.makeText(requireContext(), "Atividade deletada", Toast.LENGTH_SHORT).show()
                 parentFragmentManager.popBackStack()
             }
