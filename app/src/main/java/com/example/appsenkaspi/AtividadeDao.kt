@@ -30,8 +30,11 @@ interface AtividadeDao {
     @Insert
     suspend fun inserirComRetorno(atividade: AtividadeEntity): Long
 
-    @Query("SELECT * FROM atividades WHERE id = :id")
-    suspend fun buscarAtividadePorId(id: Int): AtividadeEntity?
+
+
+    @Query("SELECT * FROM atividades WHERE id = :atividadeId")
+    fun getAtividadeById(atividadeId: Int): LiveData<AtividadeEntity>
+
 
     @Transaction
     @Query("SELECT * FROM atividades WHERE id = :atividadeId")
@@ -44,6 +47,21 @@ interface AtividadeDao {
     @Transaction
     @Query("SELECT * FROM atividades WHERE id = :id")
     fun getAtividadeComFuncionariosPorId(id: Int): LiveData<AtividadeComFuncionarios>
+
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId")
+    fun contarTotalPorAcao(acaoId: Int): LiveData<Int>
+
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'CONCLUIDA'")
+    fun contarConcluidasPorAcao(acaoId: Int): LiveData<Int>
+
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId")
+    suspend fun contarTotalPorAcaoValor(acaoId: Int): Int
+
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'CONCLUIDA'")
+    suspend fun contarConcluidasPorAcaoValor(acaoId: Int): Int
+
+
+
 
 
 }
