@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C2C2C"
+    android:background="@drawable/background_gradient"
     tools:context=".TelaPilarFragment">
 
     <!-- Topo -->
@@ -183,11 +183,11 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                app:cardCornerRadius="12dp"
+                                app:cardCornerRadius="14dp"
                                 app:cardElevation="4dp"
-                                app:strokeColor="@android:color/black"
+                                app:strokeColor="#000000"
                                 app:strokeWidth="2dp"
-                                app:cardBackgroundColor="#24527B"
+                                app:cardBackgroundColor="#164773"
                                 android:layout_marginEnd="8dp"
                                 android:clickable="true"
                                 android:focusable="true">
@@ -209,9 +209,9 @@
                                 android:layout_weight="1"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="4dp"
-                                app:strokeColor="@android:color/black"
+                                app:strokeColor="#000000"
                                 app:strokeWidth="2dp"
-                                app:cardBackgroundColor="#24527B"
+                                app:cardBackgroundColor="#164773"
                                 android:layout_marginStart="8dp"
                                 android:clickable="true"
                                 android:focusable="true">

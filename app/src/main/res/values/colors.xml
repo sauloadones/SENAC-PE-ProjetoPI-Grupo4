@@ -9,15 +9,13 @@
         <color name="green">#22AA44</color>
         <color name="graybar">#232323</color>
         <color name="graycont">#1E2123</color>
-        <color name="selecionado">#335D8E</color> <!-- Azul claro semi-transparente -->
-        <color name="nao_selecionado">#1E1E1E</color> <!-- Cor original do card -->
+        <color name="selecionado">#335D8E</color>
+        <color name="nao_selecionado">#1E1E1E</color>
         <color name="cinza_claro">#CCCCCC</color>
-
 
         <color name="gray">#808080</color>
         <color name="light_gray">#CCCCCC</color>
         <color name="dark_gray">#444444</color>
-
 
         <color name="accent_green">#22AA44</color>
         <color name="warning_red">#FF3B3B</color>
@@ -25,6 +23,8 @@
         <color name="text_hint">#AAAAAA</color>
         <color name="input_border">#3A3A3A</color>
 
-
+        <!-- Adicionados -->
+        <color name="azulEscuro">#133A5E</color>
+        <color name="azulClaro">#1E5B9A</color>
 
 </resources>
