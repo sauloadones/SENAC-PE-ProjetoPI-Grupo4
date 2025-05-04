@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +9,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,8 +39,56 @@ class EditarPilarFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_editar_pilar, container, false)
     }
 
+    private fun deletarPilar() {
+        lifecycleScope.launch {
+            val dao = AppDatabase.getDatabase(requireContext()).pilarDao()
+            val pilar = dao.buscarPilarPorId(pilarId)
+            if (pilar != null) {
+                dao.deletarPilar(pilar)
+                Toast.makeText(requireContext(), "Pilar deletado com sucesso!", Toast.LENGTH_SHORT).show()
+                parentFragmentManager.popBackStack() // Volta para tela anterior
+            } else {
+                Toast.makeText(requireContext(), "Erro ao localizar Pilar!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun exibirDialogoConfirmacao() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Confirmar exclusão")
+            .setMessage("Deseja deletar este Pilar?")
+            .setPositiveButton("Deletar") { _, _ -> deletarPilar() }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+
+    private fun exibirPopupMenu(anchor: View) {
+        val popup = PopupMenu(requireContext(), anchor)
+        popup.menuInflater.inflate(R.menu.menu_pilar, popup.menu)
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_deletar -> {
+                    exibirDialogoConfirmacao()
+                    true
+                }
+                else -> false
+            }
+        }
+
+
+
+
+        popup.show()
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarBotaoVoltar(view)
+
 
         inputNomeEdicao = view.findViewById(R.id.inputNomeEdicao)
         inputDescricaoEdicao = view.findViewById(R.id.inputDescricaoEdicao)
@@ -45,6 +97,12 @@ class EditarPilarFragment : Fragment() {
 
         buttonPickDateEdicao.setOnClickListener { abrirDatePicker() }
         confirmarEdicaoButtonWrapper.setOnClickListener { confirmarEdicao() }
+
+
+
+        val menuIcon = view.findViewById<ImageView>(R.id.iconeMenuEdicao)
+        menuIcon.setOnClickListener { exibirPopupMenu(it) }
+
 
         // Recebe o ID do Pilar via argumentos
         pilarId = arguments?.getInt("pilarId") ?: -1

@@ -35,6 +35,12 @@ class Converters {
         VENCIDA,
     }
 
+    enum class PrioridadeAtividade {
+        ALTA,
+        MEDIA,
+        BAIXA,
+    }
+
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
         return value?.let { Date(it) }
@@ -70,13 +76,23 @@ class Converters {
             // opcional: trate valor inválido aqui
             StatusAcao.VENCIDA
         }
-    @TypeConverter fun fromStatusAtividade(statusatvidadde: StatusAtividade): String = statusatvidadde.name.lowercase()
+    @TypeConverter fun fromStatusAtividade(statusAtividade: StatusAtividade): String = statusAtividade.name.lowercase()
     @TypeConverter fun toStatusAtividade(value: String): StatusAtividade =
         try {
             StatusAtividade.valueOf(value.uppercase())
         } catch(e: IllegalArgumentException) {
             // opcional: trate valor inválido aqui
             StatusAtividade.VENCIDA
+        }
+    @TypeConverter
+    fun fromPrioridade(prioridadeAtividade: PrioridadeAtividade): String = prioridadeAtividade.name
+
+    @TypeConverter
+    fun toPrioridade(value: String): PrioridadeAtividade =
+        try {
+            PrioridadeAtividade.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            PrioridadeAtividade.MEDIA
         }
 }
 

@@ -8,8 +8,15 @@ import androidx.room.*
 @Dao
 interface FuncionarioDao {
 
+    @Query("SELECT * FROM funcionarios WHERE id_acesso = :idAcesso AND senha = :senha LIMIT 1")
+    suspend fun autenticar(idAcesso: Int, senha: String): FuncionarioEntity?
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirFuncionario(funcionario: FuncionarioEntity)
+
+    @Query("SELECT * FROM funcionarios WHERE id = :id LIMIT 1")
+    suspend fun buscarPorId(id: Int): FuncionarioEntity?
 
     @Query("SELECT * FROM funcionarios WHERE id = :id")
     suspend fun buscarFuncionarioPorId(id: Int): FuncionarioEntity?
@@ -17,6 +24,9 @@ interface FuncionarioDao {
     @Query("SELECT * FROM funcionarios")
     fun listarTodosFuncionarios(): LiveData<List<FuncionarioEntity>>
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun inserir(funcionario: FuncionarioEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirTodos(funcionarios: List<FuncionarioEntity>)

@@ -19,8 +19,7 @@ class FuncionarioSelecionadoAdapter(
 
         fun bind(funcionario: FuncionarioEntity) {
             textNome.text = funcionario.nomeCompleto
-            // Se você tiver uma URL ou recurso de foto:
-            // Glide.with(itemView).load(funcionario.urlFoto).circleCrop().into(imagePerfil)
+            imagePerfil.visibility = View.GONE
         }
     }
 

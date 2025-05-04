@@ -9,12 +9,9 @@
         <color name="green">#22AA44</color>
         <color name="graybar">#232323</color>
         <color name="graycont">#1E2123</color>
-<<<<<<< Updated upstream
-=======
         <color name="selecionado">#335D8E</color>
         <color name="nao_selecionado">#1E1E1E</color>
         <color name="cinza_claro">#CCCCCC</color>
->>>>>>> Stashed changes
 
         <color name="gray">#808080</color>
         <color name="light_gray">#CCCCCC</color>

@@ -9,6 +9,8 @@ interface AtividadeFuncionarioDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirAtividadeFuncionario(atividadeFuncionario: AtividadeFuncionarioEntity)
 
+
+
     @Delete
     suspend fun deletarAtividadeFuncionario(atividadeFuncionario: AtividadeFuncionarioEntity)
 

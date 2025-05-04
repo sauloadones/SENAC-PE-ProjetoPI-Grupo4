@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
 
+@Suppress("DEPRECATION")
 class HomeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView

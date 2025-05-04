@@ -246,12 +246,15 @@
                 android:textSize="14sp"
                 android:visibility="visible" />
 
-            <LinearLayout
-                android:id="@+id/atividadesContainer"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerAcoes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                />
 
         </LinearLayout>
     </ScrollView>
