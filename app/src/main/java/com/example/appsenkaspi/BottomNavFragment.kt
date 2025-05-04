@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.databinding.FragmentBottomNavBinding
 
 class BottomNavFragment : Fragment() {
 
     private lateinit var binding: FragmentBottomNavBinding
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -20,13 +23,23 @@ class BottomNavFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupClickListeners()
 
-        // Inicializa com Home selecionado
-        binding.root.post {
-            updateIndicator(R.id.nav_home)
-            navigateTo(HomeFragment())
+        // Aguarda o ViewModel estar carregado antes de redirecionar
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                updateIndicator(R.id.nav_home)
+
+                val destino = when (it.cargo) {
+                    Cargo.APOIO -> TelaAtividadesApoioFragment()
+                    else -> HomeFragment()
+                }
+
+                val atual = parentFragmentManager.findFragmentById(R.id.main_container)
+                if (atual == null) {
+                    navigateTo(destino)
+                }
+            }
         }
     }
 
@@ -35,14 +48,24 @@ class BottomNavFragment : Fragment() {
             updateIndicator(R.id.nav_relatorio)
             navigateTo(RelatorioFragment())
         }
+
         binding.navDashboard.setOnClickListener {
             updateIndicator(R.id.nav_dashboard)
             navigateTo(DashboardFragment())
         }
+
         binding.navHome.setOnClickListener {
             updateIndicator(R.id.nav_home)
-            navigateTo(HomeFragment())
+
+            val funcionario = funcionarioViewModel.funcionarioLogado.value
+            val destino = when (funcionario?.cargo) {
+                Cargo.APOIO -> TelaAtividadesApoioFragment()
+                else -> HomeFragment()
+            }
+
+            navigateTo(destino)
         }
+
         binding.navPerfil.setOnClickListener {
             updateIndicator(R.id.nav_perfil)
             navigateTo(PerfilFragment())
@@ -68,7 +91,6 @@ class BottomNavFragment : Fragment() {
         val indicator = binding.indicatorSlider
 
         selectedView.post {
-            // Calcula o centro do item e centraliza o indicador com base nisso
             val targetX = selectedView.left + selectedView.width / 2 - indicator.width / 2
             indicator.animate()
                 .translationX(targetX.toFloat())
@@ -76,7 +98,6 @@ class BottomNavFragment : Fragment() {
                 .start()
         }
 
-        // Atualiza ícones selecionados
         icons.forEach { (id, icon) ->
             icon.isSelected = (id == selectedId)
         }

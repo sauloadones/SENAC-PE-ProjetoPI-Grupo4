@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.Converters.PrioridadeAtividade
 import com.example.appsenkaspi.Converters.StatusAtividade
 import com.example.appsenkaspi.databinding.FragmentCriarAtividadeBinding
@@ -45,6 +46,27 @@ class CriarAtividadeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+
+                Cargo.COORDENADOR -> {
+                    binding.botaoConfirmarAtividade.visibility = View.VISIBLE
+                    binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
+
+                }
+                Cargo.GESTOR -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmacaoAtividade.visibility = View.VISIBLE
+
+                }
+
+                else -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
+
+                }
+            }
+        }
 
         acaoId = arguments?.getInt("acaoId") ?: -1
         if (acaoId == -1) {

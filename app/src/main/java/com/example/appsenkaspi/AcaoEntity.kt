@@ -31,7 +31,7 @@ import com.example.appsenkaspi.Converters.StatusAcao
     ]
 )
 data class AcaoEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nome: String,
     val descricao: String,
     val dataInicio: Date,

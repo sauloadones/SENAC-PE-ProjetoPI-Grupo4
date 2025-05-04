@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.Converters.PrioridadeAtividade
 import com.example.appsenkaspi.databinding.FragmentEditarAtividadeBinding
 import kotlinx.coroutines.launch
@@ -42,6 +43,26 @@ class EditarAtividadeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+
+                Cargo.COORDENADOR -> {
+                    binding.botaoConfirmarAtividade.visibility = View.VISIBLE
+                    binding.botaoPedirConfirmarAtividade.visibility = View.GONE
+                }
+
+                Cargo.GESTOR -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmarAtividade.visibility = View.VISIBLE
+                }
+
+                else -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmarAtividade.visibility = View.GONE
+                }
+            }
+        }
+
 
         atividadeId = arguments?.getInt("atividadeId") ?: -1
         if (atividadeId == -1) {
@@ -49,6 +70,7 @@ class EditarAtividadeFragment : Fragment() {
             parentFragmentManager.popBackStack()
             return
         }
+
 
         atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividadeComFuncionarios ->
             if (atividadeComFuncionarios != null) {

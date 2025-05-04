@@ -63,4 +63,25 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
     suspend fun deletarRelacoesPorAtividade(atividadeId: Int) {
         atividadeFuncionarioDao.deletarPorAtividade(atividadeId)
     }
+    // No ViewModel (ou Repository), filtrar pela lista de responsáveis da atividade
+    fun listarAtividadesParaFuncionario(funcionarioId: Int): LiveData<List<AtividadeEntity>> {
+        return atividadeDao.listarAtividadesPorFuncionario(funcionarioId)
+    }
+
+    fun listarAtividadesPorResponsavel(funcionarioId: Int): LiveData<List<AtividadeEntity>> {
+        return atividadeDao.listarAtividadesDoFuncionario(funcionarioId)
+    }
+
+    fun getAtividadesDoFuncionarioComResponsaveis(funcionarioId: Int): LiveData<List<AtividadeComFuncionarios>> {
+        return atividadeDao.listarAtividadesComResponsaveis(funcionarioId)
+    }
+
+
+    fun getAtividadesDoFuncionario(funcionarioId: Int): LiveData<List<AtividadeComFuncionarios>> {
+        return atividadeDao.listarAtividadesComResponsaveis(funcionarioId)
+    }
+
+
+
+
 }

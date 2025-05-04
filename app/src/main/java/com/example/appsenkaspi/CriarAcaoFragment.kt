@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.Converters.StatusAcao
 import com.example.appsenkaspi.databinding.FragmentCriarAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
@@ -44,6 +45,27 @@ class CriarAcaoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+
+                Cargo.COORDENADOR -> {
+                    binding.buttonConfirmacaoAcao.visibility = View.VISIBLE
+                    binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
+
+                }
+                Cargo.GESTOR -> {
+                    binding.buttonConfirmacaoAcao.visibility = View.GONE
+                    binding.buttonPedirConfirmacaoAcao.visibility = View.VISIBLE
+
+                }
+
+                else -> {
+                    binding.buttonConfirmacaoAcao.visibility = View.GONE
+                    binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
+
+                }
+            }
+        }
 
         // configura RecyclerView
         adapterSelecionados = FuncionarioSelecionadoAdapter(funcionariosSelecionados)
@@ -131,7 +153,7 @@ class CriarAcaoFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             // insere a ação e obtém o ID
-            val idNovaAcao: Long = acaoViewModel.inserirRetornandoId(
+            val idNovaAcao: Int = acaoViewModel.inserirRetornandoId(
                 AcaoEntity(
                     nome       = nome,
                     descricao  = descricao,
