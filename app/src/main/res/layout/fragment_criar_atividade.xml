@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/criarAtividadeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <!-- TopBar -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Bloco azul com título -->
+    <FrameLayout
+        android:id="@+id/headerNovaAtividade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#164773"
+        android:padding="18dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tituloNovaAtividade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Nova Atividade"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <!-- Nome da Atividade -->
+    <LinearLayout
+        android:id="@+id/areaNome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/headerNovaAtividade"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_nome_atividade"
+            app:tint="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/inputNomeAtividade"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Adicionar nome da atividade"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#CCCCCC"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:inputType="textCapWords"
+            android:maxLines="2" />
+    </LinearLayout>
+
+    <!-- Descrição -->
+    <LinearLayout
+        android:id="@+id/areaDescricao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/areaNome"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_text"
+            app:tint="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/inputDescricao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:hint="Adicionar descrição da atividade"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#CCCCCC"
+            android:background="@android:color/transparent"
+            android:inputType="textMultiLine"
+            android:minLines="3" />
+    </LinearLayout>
+
+    <!-- Prioridade -->
+    <LinearLayout
+        android:id="@+id/areaPrioridade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/areaDescricao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_priority"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/textPrioridade"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Adicionar prioridade"
+            android:textColor="#CCCCCC"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:drawablePadding="8dp" />
+    </LinearLayout>
+
+    <!-- Responsáveis -->
+    <LinearLayout
+        android:id="@+id/areaResponsaveis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/areaPrioridade"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/iconeResponsavel"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_person"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/textResponsaveis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Responsável"
+            android:textColor="#CCCCCC"
+            android:layout_marginStart="8dp" />
+
+        <LinearLayout
+            android:id="@+id/containerFotosResponsaveis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Datas -->
+    <LinearLayout
+        android:id="@+id/areaDatas"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/areaResponsaveis"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_clock"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/textDataInicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Data de início"
+                android:textColor="#CCCCCC" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginEnd="4dp"
+            android:background="#CCCCCC" />
+
+        <TextView
+            android:id="@+id/textDataFim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data de término"
+            android:textColor="#CCCCCC"
+            android:layout_marginStart="28dp" />
+
+    </LinearLayout>
+
+    <!-- Botão de confirmação -->
+    <FrameLayout
+        android:id="@+id/botaoConfirmarAtividade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:background="@drawable/bg_button_confirmar"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/areaDatas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/textBotaoConfirmar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Confirmar"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" />
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
