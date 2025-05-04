@@ -18,6 +18,10 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     fun getAcaoById(id: Int): LiveData<AcaoEntity?> {
         return acaoDao.getAcaoById(id)
     }
+    suspend fun getAcaoByIdNow(id: Int): AcaoEntity? {
+        return acaoDao.getAcaoByIdNow(id)
+    }
+
 
     fun listarAcoesPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>> {
         return acaoDao.listarPorPilar(pilarId)
@@ -34,9 +38,10 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     fun deletar(acao: AcaoEntity) = viewModelScope.launch {
         acaoDao.deletarAcao(acao)
     }
-    suspend fun inserirRetornandoId(acao: AcaoEntity): Long {
-        return acaoDao.inserirComRetorno(acao)
+    suspend fun inserirRetornandoId(acao: AcaoEntity): Int {
+        return acaoDao.inserirComRetorno(acao).toInt()
     }
+
 
 
     fun atualizarStatusAcaoAutomaticamente(acaoId: Int) {
@@ -57,6 +62,7 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
             if (acao.status != novoStatus) {
                 val acaoAtualizada = acao.copy(status = novoStatus)
                 acaoDao.atualizarAcao(acaoAtualizada)
+
             }
         }
     }

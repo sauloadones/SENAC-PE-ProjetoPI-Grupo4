@@ -17,8 +17,12 @@ import com.bumptech.glide.Glide
 import com.example.appsenkaspi.Converters.PrioridadeAtividade
 import com.example.appsenkaspi.Converters.StatusAtividade
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
+import com.example.appsenkaspi.Converters.Cargo
+import com.example.appsenkaspi.Converters.StatusRequisicao
+import com.example.appsenkaspi.Converters.TipoRequisicao
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class TelaAtividadeFragment : Fragment() {
@@ -28,6 +32,8 @@ class TelaAtividadeFragment : Fragment() {
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val checklistViewModel: ChecklistViewModel by activityViewModels()
     private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ Novo
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private val requisicaoViewModel: RequisicaoViewModel by activityViewModels()
     private var atividadeId: Int = -1
 
     override fun onCreateView(
@@ -42,11 +48,45 @@ class TelaAtividadeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
 
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.cardConfirmarAtividade.visibility = View.GONE
+                    binding.cardPedirConfirmacao.visibility = View.VISIBLE
+                    binding.btnEditar.visibility = View.GONE
+                    binding.btnEditar.visibility = View.GONE
+                }
+                 Cargo.COORDENADOR -> {
+                    binding.cardConfirmarAtividade.visibility = View.VISIBLE
+                    binding.cardPedirConfirmacao.visibility = View.GONE
+                }
+                Cargo.GESTOR -> {
+                    binding.cardConfirmarAtividade.visibility = View.VISIBLE
+                    binding.btnEditar.visibility = View.VISIBLE
+                    binding.btnDeletar.visibility = View.GONE
+                    binding.cardPedirConfirmacao.visibility = View.GONE
+
+                }
+                else -> {
+                    binding.cardConfirmarAtividade.visibility = View.GONE
+                    binding.cardPedirConfirmacao.visibility = View.GONE
+                    binding.btnEditar.visibility = View.GONE
+                    binding.btnDeletar.visibility = View.GONE
+                }
+            }
+        }
+
+
         if (atividadeId == -1) {
             Toast.makeText(requireContext(), "Erro: atividade inválida.", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
             return
         }
+
+
+
+
+
 
         atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividadeComFuncionarios ->
             if (atividadeComFuncionarios != null) {
@@ -128,6 +168,8 @@ class TelaAtividadeFragment : Fragment() {
 
             dialog.show()
         }
+
+
 
         binding.cardConfirmarAtividade.setOnClickListener {
             atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->

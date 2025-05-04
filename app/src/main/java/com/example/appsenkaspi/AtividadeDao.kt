@@ -57,8 +57,38 @@ interface AtividadeDao {
     @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId")
     suspend fun contarTotalPorAcaoValor(acaoId: Int): Int
 
-    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'CONCLUIDA'")
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'concluida'")
     suspend fun contarConcluidasPorAcaoValor(acaoId: Int): Int
+
+    @Query("""
+    SELECT a.* FROM atividades a
+    INNER JOIN atividades_funcionarios af ON af.atividadeId = a.id
+    WHERE af.funcionarioId = :funcionarioId 
+""")
+    fun listarAtividadesPorFuncionario(funcionarioId: Int): LiveData<List<AtividadeEntity>>
+
+    @Query("""
+    SELECT * FROM atividades
+    WHERE id IN (
+        SELECT atividadeId FROM atividades_funcionarios
+        WHERE funcionarioId = :funcionarioId
+    )
+""")
+    fun listarAtividadesDoFuncionario(funcionarioId: Int): LiveData<List<AtividadeEntity>>
+
+    @Transaction
+    @Query("""
+        SELECT * FROM atividades
+        WHERE id IN (
+            SELECT atividadeId FROM atividades_funcionarios
+            WHERE funcionarioId = :funcionarioId
+        )
+    """)
+    fun listarAtividadesComResponsaveis(funcionarioId: Int): LiveData<List<AtividadeComFuncionarios>>
+
+
+
+
 
 
 
