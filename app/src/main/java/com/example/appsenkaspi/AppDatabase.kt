@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
         ChecklistItemEntity:: class,
         AcaoFuncionarioEntity::class,
         AtividadeFuncionarioEntity::class,
+        RequisicaoEntity::class
     ],
     version = 2, // ou 3 se já atualizou
     exportSchema = false
@@ -35,7 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun atividadeDao(): AtividadeDao
     abstract fun funcionarioDao(): FuncionarioDao
     abstract fun checklistDao(): ChecklistDao
-
+    abstract fun requisicaoDao(): RequisicaoDao
 
 
 

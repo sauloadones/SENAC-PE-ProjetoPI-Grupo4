@@ -206,7 +206,9 @@
                     android:text="Editar atividade"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#3C82F6"
+                    android:visibility="gone"
                     android:layout_marginEnd="16dp" />
+
 
                 <Button
                     android:id="@+id/btnDeletar"
@@ -214,8 +216,61 @@
                     android:layout_height="wrap_content"
                     android:text="Deletar"
                     android:textColor="#FFFFFF"
+                    android:visibility="gone"
                     android:backgroundTint="#E74C3C" />
             </LinearLayout>
+            <!-- Card para COORDENADOR / GESTOR: Confirmar diretamente -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardConfirmarAtividade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#1E88E5"
+                app:strokeColor="@android:color/black"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Confirmar Conclusão"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="10dp"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Card para APOIO: Solicitar confirmação -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPedirConfirmacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFC107"
+                app:strokeColor="@android:color/black"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pedir confirmação da atividade"
+                    android:textColor="#000000"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="10dp"/>
+            </androidx.cardview.widget.CardView>
+
 
         </LinearLayout>
     </ScrollView>
