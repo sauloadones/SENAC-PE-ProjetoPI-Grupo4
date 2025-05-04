@@ -4,21 +4,23 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.example.appsenkaspi.Converters.StatusAcao
+import com.example.appsenkaspi.data.AcaoComStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class AcaoViewModel(application: Application) : AndroidViewModel(application) {
 
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
+    private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
 
-    fun listarAcoesPorPilar(pilarId: Int): LiveData<List<AcaoEntity>> {
-        return acaoDao.listarAcoesPorPilar(pilarId)
+    fun getAcaoById(id: Int): LiveData<AcaoEntity?> {
+        return acaoDao.getAcaoById(id)
     }
 
-    fun getAcaoById(id: Int): LiveData<AcaoEntity?> =
-        acaoDao.getAcaoById(id)
-
-    suspend fun getAcaoByIdNow(id: Int): AcaoEntity? {
-        return acaoDao.getAcaoByIdNow(id)
+    fun listarAcoesPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>> {
+        return acaoDao.listarPorPilar(pilarId)
     }
 
     fun inserir(acao: AcaoEntity) = viewModelScope.launch {
@@ -32,11 +34,30 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     fun deletar(acao: AcaoEntity) = viewModelScope.launch {
         acaoDao.deletarAcao(acao)
     }
-    suspend fun inserirRetornandoId(acao: AcaoEntity): Int {
-        return acaoDao.inserirAcao(acao).toInt()
+    suspend fun inserirRetornandoId(acao: AcaoEntity): Long {
+        return acaoDao.inserirComRetorno(acao)
     }
 
-    fun listarPorPilar(pilarId: Int) = acaoDao.listarPorPilar(pilarId)
 
+    fun atualizarStatusAcaoAutomaticamente(acaoId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val total = atividadeDao.contarTotalPorAcaoValor(acaoId)
+            val concluidas = atividadeDao.contarConcluidasPorAcaoValor(acaoId)
 
+            val acao = acaoDao.getAcaoPorIdDireto(acaoId) ?: return@launch
+            val hoje = Calendar.getInstance().time
+
+            val novoStatus = when {
+                total == 0 -> StatusAcao.PLANEJADA
+                concluidas == total && hoje.before(acao.dataPrazo) -> StatusAcao.CONCLUIDA
+                hoje.after(acao.dataPrazo) -> StatusAcao.VENCIDA
+                else -> StatusAcao.EM_ANDAMENTO
+            }
+
+            if (acao.status != novoStatus) {
+                val acaoAtualizada = acao.copy(status = novoStatus)
+                acaoDao.atualizarAcao(acaoAtualizada)
+            }
+        }
+    }
 }

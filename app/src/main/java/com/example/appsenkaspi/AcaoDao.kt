@@ -59,8 +59,9 @@ interface AcaoDao {
     @Transaction
 
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserirRetornandoId(acao: AcaoEntity): Long
+    @Insert
+    suspend fun inserirComRetorno(acao: AcaoEntity): Long
+
 
 
 
@@ -88,6 +89,12 @@ interface AcaoDao {
     GROUP BY a.id
 """)
     fun listarPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>>
+
+    @Query("SELECT * FROM acoes WHERE id = :acaoId LIMIT 1")
+    suspend fun getAcaoPorIdDireto(acaoId: Int): AcaoEntity?
+
+
+
 
 }
 

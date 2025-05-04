@@ -31,7 +31,12 @@ class AcaoAdapter(
             val concluidas = acaoComStatus.ativasConcluidas
             val pct = if (total > 0) concluidas * 100 / total else 0
 
-            statusTv.text = "$concluidas/$total"
+            if(total> 1) {
+                statusTv.text = "$concluidas/$total Atividade Concluidas"
+            }else {
+                statusTv.text = "$concluidas/$total Atividade Concluida"
+
+            }
             progresso.max = 100
             progresso.progress = pct
 

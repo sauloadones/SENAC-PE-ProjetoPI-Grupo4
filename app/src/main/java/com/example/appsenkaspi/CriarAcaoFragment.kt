@@ -131,7 +131,7 @@ class CriarAcaoFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             // insere a ação e obtém o ID
-            val idNovaAcao = acaoViewModel.inserirRetornandoId(
+            val idNovaAcao: Long = acaoViewModel.inserirRetornandoId(
                 AcaoEntity(
                     nome       = nome,
                     descricao  = descricao,
