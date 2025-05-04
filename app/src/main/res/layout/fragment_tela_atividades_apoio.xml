@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Top bar azul -->
+    <TextView
+        android:id="@+id/tituloTelaApoio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Minhas Atividades"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:background="#164773"
+        android:padding="16dp" />
+
+    <!-- RecyclerView com padding -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMinhasAtividades"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+    <TextView
+        android:id="@+id/emptyStateView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nenhuma atividade encontrada."
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:padding="20dp"
+        android:visibility="gone" />
+
+</LinearLayout>

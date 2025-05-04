@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.databinding.ActivityTelaPrincipalBinding
 import kotlinx.coroutines.launch
 
@@ -12,9 +13,12 @@ class TelaPrincipalActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTelaPrincipalBinding
     private lateinit var funcionarioViewModel: FuncionarioViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Layout primeiro
+        binding = ActivityTelaPrincipalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Verifica login via SharedPreferences
         val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
@@ -25,10 +29,8 @@ class TelaPrincipalActivity : AppCompatActivity() {
             return
         }
 
-        // Inicializa ViewModel
         funcionarioViewModel = ViewModelProvider(this)[FuncionarioViewModel::class.java]
 
-        // Recupera o funcionário do banco e define no ViewModel
         lifecycleScope.launch {
             val funcionario = AppDatabase.getDatabase(this@TelaPrincipalActivity)
                 .funcionarioDao()
@@ -37,16 +39,11 @@ class TelaPrincipalActivity : AppCompatActivity() {
             if (funcionario != null) {
                 funcionarioViewModel.logarFuncionario(funcionario)
             } else {
-                // Falha ao encontrar o funcionário salvo, volta pro login
                 prefs.edit().clear().apply()
                 startActivity(Intent(this@TelaPrincipalActivity, MainActivity::class.java))
                 finish()
                 return@launch
             }
-
-            // Após garantir o login e ViewModel, abre a tela principal
-            binding = ActivityTelaPrincipalBinding.inflate(layoutInflater)
-            setContentView(binding.root)
 
             if (savedInstanceState == null) {
                 supportFragmentManager.popBackStack(
@@ -54,10 +51,16 @@ class TelaPrincipalActivity : AppCompatActivity() {
                     androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
                 )
 
+                val fragmentInicial = when (funcionario.cargo) {
+                    Cargo.APOIO -> TelaAtividadesApoioFragment()
+                    else -> HomeFragment()
+                }
+
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, HomeFragment())
+                    .replace(R.id.main_container, fragmentInicial)
                     .commit()
             }
         }
     }
+
 }

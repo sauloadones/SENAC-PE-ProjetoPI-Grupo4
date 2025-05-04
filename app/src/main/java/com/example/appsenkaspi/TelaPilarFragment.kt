@@ -72,11 +72,17 @@ class TelaPilarFragment : Fragment() {
             text = pilar.nome.ifBlank { "Sem nome" }
             paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
+
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
         binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
-        animarProgresso(0)
+
+        // 🚀 Chamada para calcular progresso real
+        pilarViewModel.calcularProgressoDoPilar(pilar.id) { progresso ->
+            animarProgresso((progresso * 100).toInt())
+        }
     }
+
 
     private fun configurarBotoes() {
         binding.cardEditarPilar.setOnClickListener {
@@ -130,7 +136,7 @@ class TelaPilarFragment : Fragment() {
         val recycler = binding.recyclerAcoes
         val emptyView = binding.emptyStateView
 
-        acaoViewModel.listarPorPilar(pilarId).observe(viewLifecycleOwner) { lista ->
+        acaoViewModel.listarAcoesPorPilar(pilarId).observe(viewLifecycleOwner) { lista ->
             if (lista.isNullOrEmpty()) {
                 recycler.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE

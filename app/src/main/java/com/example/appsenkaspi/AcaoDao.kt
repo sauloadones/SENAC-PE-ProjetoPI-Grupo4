@@ -18,8 +18,10 @@ interface AcaoDao {
      * Insere uma Ação no banco e retorna o ID gerado.
      * Usa REPLACE para conflitos.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserirAcao(acao: AcaoEntity): Long
+    @Insert
+    suspend fun inserirAcao(acao: AcaoEntity)
+
+
 
     /**
      * Atualiza uma Ação existente.
@@ -92,6 +94,22 @@ interface AcaoDao {
 
     @Query("SELECT * FROM acoes WHERE id = :acaoId LIMIT 1")
     suspend fun getAcaoPorIdDireto(acaoId: Int): AcaoEntity?
+
+    @Query("""
+    SELECT 
+        a.id AS acaoId,
+        COUNT(at.id) AS totalAtividades,
+        CASE 
+            WHEN COUNT(at.id) = 0 THEN 0.0
+            ELSE CAST(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(at.id)
+        END AS progresso
+    FROM acoes a
+    LEFT JOIN atividades at ON at.acaoId = a.id
+    WHERE a.pilarId = :pilarId
+    GROUP BY a.id
+""")
+    suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
+
 
 
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.Converters.StatusPilar
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
@@ -24,6 +25,7 @@ class CriarPilarFragment : Fragment() {
 
     private val pilarViewModel: PilarViewModel        by activityViewModels()
     private val subpilarViewModel: SubpilarViewModel  by activityViewModels()
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
 
     private var dataPrazoSelecionada: Date? = null
     private val calendario = Calendar.getInstance()
@@ -44,6 +46,28 @@ class CriarPilarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configurarBotaoVoltar(view)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+
+                Cargo.COORDENADOR -> {
+                    binding.confirmarButtonWrapper.visibility = View.VISIBLE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+
+                }
+                Cargo.GESTOR -> {
+                    binding.confirmarButtonWrapper.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.VISIBLE
+
+                }
+
+                else -> {
+                    binding.confirmarButtonWrapper.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+
+                }
+            }
+        }
+
 
         // configura RecyclerView de subpilares
         subpilarAdapter = SubpilarAdapter(listaSubpilares)

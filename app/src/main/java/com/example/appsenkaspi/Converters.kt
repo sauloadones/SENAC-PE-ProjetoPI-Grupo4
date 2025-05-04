@@ -51,6 +51,18 @@ class Converters {
         return date?.time
     }
 
+    enum class StatusRequisicao {
+        PENDENTE,
+        APROVADA,
+        REJEITADA
+    }
+
+    enum class TipoRequisicao {
+        CONFIRMACAO_ATIVIDADE,
+        EDICAO_PILAR,
+        CRIACAO_ACAO
+    }
+
     @TypeConverter fun fromCargo(cargo: Cargo): String = cargo.name.lowercase()
     @TypeConverter fun toCargo(value: String): Cargo =
         try {
@@ -74,7 +86,7 @@ class Converters {
             StatusAcao.valueOf(value.uppercase())
         } catch(e: IllegalArgumentException) {
             // opcional: trate valor inválido aqui
-            StatusAcao.VENCIDA
+            StatusAcao.PLANEJADA
         }
     @TypeConverter fun fromStatusAtividade(statusAtividade: StatusAtividade): String = statusAtividade.name.lowercase()
     @TypeConverter fun toStatusAtividade(value: String): StatusAtividade =
@@ -82,17 +94,32 @@ class Converters {
             StatusAtividade.valueOf(value.uppercase())
         } catch(e: IllegalArgumentException) {
             // opcional: trate valor inválido aqui
-            StatusAtividade.VENCIDA
+            StatusAtividade.PENDENTE
         }
-    @TypeConverter
-    fun fromPrioridade(prioridadeAtividade: PrioridadeAtividade): String = prioridadeAtividade.name
-
-    @TypeConverter
-    fun toPrioridade(value: String): PrioridadeAtividade =
+    @TypeConverter fun fromPrioridade(prioridadeAtividade: PrioridadeAtividade): String = prioridadeAtividade.name.lowercase()
+    @TypeConverter fun toPrioridade(value: String): PrioridadeAtividade =
         try {
-            PrioridadeAtividade.valueOf(value)
+            PrioridadeAtividade.valueOf(value.uppercase())
         } catch (e: IllegalArgumentException) {
             PrioridadeAtividade.MEDIA
         }
+
+    @TypeConverter fun fromStatusRequisicao(status: StatusRequisicao): String = status.name.lowercase()
+    @TypeConverter fun toStatusRequisicao(value: String): StatusRequisicao =
+        try {
+            StatusRequisicao.valueOf(value.uppercase())
+        } catch (e: IllegalArgumentException) {
+            StatusRequisicao.PENDENTE
+        }
+    @TypeConverter fun fromTipoRequisicao(tipo: TipoRequisicao): String = tipo.name.lowercase()
+    @TypeConverter fun toTipoRequisicao(value: String): TipoRequisicao =
+        try {
+            TipoRequisicao.valueOf(value.uppercase())
+        } catch (e: IllegalArgumentException) {
+            TipoRequisicao.CONFIRMACAO_ATIVIDADE
+        }
+
 }
+
+
 
