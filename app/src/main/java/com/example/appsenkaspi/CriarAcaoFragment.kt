@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.Converters.StatusAcao
 import com.example.appsenkaspi.databinding.FragmentCriarAcaoBinding
+import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,6 +43,7 @@ class CriarAcaoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarBotaoVoltar(view)
 
         // configura RecyclerView
         adapterSelecionados = FuncionarioSelecionadoAdapter(funcionariosSelecionados)
@@ -53,7 +55,7 @@ class CriarAcaoFragment : Fragment() {
         binding.buttonPickDateAcao.setOnClickListener { abrirDatePicker() }
         binding.iconSelecionarFuncionario
             .setOnClickListener {
-                SelecionarFuncionariosDialogFragment()
+                SelecionarResponsavelDialogFragment()
                     .show(childFragmentManager, "SelecionarFuncionariosDialog")
             }
         binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
@@ -97,13 +99,19 @@ class CriarAcaoFragment : Fragment() {
 
     private fun abrirDialogSelecionarFuncionarios() {
         // **AGORA** usa childFragmentManager
-        SelecionarFuncionariosDialogFragment()
+        SelecionarResponsavelDialogFragment()
             .show(childFragmentManager, "SelecionarFuncionariosDialog")
     }
 
     private fun confirmarCriacaoAcao() {
         val nome = binding.inputNomeAcao.text.toString().trim()
         val descricao = binding.inputDescricaoAcao.text.toString().trim()
+        val funcionarioLogado = funcionarioViewModel.funcionarioLogado.value
+        if (funcionarioLogado == null) {
+            Toast.makeText(context, "Erro: usuário não autenticado!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
 
         if (nome.isEmpty()) {
             binding.inputNomeAcao.error = "Digite o nome da ação"
@@ -131,7 +139,7 @@ class CriarAcaoFragment : Fragment() {
                     dataPrazo  = dataPrazoSelecionada!!,
                     pilarId    = pilarId,
                     status      = StatusAcao.PLANEJADA,
-                    criadoPor   = 1, // <- pegue o ID real do usuário logado
+                    criadoPor   = funcionarioLogado.id, // <- pegue o ID real do usuário logado
                     dataCriacao = Date()
 
                 )
