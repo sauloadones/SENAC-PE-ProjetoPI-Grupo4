@@ -1,7 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.AppSenkasPI" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Cor da barra de status -->
+        <item name="android:statusBarColor">@color/graybar</item>
+
+        <!-- Cores do tema -->
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/azulEscuro</item>
+        <item name="colorSecondary">@color/azulClaro</item>
     </style>
+
+    <style name="Theme.AppSenkasPI" parent="Base.Theme.AppSenkasPI" />
 </resources>
