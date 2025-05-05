@@ -11,6 +11,15 @@ interface AtividadeFuncionarioDao {
 
 
 
+
+    @Dao
+    interface AtividadeFuncionarioDao {
+        @Query("SELECT f.* FROM funcionarios f INNER JOIN atividade_funcionario af ON f.id = af.funcionarioId WHERE af.atividadeId = :atividadeId")
+        suspend fun getResponsaveisByAtividadeId(atividadeId: Int): List<FuncionarioEntity>
+    }
+
+
+
     @Delete
     suspend fun deletarAtividadeFuncionario(atividadeFuncionario: AtividadeFuncionarioEntity)
 
@@ -22,5 +31,15 @@ interface AtividadeFuncionarioDao {
 
     @Query("DELETE FROM atividades_funcionarios WHERE atividadeId = :atividadeId")
     suspend fun deletarPorAtividade(atividadeId: Int)
+
+    @Query("""
+        SELECT f.* FROM funcionarios f
+        INNER JOIN atividades_funcionarios af ON af.funcionarioId = f.id
+        WHERE af.atividadeId = :atividadeId
+    """)
+    suspend fun getResponsaveisByAtividadeId(atividadeId: Int): List<FuncionarioEntity>
+
+
+
 
 }

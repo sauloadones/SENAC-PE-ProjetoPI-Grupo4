@@ -5,9 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.appsenkaspi.Converters.PrioridadeAtividade
-import com.example.appsenkaspi.Converters.StatusAcao
-import com.example.appsenkaspi.Converters.StatusAtividade
+
 
 @Entity(
     tableName = "checklist_itens",

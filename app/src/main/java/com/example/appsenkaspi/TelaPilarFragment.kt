@@ -12,6 +12,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+
 import com.example.appsenkaspi.databinding.FragmentTelaPilarBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
@@ -24,6 +25,8 @@ class TelaPilarFragment : Fragment() {
 
     private val pilarViewModel: PilarViewModel by activityViewModels()
     private val acaoViewModel: AcaoViewModel by activityViewModels()
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+
 
     private var pilarId: Int = -1
     private lateinit var acaoAdapter: AcaoAdapter
@@ -40,6 +43,34 @@ class TelaPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.cardEditarPilar.visibility = View.GONE
+                    binding.cardAdicionarAcoes.visibility = View.VISIBLE
+                }
+
+                Cargo.COORDENADOR -> {
+                    binding.cardEditarPilar.visibility = View.VISIBLE
+                    binding.cardAdicionarAcoes.visibility = View.VISIBLE
+
+                }
+                Cargo.GESTOR -> {
+                    binding.cardEditarPilar.visibility = View.GONE
+                    binding.cardAdicionarAcoes.visibility = View.GONE
+
+                }
+
+                else -> {
+                    binding.cardEditarPilar.visibility = View.GONE
+                    binding.cardAdicionarAcoes.visibility = View.GONE
+
+                }
+            }
+        }
+
 
         // 1) Recupera o ID
         pilarId = arguments?.getInt("pilarId") ?: -1

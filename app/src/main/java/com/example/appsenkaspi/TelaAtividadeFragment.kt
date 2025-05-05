@@ -14,12 +14,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
-import com.example.appsenkaspi.Converters.PrioridadeAtividade
-import com.example.appsenkaspi.Converters.StatusAtividade
+
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
-import com.example.appsenkaspi.Converters.Cargo
-import com.example.appsenkaspi.Converters.StatusRequisicao
-import com.example.appsenkaspi.Converters.TipoRequisicao
+
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,22 +44,25 @@ class TelaAtividadeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
                     binding.cardConfirmarAtividade.visibility = View.GONE
                     binding.cardPedirConfirmacao.visibility = View.VISIBLE
-                    binding.btnEditar.visibility = View.GONE
-                    binding.btnEditar.visibility = View.GONE
+                    binding.btnEditar.visibility = View.VISIBLE
+                    binding.btnDeletar.visibility = View.GONE
+
+
                 }
                  Cargo.COORDENADOR -> {
                     binding.cardConfirmarAtividade.visibility = View.VISIBLE
                     binding.cardPedirConfirmacao.visibility = View.GONE
                 }
                 Cargo.GESTOR -> {
-                    binding.cardConfirmarAtividade.visibility = View.VISIBLE
-                    binding.btnEditar.visibility = View.VISIBLE
+                    binding.cardConfirmarAtividade.visibility = View.GONE
+                    binding.btnEditar.visibility = View.GONE
                     binding.btnDeletar.visibility = View.GONE
                     binding.cardPedirConfirmacao.visibility = View.GONE
 

@@ -87,6 +87,17 @@ interface AtividadeDao {
     fun listarAtividadesComResponsaveis(funcionarioId: Int): LiveData<List<AtividadeComFuncionarios>>
 
 
+    @Query("SELECT * FROM atividades WHERE id = :id")
+    fun buscarPorId(id: Int): AtividadeEntity?
+
+    @Query("SELECT * FROM atividades WHERE id = :id")
+    suspend fun getById(id: Int): AtividadeEntity
+
+    @Transaction
+    @Query("SELECT * FROM atividades WHERE id = :atividadeId")
+    suspend fun buscarComFuncionarios(atividadeId: Int): AtividadeComFuncionarios
+
+
 
 
 

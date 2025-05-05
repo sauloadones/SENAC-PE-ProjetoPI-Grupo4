@@ -4,8 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.appsenkaspi.Converters.StatusRequisicao
-import com.example.appsenkaspi.Converters.TipoRequisicao
 import kotlinx.coroutines.launch
 
 class RequisicaoViewModel(application: Application) : AndroidViewModel(application) {
@@ -31,7 +29,25 @@ class RequisicaoViewModel(application: Application) : AndroidViewModel(applicati
         requisicaoDao.atualizar(requisicao)
     }
 
-    fun deletar(requisicao: RequisicaoEntity) = viewModelScope.launch {
-        requisicaoDao.deletar(requisicao)
+    suspend fun buscarPorId(id: Int): RequisicaoEntity? {
+        return requisicaoDao.buscarPorId(id)
+    }
+
+    fun responderRequisicao(
+        id: Int,
+        status: StatusRequisicao,
+        coordenadorId: Int,
+        mensagem: String?
+    ) = viewModelScope.launch {
+        val requisicao = requisicaoDao.buscarPorId(id)
+        requisicao?.let {
+            val resposta = it.copy(
+                status = status,
+                coordenadorId = coordenadorId,
+                mensagemRetorno = mensagem,
+                dataResposta = java.util.Date()
+            )
+            requisicaoDao.atualizar(resposta)
+        }
     }
 }

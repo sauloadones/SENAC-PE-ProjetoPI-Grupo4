@@ -66,6 +66,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("com.google.code.gson:gson:2.10.1")// ou versão mais recente
 
 
     // Testes

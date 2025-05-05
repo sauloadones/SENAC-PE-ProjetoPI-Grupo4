@@ -4,10 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.appsenkaspi.Converters.StatusAcao
+
 import com.example.appsenkaspi.data.AcaoComStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AcaoViewModel(application: Application) : AndroidViewModel(application) {
@@ -64,6 +65,13 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
                 acaoDao.atualizarAcao(acaoAtualizada)
 
             }
+        }
+    }
+    suspend fun inserirRequisicaoSuspend(requisicao: RequisicaoEntity): Long {
+        return withContext(Dispatchers.IO) {
+            AppDatabase.getDatabase(getApplication())
+                .requisicaoDao()
+                .inserir(requisicao)
         }
     }
 }

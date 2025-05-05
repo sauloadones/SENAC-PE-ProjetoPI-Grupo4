@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.appsenkaspi.Converters.Cargo
+
 import com.example.appsenkaspi.databinding.FragmentEditarPilarBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
@@ -44,14 +44,20 @@ class EditarPilarFragment : Fragment() {
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.confirmarButtonWrapperEdicao.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapperEdicao.visibility = View.VISIBLE
+                    binding.iconeMenuEdicao.visibility = View.VISIBLE
+
+                }
                 Cargo.COORDENADOR -> {
                     binding.confirmarButtonWrapperEdicao.visibility = View.VISIBLE
                     binding.pedirConfirmarButtonWrapperEdicao.visibility = View.GONE
-                    binding.iconeMenuEdicao.visibility = View.GONE
+                    binding.iconeMenuEdicao.visibility = View.VISIBLE
                 }
                 Cargo.GESTOR -> {
                     binding.confirmarButtonWrapperEdicao.visibility = View.GONE
-                    binding.pedirConfirmarButtonWrapperEdicao.visibility = View.VISIBLE
+                    binding.pedirConfirmarButtonWrapperEdicao.visibility = View.GONE
                     binding.iconeMenuEdicao.visibility = View.GONE
                 }
                 else -> {

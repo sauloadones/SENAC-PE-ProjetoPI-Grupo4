@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.databinding.FragmentBottomNavBinding
 
 class BottomNavFragment : Fragment() {
@@ -25,19 +24,13 @@ class BottomNavFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
 
-        // Aguarda o ViewModel estar carregado antes de redirecionar
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             funcionario?.let {
                 updateIndicator(R.id.nav_home)
 
-                val destino = when (it.cargo) {
-                    Cargo.APOIO -> TelaAtividadesApoioFragment()
-                    else -> HomeFragment()
-                }
-
                 val atual = parentFragmentManager.findFragmentById(R.id.main_container)
                 if (atual == null) {
-                    navigateTo(destino)
+                    navigateTo(HomeFragment()) // ✅ Direciona todos para o mesmo fragmento
                 }
             }
         }
@@ -56,14 +49,7 @@ class BottomNavFragment : Fragment() {
 
         binding.navHome.setOnClickListener {
             updateIndicator(R.id.nav_home)
-
-            val funcionario = funcionarioViewModel.funcionarioLogado.value
-            val destino = when (funcionario?.cargo) {
-                Cargo.APOIO -> TelaAtividadesApoioFragment()
-                else -> HomeFragment()
-            }
-
-            navigateTo(destino)
+            navigateTo(HomeFragment()) // ✅ Apoio e demais cargos voltam para o padrão
         }
 
         binding.navPerfil.setOnClickListener {

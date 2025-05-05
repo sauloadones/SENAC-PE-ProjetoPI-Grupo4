@@ -10,8 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.appsenkaspi.Converters.Cargo
-import com.example.appsenkaspi.Converters.StatusAcao
+
 import com.example.appsenkaspi.databinding.FragmentCriarAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
@@ -47,6 +46,11 @@ class CriarAcaoFragment : Fragment() {
         configurarBotaoVoltar(view)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.buttonConfirmacaoAcao.visibility = View.GONE
+                    binding.buttonPedirConfirmacaoAcao.visibility = View.VISIBLE
+
+                }
 
                 Cargo.COORDENADOR -> {
                     binding.buttonConfirmacaoAcao.visibility = View.VISIBLE
@@ -55,7 +59,7 @@ class CriarAcaoFragment : Fragment() {
                 }
                 Cargo.GESTOR -> {
                     binding.buttonConfirmacaoAcao.visibility = View.GONE
-                    binding.buttonPedirConfirmacaoAcao.visibility = View.VISIBLE
+                    binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
 
                 }
 
@@ -80,8 +84,14 @@ class CriarAcaoFragment : Fragment() {
                 SelecionarResponsavelDialogFragment()
                     .show(childFragmentManager, "SelecionarFuncionariosDialog")
             }
-        binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
+        binding.buttonPedirConfirmacaoAcao.setOnClickListener {
 
+        }
+
+
+        binding.buttonConfirmacaoAcao.setOnClickListener {
+            confirmarCriacaoAcao()
+        }
         // obtém o pilarId passado nas args
         pilarId = arguments?.getInt("pilarId") ?: -1
         if (pilarId == -1) {

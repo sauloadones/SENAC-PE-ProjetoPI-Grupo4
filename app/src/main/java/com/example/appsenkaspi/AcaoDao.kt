@@ -21,6 +21,9 @@ interface AcaoDao {
     @Insert
     suspend fun inserirAcao(acao: AcaoEntity)
 
+    @Transaction
+    @Query("SELECT * FROM acoes WHERE id = :acaoId")
+    suspend fun buscarComFuncionarios(acaoId: Int): AcaoComFuncionarios
 
 
     /**
@@ -109,6 +112,14 @@ interface AcaoDao {
     GROUP BY a.id
 """)
     suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    fun buscarPorId(id: Int): AcaoEntity?
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getById(id: Int): AcaoEntity
 
 
 

@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.appsenkaspi.Converters.Cargo
-import com.example.appsenkaspi.Converters.PrioridadeAtividade
+
+
 import com.example.appsenkaspi.databinding.FragmentEditarAtividadeBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -45,7 +45,11 @@ class EditarAtividadeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmarAtividade.visibility = View.VISIBLE
 
+                }
                 Cargo.COORDENADOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.VISIBLE
                     binding.botaoPedirConfirmarAtividade.visibility = View.GONE
@@ -53,7 +57,7 @@ class EditarAtividadeFragment : Fragment() {
 
                 Cargo.GESTOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
-                    binding.botaoPedirConfirmarAtividade.visibility = View.VISIBLE
+                    binding.botaoPedirConfirmarAtividade.visibility = View.GONE
                 }
 
                 else -> {

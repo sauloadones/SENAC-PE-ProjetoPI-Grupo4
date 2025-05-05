@@ -29,6 +29,14 @@ interface PilarDao {
     suspend fun inserirRetornandoId(pilar: PilarEntity): Long
 
 
+    @Query("SELECT * FROM pilares WHERE id = :id")
+    suspend fun getById(id: Int): PilarEntity
+
+    @Query("SELECT * FROM pilares WHERE id = :id")
+    suspend fun buscarPorId(id: Int): PilarEntity?
+
+
+
 
 
 }
