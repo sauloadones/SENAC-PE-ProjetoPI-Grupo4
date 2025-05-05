@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import ResponsavelAdapter
 import android.app.Dialog
 import android.os.Bundle
 import android.view.*
@@ -25,23 +26,27 @@ class SelecionarResponsavelDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = ResponsavelAdapter(emptyList(), selecionados) { atualizados ->
-            // Atualização opcional em tempo real se quiser exibir contadores
-        }
+        // ✅ Inicialize o adapter primeiro
+        adapter = ResponsavelAdapter(
+            funcionarios = listOf(), // inicial vazio
+            selecionados = selecionados,
+            onSelecionadosAtualizados = { listaAtualizada ->
+                // Aqui você pode atualizar UI ou estado se quiser
+            }
+        )
 
         binding.recyclerMembros.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerMembros.adapter = adapter
 
+        // ✅ Agora é seguro observar e usar o adapter
         funcionarioViewModel.listasFuncionarios.observe(viewLifecycleOwner) { lista ->
-            adapter = ResponsavelAdapter(lista, selecionados) { atualizados ->
-                // Atualiza a lista sempre que houver clique
-            }
-            binding.recyclerMembros.adapter = adapter
+            adapter.atualizarLista(lista)
         }
 
         binding.fecharDialog.setOnClickListener {
             dismiss()
-            }
+        }
+
         binding.buttonConfirmarSelecionados.setOnClickListener {
             val result = Bundle().apply {
                 putParcelableArrayList("listaFuncionarios", ArrayList(selecionados))
@@ -50,6 +55,7 @@ class SelecionarResponsavelDialogFragment : DialogFragment() {
             dismiss()
         }
     }
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)

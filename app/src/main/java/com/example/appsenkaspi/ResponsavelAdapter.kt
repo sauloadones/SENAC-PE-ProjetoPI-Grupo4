@@ -1,18 +1,21 @@
-package com.example.appsenkaspi
-
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.appsenkaspi.FuncionarioEntity
+import com.example.appsenkaspi.R
 import com.example.appsenkaspi.databinding.ItemResponsavelBinding
 
 class ResponsavelAdapter(
-    private val funcionarios: List<FuncionarioEntity>,
+    funcionarios: List<FuncionarioEntity>,
     private val selecionados: MutableList<FuncionarioEntity>,
-    private val onSelecionadosAtualizados: (List<FuncionarioEntity>) -> Unit
+    private val onSelecionadosAtualizados: (List<FuncionarioEntity>) -> Unit,
+    private val modoLeitura: Boolean = false
 ) : RecyclerView.Adapter<ResponsavelAdapter.ResponsavelViewHolder>() {
+
+    private var listaFuncionarios: MutableList<FuncionarioEntity> = funcionarios.toMutableList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResponsavelViewHolder {
         val binding = ItemResponsavelBinding.inflate(
@@ -22,10 +25,10 @@ class ResponsavelAdapter(
     }
 
     override fun onBindViewHolder(holder: ResponsavelViewHolder, position: Int) {
-        holder.bind(funcionarios[position])
+        holder.bind(listaFuncionarios[position])
     }
 
-    override fun getItemCount(): Int = funcionarios.size
+    override fun getItemCount(): Int = listaFuncionarios.size
 
     inner class ResponsavelViewHolder(
         private val binding: ItemResponsavelBinding
@@ -42,22 +45,32 @@ class ResponsavelAdapter(
                 .placeholder(R.drawable.ic_person)
                 .into(binding.imagemPerfil)
 
-            // Estilo visual conforme seleção
-            val isSelecionado = selecionados.contains(funcionario)
-            binding.root.setCardBackgroundColor(
-                if (isSelecionado) ContextCompat.getColor(contexto, R.color.selecionado)
-                else ContextCompat.getColor(contexto, R.color.nao_selecionado)
-            )
+            if (!modoLeitura) {
+                val isSelecionado = selecionados.contains(funcionario)
+                binding.root.setCardBackgroundColor(
+                    if (isSelecionado) ContextCompat.getColor(contexto, R.color.selecionado)
+                    else ContextCompat.getColor(contexto, R.color.nao_selecionado)
+                )
 
-            binding.root.setOnClickListener {
-                if (isSelecionado) {
-                    selecionados.remove(funcionario)
-                } else {
-                    selecionados.add(funcionario)
+                binding.root.setOnClickListener {
+                    if (isSelecionado) {
+                        selecionados.remove(funcionario)
+                    } else {
+                        selecionados.add(funcionario)
+                    }
+                    this@ResponsavelAdapter.notifyItemChanged(adapterPosition)
+                    onSelecionadosAtualizados.invoke(selecionados)
                 }
-                notifyItemChanged(adapterPosition)
-                onSelecionadosAtualizados(selecionados)
+            } else {
+                binding.root.setCardBackgroundColor(Color.TRANSPARENT)
+                binding.root.setOnClickListener(null)
             }
         }
+    }
+
+    fun atualizarLista(novaLista: List<FuncionarioEntity>) {
+        listaFuncionarios.clear()
+        listaFuncionarios.addAll(novaLista)
+        notifyDataSetChanged()
     }
 }

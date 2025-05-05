@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import com.example.appsenkaspi.Converters.PrioridadeAtividade
+
 
 class EscolherPrioridadeDialogFragment : DialogFragment() {
 

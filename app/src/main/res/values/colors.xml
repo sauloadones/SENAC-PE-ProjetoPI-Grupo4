@@ -13,6 +13,8 @@
         <color name="nao_selecionado">#1E1E1E</color>
         <color name="cinza_claro">#CCCCCC</color>
 
+        <color name="cinza_escuro">#2A2A2A</color>
+
         <color name="gray">#808080</color>
         <color name="light_gray">#CCCCCC</color>
         <color name="dark_gray">#444444</color>

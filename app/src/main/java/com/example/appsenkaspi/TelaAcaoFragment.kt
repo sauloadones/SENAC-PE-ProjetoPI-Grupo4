@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
@@ -25,6 +26,8 @@ class TelaAcaoFragment : Fragment() {
     private val pilarViewModel: PilarViewModel by activityViewModels()
     private val acaoViewModel: AcaoViewModel by activityViewModels()
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+
     private var acaoId: Int = -1
     private lateinit var atividadeAdapter: AtividadeAdapter
 
@@ -40,6 +43,42 @@ class TelaAcaoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+
+                    binding.cardEditarAcao.visibility = View.VISIBLE
+                    binding.cardAdicionarAtividade.visibility = View.VISIBLE
+
+                }
+
+                Cargo.COORDENADOR -> {
+                    binding.cardAdicionarAtividade.visibility = View.VISIBLE
+
+                    binding.cardEditarAcao.visibility = View.VISIBLE
+
+
+                }
+                Cargo.GESTOR -> {
+                    binding.cardAdicionarAtividade.visibility = View.GONE
+
+                    binding.cardEditarAcao.visibility = View.GONE
+
+
+
+
+                }
+
+                else -> {
+                    binding.cardAdicionarAtividade.visibility = View.GONE
+
+                    binding.cardEditarAcao.visibility = View.GONE
+
+                }
+            }
+        }
 
         acaoId = arguments?.getInt("acaoId") ?: -1
         if (acaoId == -1) {

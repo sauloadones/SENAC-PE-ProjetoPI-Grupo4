@@ -11,9 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.appsenkaspi.Converters.Cargo
-import com.example.appsenkaspi.Converters.PrioridadeAtividade
-import com.example.appsenkaspi.Converters.StatusAtividade
+
 import com.example.appsenkaspi.databinding.FragmentCriarAtividadeBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
@@ -48,6 +46,10 @@ class CriarAtividadeFragment : Fragment() {
         configurarBotaoVoltar(view)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.botaoConfirmarAtividade.visibility = View.GONE
+                    binding.botaoPedirConfirmacaoAtividade.visibility = View.VISIBLE
+                }
 
                 Cargo.COORDENADOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.VISIBLE
@@ -56,7 +58,7 @@ class CriarAtividadeFragment : Fragment() {
                 }
                 Cargo.GESTOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
-                    binding.botaoPedirConfirmacaoAtividade.visibility = View.VISIBLE
+                    binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
 
                 }
 

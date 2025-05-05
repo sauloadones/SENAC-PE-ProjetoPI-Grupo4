@@ -2,8 +2,7 @@ package com.example.appsenkaspi
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.appsenkaspi.Converters.StatusRequisicao
-import com.example.appsenkaspi.Converters.TipoRequisicao
+
 
 @Dao
 interface RequisicaoDao {
@@ -26,6 +25,16 @@ interface RequisicaoDao {
     @Query("SELECT * FROM requisicoes WHERE tipo = :tipo")
     fun listarPorTipo(tipo: TipoRequisicao): LiveData<List<RequisicaoEntity>>
 
-    @Query("SELECT * FROM requisicoes WHERE idSolicitante = :funcionarioId")
+    @Query("SELECT * FROM requisicoes WHERE solicitanteId = :funcionarioId")
     fun listarPorSolicitante(funcionarioId: Int): LiveData<List<RequisicaoEntity>>
+
+
+
+    @Query("UPDATE requisicoes SET status = :status WHERE id = :id")
+    fun atualizarStatus(id: Int, status: StatusRequisicao)
+
+
+
+    @Query("SELECT * FROM requisicoes WHERE id = :id")
+    suspend fun buscarPorId(id: Int): RequisicaoEntity?
 }

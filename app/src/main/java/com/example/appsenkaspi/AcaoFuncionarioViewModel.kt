@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AcaoFuncionarioViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,4 +27,5 @@ class AcaoFuncionarioViewModel(application: Application) : AndroidViewModel(appl
     fun deletar(acaoFuncionario: AcaoFuncionarioEntity) = viewModelScope.launch {
         dao.deletarAcaoFuncionario(acaoFuncionario)
     }
+
 }

@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.appsenkaspi.Converters.Cargo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +20,8 @@ import kotlinx.coroutines.launch
         ChecklistItemEntity:: class,
         AcaoFuncionarioEntity::class,
         AtividadeFuncionarioEntity::class,
-        RequisicaoEntity::class
+        RequisicaoEntity::class,
+        NotificacaoEntity::class
     ],
     version = 2, // ou 3 se já atualizou
     exportSchema = false
@@ -37,7 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun funcionarioDao(): FuncionarioDao
     abstract fun checklistDao(): ChecklistDao
     abstract fun requisicaoDao(): RequisicaoDao
-
+    abstract fun notificacaoDao(): NotificacaoDao
 
 
     abstract fun acaoFuncionarioDao(): AcaoFuncionarioDao    // 🔵 Adicionado

@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.appsenkaspi.Converters.Cargo
 import com.example.appsenkaspi.databinding.ActivityTelaPrincipalBinding
 import kotlinx.coroutines.launch
 
@@ -13,16 +12,16 @@ class TelaPrincipalActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTelaPrincipalBinding
     private lateinit var funcionarioViewModel: FuncionarioViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Layout primeiro
         binding = ActivityTelaPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Verifica login via SharedPreferences
         val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
         val funcionarioId = prefs.getInt("funcionarioId", -1)
+
         if (funcionarioId == -1) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -45,22 +44,19 @@ class TelaPrincipalActivity : AppCompatActivity() {
                 return@launch
             }
 
+            // Redirecionamento inicial unificado para todos os cargos
             if (savedInstanceState == null) {
                 supportFragmentManager.popBackStack(
                     null,
                     androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
                 )
 
-                val fragmentInicial = when (funcionario.cargo) {
-                    Cargo.APOIO -> TelaAtividadesApoioFragment()
-                    else -> HomeFragment()
-                }
-
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_container, fragmentInicial)
+                    .replace(R.id.main_container, HomeFragment()) // ✅ único destino
                     .commit()
             }
         }
     }
+
 
 }

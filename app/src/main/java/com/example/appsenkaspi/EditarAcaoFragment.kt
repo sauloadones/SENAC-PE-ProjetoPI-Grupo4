@@ -13,8 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.appsenkaspi.Converters.Cargo
-import com.example.appsenkaspi.Converters.StatusAcao
+
 import com.example.appsenkaspi.databinding.FragmentEditarAcaoBinding
 import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
@@ -50,14 +49,18 @@ class EditarAcaoFragment : Fragment() {
         configurarBotaoVoltar(view)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
-
+                Cargo.APOIO -> {
+                    binding.confirmarButtonWrapperEdicao.visibility = View.GONE
+                    binding.cardPedirConfirmacao.visibility = View.VISIBLE
+                    binding.iconeMenuEdicao.visibility = View.GONE
+                }
                 Cargo.COORDENADOR -> {
                     binding.confirmarButtonWrapperEdicao.visibility = View.VISIBLE
                     binding.cardPedirConfirmacao.visibility = View.GONE
                 }
                 Cargo.GESTOR -> {
                     binding.confirmarButtonWrapperEdicao.visibility = View.GONE
-                    binding.cardPedirConfirmacao.visibility = View.VISIBLE
+                    binding.cardPedirConfirmacao.visibility = View.GONE
                     binding.iconeMenuEdicao.visibility = View.GONE
                 }
 
