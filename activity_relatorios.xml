@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
 
-    <!-- TopBar -->
+
 
     <TextView
         android:id="@+id/textView16"
@@ -32,17 +32,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Título da seção -->
-
-    <!-- Campo simples substituindo o Spinner de Pilar -->
-
-    <!-- Campo simples substituindo o Spinner de Tipo de Arquivo -->
-
-    <!-- Seletor de Data -->
-
-    <!-- Botão Gerar Relatório -->
-
-    <!-- Navegação Inferior -->
 
     <TextView
         android:id="@+id/tituloTipoRelatorio"
@@ -400,7 +389,4 @@
         tools:layout_editor_absoluteY="256dp" />
 
     /
-
-    <!-- Demais imagens e textos de relatórios continuam aqui (sem alterações) -->
-    <!-- ... -->
 </androidx.constraintlayout.widget.ConstraintLayout>
