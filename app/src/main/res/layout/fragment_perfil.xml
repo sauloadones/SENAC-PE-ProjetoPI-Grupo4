@@ -1,14 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Topo: Logo e Notificação -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Capa + Foto de Perfil (com espaço para sobreposição) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginBottom="0dp">
+
+        <!-- Banner -->
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_imagemfundo" />
+
+        <!-- Foto de perfil (sobreposta) -->
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="0dp"
+            android:scaleType="centerCrop"
+
+            android:background="@drawable/profile_border"
+            android:src="@drawable/ic_icone_perfil"
+            android:elevation="8dp" />
+    </FrameLayout>
+
+    <!-- Nome e Botão Editar (com paddingTop para compensar sobreposição) -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Perfil do Usuáriooo"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"
-        android:layout_gravity="center"/>
-</FrameLayout>
+        android:orientation="vertical"
+        android:paddingTop="40dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nome de Usuario"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_edit_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editar Perfil"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#0062FF"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+    <!-- Abas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#2C2C2E">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Detalhes"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#3C3C3E"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Trabalhos"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:padding="12dp"/>
+    </LinearLayout>
+
+    <!-- Informações -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_work"
+            android:text="Coordenador na empresa SENAC"
+            android:textColor="#FFFFFF"
+            android:drawablePadding="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_email"
+            android:text="exampleemail@gmail.com"
+            android:textColor="#FFFFFF"
+            android:drawablePadding="8dp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_phone"
+            android:text="+55 (81) 9 4002-8922"
+            android:textColor="#FFFFFF"
+            android:drawablePadding="8dp"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+
+
+</LinearLayout>
