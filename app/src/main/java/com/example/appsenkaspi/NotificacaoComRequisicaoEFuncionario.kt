@@ -1,12 +1,10 @@
-package com.example.appsenkaspi.Notificacao
+package com.example.appsenkaspi
 
 import DadosRequisicao
 import androidx.room.Embedded
-import androidx.room.Ignore
+
 import androidx.room.Relation
-import com.example.appsenkaspi.FuncionarioEntity
-import com.example.appsenkaspi.NotificacaoEntity
-import com.example.appsenkaspi.RequisicaoEntity
+
 
 
 data class NotificacaoComRequisicaoEFuncionario(

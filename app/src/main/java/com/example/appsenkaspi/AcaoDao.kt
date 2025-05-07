@@ -122,6 +122,32 @@ interface AcaoDao {
     suspend fun getById(id: Int): AcaoEntity
 
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(acao: AcaoEntity)
+
+    @Update
+    suspend fun update(acao: AcaoEntity)
+
+
+    @Delete
+    suspend fun delete(acao: AcaoEntity)
+
+
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getAcaoPorId(id: Int): AcaoEntity?
+
+
+
+    @Query("SELECT * FROM acoes")
+    fun listarTodas(): LiveData<List<AcaoEntity>>
+
+
+
+
+
+
 
 
 

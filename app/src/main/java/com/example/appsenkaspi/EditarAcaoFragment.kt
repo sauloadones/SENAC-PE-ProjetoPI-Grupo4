@@ -1,8 +1,10 @@
 package com.example.appsenkaspi
 
+
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentEditarAcaoBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
+
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -81,6 +86,60 @@ class EditarAcaoFragment : Fragment() {
         binding.buttonPickDateEdicao.setOnClickListener { abrirDatePicker() }
         binding.iconSelecionarFuncionario.setOnClickListener { abrirDialogSelecionarFuncionarios() }
         binding.confirmarButtonWrapperEdicao.setOnClickListener { confirmarEdicaoAcao() }
+        binding.cardPedirConfirmacao.setOnClickListener {
+            val nome = binding.inputNomeEdicao.text.toString().trim()
+            val descricao = binding.inputDescricaoEdicao.text.toString().trim()
+            val funcionarioLogado = funcionarioViewModel.funcionarioLogado.value
+
+            if (nome.isEmpty() || dataPrazoSelecionada == null || funcionarioLogado == null) {
+                Toast.makeText(requireContext(), "Preencha todos os campos obrigatórios!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val acao =
+                    AppDatabase.getDatabase(requireContext()).acaoDao().getAcaoPorIdDireto(acaoId)
+                if (acao == null) return@launch
+
+                val nomePilar = acao.pilarId?.let {
+                    AppDatabase.getDatabase(requireContext()).pilarDao().getNomePilarPorId(it)
+                } ?: "Pilar não identificado"
+
+                val acaoJson = AcaoJson(
+                    id = acao.id,
+                    nome = nome,
+                    descricao = descricao,
+                    dataInicio = acao.dataInicio,
+                    dataPrazo = dataPrazoSelecionada!!,
+                    status = acao.status,
+                    criadoPor = acao.criadoPor,
+                    dataCriacao = acao.dataCriacao,
+                    pilarId = acao.pilarId,
+                    nomePilar = nomePilar,
+                    responsaveis = funcionariosSelecionados.map { it.id }
+                )
+
+                val requisicao = RequisicaoEntity(
+                    tipo = TipoRequisicao.EDITAR_ACAO,
+                    acaoJson = Gson().toJson(acaoJson),
+                    status = StatusRequisicao.PENDENTE,
+                    solicitanteId = funcionarioLogado.id,
+                    dataSolicitacao = Date()
+                )
+
+                AppDatabase.getDatabase(requireContext()).requisicaoDao().inserir(requisicao)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Requisição enviada para aprovação!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    parentFragmentManager.popBackStack()
+                }
+            }
+        }
+
         val menuIcon = view.findViewById<ImageView>(R.id.iconeMenuEdicao)
         menuIcon.setOnClickListener { exibirPopupMenu(it) }
 

@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+
 import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -13,14 +14,15 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
 
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class TelaAtividadeFragment : Fragment() {
 
@@ -28,14 +30,12 @@ class TelaAtividadeFragment : Fragment() {
     private val binding get() = _binding!!
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val checklistViewModel: ChecklistViewModel by activityViewModels()
-    private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ Novo
+    private val acaoViewModel: AcaoViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-    private val requisicaoViewModel: RequisicaoViewModel by activityViewModels()
+    private val requisicaoViewModel: NotificacaoViewModel by activityViewModels()
     private var atividadeId: Int = -1
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTelaAtividadeBinding.inflate(inflater, container, false)
         atividadeId = arguments?.getInt("atividadeId") ?: -1
         return binding.root
@@ -44,7 +44,7 @@ class TelaAtividadeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
+
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
@@ -53,19 +53,12 @@ class TelaAtividadeFragment : Fragment() {
                     binding.cardPedirConfirmacao.visibility = View.VISIBLE
                     binding.btnEditar.visibility = View.VISIBLE
                     binding.btnDeletar.visibility = View.GONE
-
-
                 }
-                 Cargo.COORDENADOR -> {
+                Cargo.COORDENADOR -> {
                     binding.cardConfirmarAtividade.visibility = View.VISIBLE
                     binding.cardPedirConfirmacao.visibility = View.GONE
-                }
-                Cargo.GESTOR -> {
-                    binding.cardConfirmarAtividade.visibility = View.GONE
-                    binding.btnEditar.visibility = View.GONE
-                    binding.btnDeletar.visibility = View.GONE
-                    binding.cardPedirConfirmacao.visibility = View.GONE
-
+                    binding.btnDeletar.visibility = View.VISIBLE
+                    binding.btnEditar.visibility = View.VISIBLE
                 }
                 else -> {
                     binding.cardConfirmarAtividade.visibility = View.GONE
@@ -76,17 +69,11 @@ class TelaAtividadeFragment : Fragment() {
             }
         }
 
-
         if (atividadeId == -1) {
             Toast.makeText(requireContext(), "Erro: atividade inválida.", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
             return
         }
-
-
-
-
-
 
         atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividadeComFuncionarios ->
             if (atividadeComFuncionarios != null) {
@@ -120,57 +107,6 @@ class TelaAtividadeFragment : Fragment() {
                 .commit()
         }
 
-        binding.btnDeletar.setOnClickListener {
-            mostrarDialogoConfirmacao()
-        }
-
-        binding.btnAdicionarItemChecklist.setOnClickListener {
-            val editText = EditText(requireContext()).apply {
-                hint = "Digite o nome do item"
-                setTextColor(Color.WHITE)
-                setHintTextColor(Color.LTGRAY)
-                background = ContextCompat.getDrawable(context, R.drawable.bg_edittext_dialog)
-                setPadding(32, 24, 32, 24)
-            }
-
-            val container = FrameLayout(requireContext()).apply {
-                setPadding(48, 24, 48, 0)
-                addView(editText)
-            }
-
-            val dialog = AlertDialog.Builder(requireContext())
-                .setTitle("Novo item do checklist")
-                .setView(container)
-                .setPositiveButton("Adicionar", null)
-                .setNegativeButton("Cancelar", null)
-                .create()
-
-            dialog.setOnShowListener {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
-                    setTextColor(Color.parseColor("#3C82F6"))
-                    setOnClickListener {
-                        val texto = editText.text.toString().trim()
-                        if (texto.isNotEmpty()) {
-                            checklistViewModel.inserir(
-                                ChecklistItemEntity(
-                                    descricao = texto,
-                                    atividadeId = atividadeId
-                                )
-                            )
-                            dialog.dismiss()
-                        } else {
-                            editText.error = "Este campo não pode estar vazio"
-                        }
-                    }
-                }
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.WHITE)
-            }
-
-            dialog.show()
-        }
-
-
-
         binding.cardConfirmarAtividade.setOnClickListener {
             atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->
                 if (atividade != null) {
@@ -185,6 +121,56 @@ class TelaAtividadeFragment : Fragment() {
                 }
             }
         }
+
+
+        binding.btnDeletar.setOnClickListener {
+            mostrarDialogoConfirmacao()
+        }
+
+        binding.cardPedirConfirmacao.setOnClickListener {
+            atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividade ->
+                val funcionario = funcionarioViewModel.funcionarioLogado.value ?: return@observe
+
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val acao = AppDatabase.getDatabase(requireContext()).acaoDao().getAcaoPorIdDireto(atividade.atividade.acaoId)
+                    val nomePilar = acao?.pilarId?.let {
+                        AppDatabase.getDatabase(requireContext()).pilarDao().getNomePilarPorId(it)
+                    } ?: "Pilar não identificado"
+
+                    val atividadeJson = AtividadeJson(
+                        id = atividade.atividade.id,
+                        nome = atividade.atividade.nome,
+                        descricao = atividade.atividade.descricao,
+                        dataInicio = atividade.atividade.dataInicio,
+                        dataPrazo = atividade.atividade.dataPrazo,
+                        status = StatusAtividade.CONCLUIDA,
+                        prioridade = atividade.atividade.prioridade,
+                        criadoPor = atividade.atividade.criadoPor,
+                        dataCriacao = atividade.atividade.dataCriacao,
+                        acaoId = atividade.atividade.acaoId,
+                        nomePilar = nomePilar,
+                        responsaveis = atividade.funcionarios.map { it.id }
+                    )
+
+                    val json = Gson().toJson(atividadeJson)
+
+                    val requisicao = RequisicaoEntity(
+                        tipo = TipoRequisicao.COMPLETAR_ATIVIDADE,
+                        atividadeJson = json,
+                        status = StatusRequisicao.PENDENTE,
+                        solicitanteId = funcionario.id,
+                        dataSolicitacao = Date()
+                    )
+
+                    requisicaoViewModel.inserirRequisicao(requisicao)
+
+                    launch(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Requisição de conclusão enviada para aprovação!", Toast.LENGTH_SHORT).show()
+                        parentFragmentManager.popBackStack()
+                    }
+                }
+            }
+        }
     }
 
     private fun preencherCampos(atividade: AtividadeComFuncionarios) {
@@ -192,7 +178,6 @@ class TelaAtividadeFragment : Fragment() {
         binding.descricaoAtividade.text = atividade.atividade.descricao
 
         val prioridade = atividade.atividade.prioridade
-
         binding.textPrioridade.text = when (prioridade) {
             PrioridadeAtividade.ALTA -> "Prioridade Alta"
             PrioridadeAtividade.MEDIA -> "Prioridade Média"
@@ -233,8 +218,6 @@ class TelaAtividadeFragment : Fragment() {
                 atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->
                     if (atividade != null) {
                         atividadeViewModel.deletarAtividadePorId(atividadeId)
-
-                        // ✅ Atualiza o status da ação após deletar a atividade
                         acaoViewModel.atualizarStatusAcaoAutomaticamente(atividade.acaoId)
                     }
                 }

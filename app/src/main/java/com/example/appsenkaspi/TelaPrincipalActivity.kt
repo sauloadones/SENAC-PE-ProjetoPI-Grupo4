@@ -19,8 +19,8 @@ class TelaPrincipalActivity : AppCompatActivity() {
         binding = ActivityTelaPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
-        val funcionarioId = prefs.getInt("funcionarioId", -1)
+        val prefs = getSharedPreferences("funcionario_prefs", MODE_PRIVATE)
+        val funcionarioId = prefs.getInt("funcionario_id", -1)
 
         if (funcionarioId == -1) {
             startActivity(Intent(this, MainActivity::class.java))

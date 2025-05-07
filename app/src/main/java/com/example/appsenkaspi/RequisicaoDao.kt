@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
@@ -8,33 +9,22 @@ import androidx.room.*
 interface RequisicaoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserir(requisicao: RequisicaoEntity): Long
+    suspend fun inserir(requisicao: RequisicaoEntity)
 
     @Update
-    suspend fun atualizar(requisicao: RequisicaoEntity)
-
-    @Delete
-    suspend fun deletar(requisicao: RequisicaoEntity)
-
-    @Query("SELECT * FROM requisicoes ORDER BY dataCriacao DESC")
-    fun listarTodas(): LiveData<List<RequisicaoEntity>>
+    suspend fun update(requisicao: RequisicaoEntity)
 
     @Query("SELECT * FROM requisicoes WHERE status = :status")
-    fun listarPorStatus(status: StatusRequisicao): LiveData<List<RequisicaoEntity>>
-
-    @Query("SELECT * FROM requisicoes WHERE tipo = :tipo")
-    fun listarPorTipo(tipo: TipoRequisicao): LiveData<List<RequisicaoEntity>>
-
-    @Query("SELECT * FROM requisicoes WHERE solicitanteId = :funcionarioId")
-    fun listarPorSolicitante(funcionarioId: Int): LiveData<List<RequisicaoEntity>>
-
-
-
-    @Query("UPDATE requisicoes SET status = :status WHERE id = :id")
-    fun atualizarStatus(id: Int, status: StatusRequisicao)
-
+    fun getRequisicoesPendentes(status: StatusRequisicao = StatusRequisicao.PENDENTE): LiveData<List<RequisicaoEntity>>
 
 
     @Query("SELECT * FROM requisicoes WHERE id = :id")
-    suspend fun buscarPorId(id: Int): RequisicaoEntity?
+    suspend fun getRequisicaoById(id: Int): RequisicaoEntity?
+
+    @Query("SELECT * FROM requisicoes WHERE solicitanteId = :userId ORDER BY dataSolicitacao DESC")
+    fun getRequisicoesDoUsuario(userId: Int): LiveData<List<RequisicaoEntity>>
+
+    @Query("SELECT * FROM requisicoes WHERE solicitanteId = :usuarioId ORDER BY dataSolicitacao DESC")
+    fun getNotificacoesDoApoio(usuarioId: Int): LiveData<List<RequisicaoEntity>>
+
 }

@@ -14,7 +14,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentTelaPilarBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,7 +42,8 @@ class TelaPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
+        configurarBotaoSino(view, parentFragmentManager)
+
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {

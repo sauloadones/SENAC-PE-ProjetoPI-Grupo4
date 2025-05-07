@@ -14,6 +14,9 @@ interface PilarDao {
     suspend fun buscarPilarPorId(id: Int): PilarEntity?
 
     @Query("SELECT * FROM pilares WHERE id = :id")
+    suspend fun getPilarPorId(id: Int): PilarEntity?
+
+    @Query("SELECT * FROM pilares WHERE id = :id")
     fun getPilarById(id: Int): LiveData<PilarEntity?>
 
     @Update
@@ -34,6 +37,9 @@ interface PilarDao {
 
     @Query("SELECT * FROM pilares WHERE id = :id")
     suspend fun buscarPorId(id: Int): PilarEntity?
+
+    @Query("SELECT nome FROM pilares WHERE id = :id")
+    suspend fun getNomePilarPorId(id: Int): String?
 
 
 

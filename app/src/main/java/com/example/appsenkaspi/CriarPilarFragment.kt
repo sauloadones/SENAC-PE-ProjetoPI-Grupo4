@@ -11,7 +11,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -131,8 +130,8 @@ class CriarPilarFragment : Fragment() {
             binding.buttonPickDate.error = "Escolha um prazo"
             return
         }
-        val prefs = requireContext().getSharedPreferences("loginPrefs", android.content.Context.MODE_PRIVATE)
-        val funcionarioId = prefs.getInt("funcionarioId", -1)
+        val prefs = requireContext().getSharedPreferences("funcionario_prefs", android.content.Context.MODE_PRIVATE)
+        val funcionarioId = prefs.getInt("funcionario_id", -1)
         if (funcionarioId == -1) {
             Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
             return

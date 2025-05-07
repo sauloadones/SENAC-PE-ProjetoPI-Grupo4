@@ -1,48 +1,23 @@
 package com.example.appsenkaspi
-
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.Date
 
-@Entity(
-    tableName = "requisicoes",
-    foreignKeys = [
-        ForeignKey(
-            entity = PilarEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["pilarId"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = FuncionarioEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["solicitanteId"],
-            onDelete = ForeignKey.SET_NULL
-        ),
-        ForeignKey(
-            entity = FuncionarioEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["coordenadorId"],
-            onDelete = ForeignKey.SET_NULL
-        )
-    ],
-    indices = [Index("pilarId"), Index("solicitanteId"), Index("coordenadorId")]
-)
+
+
+@Entity(tableName = "requisicoes")
 data class RequisicaoEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-
     val tipo: TipoRequisicao,
-    val status: StatusRequisicao = StatusRequisicao.PENDENTE,
-
-    val pilarId: Int,
-
     val atividadeJson: String? = null,
     val acaoJson: String? = null,
-
+    val atividadeId: Int? = null,
+    val acaoId: Int? = null,
     val solicitanteId: Int,
+    val status: StatusRequisicao = StatusRequisicao.PENDENTE,
+    val dataSolicitacao: Date = Date(),
+    val dataResposta: Date? = null,
     val coordenadorId: Int? = null,
-
-    val mensagemRetorno: String? = null,
-
-    val dataCriacao: Date = Date(),
-    val dataResposta: Date? = null
+    val mensagemResposta: String? = null
 )
+

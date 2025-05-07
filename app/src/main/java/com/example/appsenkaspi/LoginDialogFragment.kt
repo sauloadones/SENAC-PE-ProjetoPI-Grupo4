@@ -2,6 +2,7 @@ package com.example.appsenkaspi
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -66,23 +67,18 @@ class LoginDialogFragment : DialogFragment() {
                 return@setOnClickListener
             }
 
-            // Executa a verificação em background
             lifecycleScope.launch {
                 val dao = AppDatabase.getDatabase(requireContext()).funcionarioDao()
                 val funcionario = dao.autenticar(idAcesso, senha)
 
                 if (funcionario != null) {
-                    // 1. Salva o ID no SharedPreferences
-                    val prefs = requireContext().getSharedPreferences("loginPrefs", android.content.Context.MODE_PRIVATE)
-                    prefs.edit().putInt("funcionarioId", funcionario.id).apply()
+                    // Salva login no SharedPreferences
+                    val prefs = requireContext().getSharedPreferences("funcionario_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putInt("funcionario_id", funcionario.id).apply()
                     prefs.edit().putBoolean("lembrarLogin", checkBox.isChecked).apply()
 
-
-
-                    // 2. Salva no ViewModel (sessão atual)
                     funcionarioViewModel.logarFuncionario(funcionario)
 
-                    // 3. Navega para a tela principal
                     startActivity(Intent(requireContext(), TelaPrincipalActivity::class.java))
                     dismiss()
                 } else {
