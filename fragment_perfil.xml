@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+
+    <ImageView
+        android:layout_width="94dp"
+        android:layout_height="92dp"
+        android:src="@drawable/logo"
+        tools:layout_editor_absoluteX="25dp"
+        tools:layout_editor_absoluteY="23dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_notification"
+        tools:layout_editor_absoluteX="345dp"
+        tools:layout_editor_absoluteY="43dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="399dp"
+        android:layout_height="289dp"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_fundo"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="90dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="  Nome do Usuário "
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="18dp"
+        tools:layout_editor_absoluteY="360dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="74dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:contentDescription="Imagem de Perfil"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_icone_perfil"
+        tools:layout_editor_absoluteX="25dp"
+        tools:layout_editor_absoluteY="300dp"
+        tools:ignore="MissingConstraints" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/button"
+        android:layout_width="127dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="36dp"
+        android:text="editar perfil"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="402dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="425dp"
+        android:layout_height="130dp"
+        android:src="@drawable/ic_teladoperfil"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="-13dp"
+        tools:layout_editor_absoluteY="623dp" />
+
+    <ImageView
+        android:layout_width="44dp"
+        android:layout_height="39dp"
+        android:src="@drawable/ic_adicionar"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="605dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="29dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_carta"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="549dp"
+        tools:ignore="MissingConstraints" />
+
+
+    <ImageView
+        android:layout_width="29dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_empresa"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="523dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="29dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_telefone"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="577dp"
+        tools:ignore="MissingConstraints" />
+
+
+    <ImageView
+        android:layout_width="230dp"
+        android:layout_height="74dp"
+        android:src="@drawable/ic_detalhe"
+        tools:layout_editor_absoluteX="-14dp"
+        tools:layout_editor_absoluteY="447dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:layout_width="230dp"
+        android:layout_height="74dp"
+        android:src="@drawable/ic_trabalho"
+        tools:layout_editor_absoluteX="214dp"
+        tools:layout_editor_absoluteY="447dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="  Cordenador na empresa SENAC "
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="528dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="  +55 (81) 9 4002-8922 "
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="582dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="  exampleemail@gmail.com "
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="554dp"
+        tools:ignore="MissingConstraints" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
