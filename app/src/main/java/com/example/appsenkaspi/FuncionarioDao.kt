@@ -39,4 +39,12 @@ interface FuncionarioDao {
 
     @Delete
     suspend fun deletarFuncionario(funcionario: FuncionarioEntity)
+
+    @Query("SELECT * FROM funcionarios WHERE id IN (:ids)")
+    suspend fun getFuncionariosPorIds(ids: List<Int>): List<FuncionarioEntity>
+
+    @Query("SELECT * FROM funcionarios WHERE id = :id LIMIT 1")
+    suspend fun getFuncionarioById(id: Int): FuncionarioEntity?
+
+
 }

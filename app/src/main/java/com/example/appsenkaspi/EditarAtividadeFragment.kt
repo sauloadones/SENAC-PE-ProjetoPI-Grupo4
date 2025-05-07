@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-
-
 import com.example.appsenkaspi.databinding.FragmentEditarAtividadeBinding
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,7 +24,7 @@ class EditarAtividadeFragment : Fragment() {
 
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-    private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ Adicionado
+    private val acaoViewModel: AcaoViewModel by activityViewModels()
 
     private var atividadeId: Int = -1
     private lateinit var atividadeOriginal: AtividadeEntity
@@ -33,33 +33,24 @@ class EditarAtividadeFragment : Fragment() {
     private var prioridadeSelecionada: PrioridadeAtividade? = null
     private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentEditarAtividadeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
                     binding.botaoPedirConfirmarAtividade.visibility = View.VISIBLE
-
                 }
                 Cargo.COORDENADOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.VISIBLE
                     binding.botaoPedirConfirmarAtividade.visibility = View.GONE
                 }
-
-                Cargo.GESTOR -> {
-                    binding.botaoConfirmarAtividade.visibility = View.GONE
-                    binding.botaoPedirConfirmarAtividade.visibility = View.GONE
-                }
-
                 else -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
                     binding.botaoPedirConfirmarAtividade.visibility = View.GONE
@@ -67,14 +58,12 @@ class EditarAtividadeFragment : Fragment() {
             }
         }
 
-
         atividadeId = arguments?.getInt("atividadeId") ?: -1
         if (atividadeId == -1) {
             Toast.makeText(requireContext(), "Erro: atividade inválida!", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
             return
         }
-
 
         atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividadeComFuncionarios ->
             if (atividadeComFuncionarios != null) {
@@ -100,6 +89,55 @@ class EditarAtividadeFragment : Fragment() {
 
         binding.botaoConfirmarAtividade.setOnClickListener {
             salvarAlteracoes()
+        }
+
+        binding.botaoPedirConfirmarAtividade.setOnClickListener {
+            val nome = binding.inputNomeAtividade.text.toString().trim()
+            val descricao = binding.inputDescricao.text.toString().trim()
+            val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
+
+            if (nome.isEmpty() || dataInicio == null || dataFim == null || prioridadeSelecionada == null || funcionariosSelecionados.isEmpty() || funcionarioCriador == null) {
+                Toast.makeText(requireContext(), "Preencha todos os campos obrigatórios.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val nomePilar = AppDatabase.getDatabase(requireContext())
+                    .pilarDao()
+                    .getNomePilarPorId(atividadeOriginal.acaoId) ?: "Indefinido"
+
+                val atividadeEditada = AtividadeJson(
+                    id = atividadeOriginal.id,
+                    nome = nome,
+                    descricao = descricao,
+                    dataInicio = dataInicio!!,
+                    dataPrazo = dataFim!!,
+                    status = StatusAtividade.PENDENTE,
+                    prioridade = prioridadeSelecionada!!,
+                    criadoPor = funcionarioCriador.id,
+                    dataCriacao = atividadeOriginal.dataCriacao,
+                    acaoId = atividadeOriginal.acaoId,
+                    nomePilar = nomePilar,
+                    responsaveis = funcionariosSelecionados.map { it.id }
+                )
+
+                val json = Gson().toJson(atividadeEditada)
+
+                val requisicao = RequisicaoEntity(
+                    tipo = TipoRequisicao.EDITAR_ATIVIDADE,
+                    atividadeJson = json,
+                    status = StatusRequisicao.PENDENTE,
+                    solicitanteId = funcionarioCriador.id,
+                    dataSolicitacao = Date()
+                )
+
+                AppDatabase.getDatabase(requireContext()).requisicaoDao().inserir(requisicao)
+
+                launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Requisição de edição enviada para aprovação.", Toast.LENGTH_SHORT).show()
+                    parentFragmentManager.popBackStack()
+                }
+            }
         }
 
         parentFragmentManager.setFragmentResultListener("prioridadeSelecionada", viewLifecycleOwner) { _, bundle ->
@@ -240,7 +278,6 @@ class EditarAtividadeFragment : Fragment() {
                 atividadeViewModel.inserirRelacaoFuncionario(relacao)
             }
 
-            // ✅ Atualiza o status da ação automaticamente após edição
             acaoViewModel.atualizarStatusAcaoAutomaticamente(atividadeAtualizada.acaoId)
         }
 

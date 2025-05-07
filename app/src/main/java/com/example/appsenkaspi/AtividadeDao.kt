@@ -51,7 +51,7 @@ interface AtividadeDao {
     @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId")
     fun contarTotalPorAcao(acaoId: Int): LiveData<Int>
 
-    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'CONCLUIDA'")
+    @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId AND status = 'concluida'")
     fun contarConcluidasPorAcao(acaoId: Int): LiveData<Int>
 
     @Query("SELECT COUNT(*) FROM atividades WHERE acaoId = :acaoId")
@@ -96,6 +96,24 @@ interface AtividadeDao {
     @Transaction
     @Query("SELECT * FROM atividades WHERE id = :atividadeId")
     suspend fun buscarComFuncionarios(atividadeId: Int): AtividadeComFuncionarios
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(atividade: AtividadeEntity)
+
+    @Update
+    suspend fun update(atividade: AtividadeEntity)
+
+    @Delete
+    suspend fun delete(atividade: AtividadeEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertComRetorno(atividade: AtividadeEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun inserirRelacaoFuncionario(relacao: AtividadeFuncionarioEntity)
+
+
+
 
 
 

@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -12,6 +13,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class AcaoViewModel(application: Application) : AndroidViewModel(application) {
+    private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
 
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
     private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
@@ -67,11 +69,12 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    suspend fun inserirRequisicaoSuspend(requisicao: RequisicaoEntity): Long {
-        return withContext(Dispatchers.IO) {
-            AppDatabase.getDatabase(getApplication())
-                .requisicaoDao()
-                .inserir(requisicao)
-        }
+    suspend fun buscarAcaoPorId(id: Int): AcaoEntity? {
+        return acaoDao.getAcaoPorId(id)
     }
+
+    suspend fun buscarPilarPorId(id: Int): PilarEntity? {
+        return pilarDao.getPilarPorId(id)
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.example.appsenkaspi
 
 import android.animation.ObjectAnimator
-import android.graphics.Color
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -14,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,7 +41,6 @@ class TelaAcaoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        configurarBotaoSino(view, viewLifecycleOwner, funcionarioViewModel)
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {

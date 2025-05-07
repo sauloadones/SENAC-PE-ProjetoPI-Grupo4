@@ -1,3 +1,4 @@
+// DetalheNotificacaoFragment.kt
 package com.example.appsenkaspi
 
 import android.app.DatePickerDialog
@@ -11,9 +12,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-
 import com.example.appsenkaspi.databinding.FragmentCriarAtividadeBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +26,7 @@ class CriarAtividadeFragment : Fragment() {
 
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-    private val acaoViewModel: AcaoViewModel by activityViewModels() // ✅ NOVO
+    private val acaoViewModel: AcaoViewModel by activityViewModels()
 
     private var dataInicio: Date? = null
     private var dataFim: Date? = null
@@ -33,10 +34,7 @@ class CriarAtividadeFragment : Fragment() {
     private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
     private var acaoId: Int = -1
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCriarAtividadeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -44,28 +42,20 @@ class CriarAtividadeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
                     binding.botaoPedirConfirmacaoAtividade.visibility = View.VISIBLE
                 }
-
                 Cargo.COORDENADOR -> {
                     binding.botaoConfirmarAtividade.visibility = View.VISIBLE
                     binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
-
                 }
-                Cargo.GESTOR -> {
-                    binding.botaoConfirmarAtividade.visibility = View.GONE
-                    binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
-
-                }
-
                 else -> {
                     binding.botaoConfirmarAtividade.visibility = View.GONE
                     binding.botaoPedirConfirmacaoAtividade.visibility = View.GONE
-
                 }
             }
         }
@@ -100,6 +90,77 @@ class CriarAtividadeFragment : Fragment() {
 
         binding.botaoConfirmarAtividade.setOnClickListener {
             confirmarCriacaoAtividade()
+        }
+
+        binding.botaoPedirConfirmacaoAtividade.setOnClickListener {
+            val nome = binding.inputNomeAtividade.text.toString().trim()
+            val descricao = binding.inputDescricao.text.toString().trim()
+            val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
+
+
+            when {
+                nome.isEmpty() -> {
+                    binding.inputNomeAtividade.error = "Nome obrigatório"
+                    return@setOnClickListener
+                }
+                dataInicio == null || dataFim == null -> {
+                    Toast.makeText(requireContext(), "Preencha as datas", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                prioridadeSelecionada == null -> {
+                    Toast.makeText(requireContext(), "Selecione uma prioridade", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                funcionariosSelecionados.isEmpty() -> {
+                    Toast.makeText(requireContext(), "Selecione ao menos um responsável", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                funcionarioCriador == null -> {
+                    Toast.makeText(requireContext(), "Erro de autenticação!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val acao = acaoViewModel.buscarAcaoPorId(acaoId)
+                val pilarId = acao?.pilarId
+                val nomePilar = if (pilarId != null) {
+                    AppDatabase.getDatabase(requireContext()).pilarDao().getNomePilarPorId(pilarId)
+                } else {
+                    "Pilar não identificado"
+                }
+
+                val atividadeJson = AtividadeJson(
+                    nome = nome,
+                    descricao = descricao,
+                    dataInicio = dataInicio!!,
+                    dataPrazo = dataFim!!,
+                    status = StatusAtividade.PENDENTE,
+                    prioridade = prioridadeSelecionada!!,
+                    criadoPor = funcionarioCriador.id,
+                    acaoId = acaoId,
+                    nomePilar = nomePilar ?: "",
+                    dataCriacao = Date(),
+                    responsaveis = funcionariosSelecionados.map { it.id }
+                )
+
+                val json = Gson().toJson(atividadeJson)
+
+                val requisicao = RequisicaoEntity(
+                    tipo = TipoRequisicao.CRIAR_ATIVIDADE,
+                    atividadeJson = json,
+                    status = StatusRequisicao.PENDENTE,
+                    solicitanteId = funcionarioCriador.id,
+                    dataSolicitacao = Date()
+                )
+
+                AppDatabase.getDatabase(requireContext()).requisicaoDao().inserir(requisicao)
+
+                launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Requisição enviada para aprovação!", Toast.LENGTH_SHORT).show()
+                    parentFragmentManager.popBackStack()
+                }
+            }
         }
 
         setFragmentResultListener("prioridadeSelecionada") { _, bundle ->
@@ -189,7 +250,12 @@ class CriarAtividadeFragment : Fragment() {
         val nome = binding.inputNomeAtividade.text.toString().trim()
         val descricao = binding.inputDescricao.text.toString().trim()
         val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
-
+        val prefs = requireContext().getSharedPreferences("funcionario_prefs", android.content.Context.MODE_PRIVATE)
+        val funcionarioId = prefs.getInt("funcionarioId", -1)
+        if (funcionarioId == -1) {
+            Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
+            return
+        }
         when {
             nome.isEmpty() -> {
                 binding.inputNomeAtividade.error = "Nome obrigatório"
@@ -223,7 +289,8 @@ class CriarAtividadeFragment : Fragment() {
             status = StatusAtividade.PENDENTE,
             prioridade = prioridadeSelecionada!!,
             criadoPor = funcionarioCriador.id,
-            dataCriacao = Date()
+            dataCriacao = Date(),
+
         )
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -250,4 +317,3 @@ class CriarAtividadeFragment : Fragment() {
         _binding = null
     }
 }
-

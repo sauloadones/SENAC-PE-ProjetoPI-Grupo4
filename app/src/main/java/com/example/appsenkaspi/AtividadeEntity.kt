@@ -47,5 +47,5 @@ data class AtividadeEntity(
     @ColumnInfo(name = "status") val status: StatusAtividade,
     @ColumnInfo(name = "prioridade") val prioridade: PrioridadeAtividade,
     @ColumnInfo(name = "criado_por") val criadoPor: Int,
-    @ColumnInfo(name = "data_criacao") val dataCriacao: Date
+    @ColumnInfo(name = "data_criacao") val dataCriacao: Date,
 )

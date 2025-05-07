@@ -32,7 +32,7 @@ class Converters {
     fun toStatusPilar(value: String): StatusPilar = try {
         StatusPilar.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
-        StatusPilar.VENCIDO
+        StatusPilar.ATIVO
     }
 
     // StatusAcao
@@ -90,27 +90,11 @@ class Converters {
         TipoRequisicao.COMPLETAR_ATIVIDADE
     }
 
-    // StatusNotificacao
-    @TypeConverter
-    fun fromStatusNotificacao(status: StatusNotificacao): String = status.name.lowercase()
 
-    @TypeConverter
-    fun toStatusNotificacao(value: String): StatusNotificacao = try {
-        StatusNotificacao.valueOf(value.uppercase())
-    } catch (e: IllegalArgumentException) {
-        StatusNotificacao.NOVA
-    }
+
 
     // TipoDeNotificacao
-    @TypeConverter
-    fun fromTipoDeNotificacao(tipo: TipoDeNotificacao): String = tipo.name.lowercase()
 
-    @TypeConverter
-    fun toTipoDeNotificacao(value: String): TipoDeNotificacao = try {
-        TipoDeNotificacao.valueOf(value.uppercase())
-    } catch (e: IllegalArgumentException) {
-        TipoDeNotificacao.PEDIDO_CRIACAO_ACAO
-    }
 
     // JSON para entidades completas (opcional, se usados em campos string)
     private val gson = Gson()

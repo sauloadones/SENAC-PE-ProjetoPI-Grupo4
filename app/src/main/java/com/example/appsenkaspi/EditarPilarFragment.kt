@@ -14,7 +14,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 
 import com.example.appsenkaspi.databinding.FragmentEditarPilarBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*

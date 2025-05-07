@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.example.appsenkaspi.databinding.FragmentCriarAcaoBinding
-import com.example.appsenkaspi.utils.configurarBotaoVoltar
+
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,6 +26,7 @@ class CriarAcaoFragment : Fragment() {
     private val acaoViewModel: AcaoViewModel by activityViewModels()
     private val acaoFuncionarioViewModel: AcaoFuncionarioViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private val requisicaoViewModel: NotificacaoViewModel by activityViewModels()
 
     private var dataPrazoSelecionada: Date? = null
     private val calendario = Calendar.getInstance()
@@ -44,70 +46,87 @@ class CriarAcaoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
                     binding.buttonConfirmacaoAcao.visibility = View.GONE
                     binding.buttonPedirConfirmacaoAcao.visibility = View.VISIBLE
-
                 }
-
                 Cargo.COORDENADOR -> {
                     binding.buttonConfirmacaoAcao.visibility = View.VISIBLE
                     binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
-
                 }
-                Cargo.GESTOR -> {
-                    binding.buttonConfirmacaoAcao.visibility = View.GONE
-                    binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
-
-                }
-
                 else -> {
                     binding.buttonConfirmacaoAcao.visibility = View.GONE
                     binding.buttonPedirConfirmacaoAcao.visibility = View.GONE
-
                 }
             }
         }
 
-        // configura RecyclerView
         adapterSelecionados = FuncionarioSelecionadoAdapter(funcionariosSelecionados)
         binding.recyclerViewFuncionariosSelecionados.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewFuncionariosSelecionados.adapter = adapterSelecionados
 
-        // listeners de clique
         binding.buttonPickDateAcao.setOnClickListener { abrirDatePicker() }
-        binding.iconSelecionarFuncionario
-            .setOnClickListener {
-                SelecionarResponsavelDialogFragment()
-                    .show(childFragmentManager, "SelecionarFuncionariosDialog")
-            }
+        binding.iconSelecionarFuncionario.setOnClickListener {
+            SelecionarResponsavelDialogFragment().show(childFragmentManager, "SelecionarFuncionariosDialog")
+        }
+
         binding.buttonPedirConfirmacaoAcao.setOnClickListener {
+            val nome = binding.inputNomeAcao.text.toString().trim()
+            val descricao = binding.inputDescricaoAcao.text.toString().trim()
+            val funcionarioLogado = funcionarioViewModel.funcionarioLogado.value
 
+            if (nome.isEmpty() || dataPrazoSelecionada == null || funcionariosSelecionados.isEmpty() || funcionarioLogado == null) {
+                Toast.makeText(requireContext(), "Preencha todos os campos obrigatórios!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                val nomePilar = acaoViewModel.buscarPilarPorId(pilarId)?.nome ?: "Pilar não identificado"
+
+                val acaoJson = AcaoJson(
+                    nome = nome,
+                    descricao = descricao,
+                    dataPrazo = dataPrazoSelecionada!!,
+                    dataInicio = Date(),
+                    criadoPor = funcionarioLogado.id,
+                    status = StatusAcao.PLANEJADA,
+                    dataCriacao = Date(),
+                    pilarId = pilarId,
+                    nomePilar = nomePilar,
+                    responsaveis = funcionariosSelecionados.map { it.id }
+                )
+
+                val json = Gson().toJson(acaoJson)
+
+                val requisicao = RequisicaoEntity(
+                    tipo = TipoRequisicao.CRIAR_ACAO,
+                    acaoJson = json,
+                    status = StatusRequisicao.PENDENTE,
+                    solicitanteId = funcionarioLogado.id,
+                    dataSolicitacao = Date()
+                )
+
+                requisicaoViewModel.inserirRequisicao(requisicao)
+                Toast.makeText(requireContext(), "Requisição de ação enviada para aprovação!", Toast.LENGTH_SHORT).show()
+                parentFragmentManager.popBackStack()
+            }
         }
 
+        binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
 
-        binding.buttonConfirmacaoAcao.setOnClickListener {
-            confirmarCriacaoAcao()
-        }
-        // obtém o pilarId passado nas args
         pilarId = arguments?.getInt("pilarId") ?: -1
         if (pilarId == -1) {
             Toast.makeText(requireContext(), "Erro: Pilar inválido!", Toast.LENGTH_SHORT).show()
-            parentFragmentManager.popBackStack() // volta uma tela (semântica)
+            parentFragmentManager.popBackStack()
             return
         }
 
-        // **OUVINTE** para o resultado de seleção de funcionários
-        childFragmentManager.setFragmentResultListener(
-            "funcionariosSelecionados",
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val lista = bundle.getParcelableArrayList<FuncionarioEntity>(
-                "listaFuncionarios"
-            ) ?: arrayListOf()
+        childFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
+            val lista = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: arrayListOf()
             funcionariosSelecionados.clear()
             funcionariosSelecionados.addAll(lista.filterNotNull())
             adapterSelecionados.notifyDataSetChanged()
@@ -129,12 +148,6 @@ class CriarAcaoFragment : Fragment() {
         ).show()
     }
 
-    private fun abrirDialogSelecionarFuncionarios() {
-        // **AGORA** usa childFragmentManager
-        SelecionarResponsavelDialogFragment()
-            .show(childFragmentManager, "SelecionarFuncionariosDialog")
-    }
-
     private fun confirmarCriacaoAcao() {
         val nome = binding.inputNomeAcao.text.toString().trim()
         val descricao = binding.inputDescricaoAcao.text.toString().trim()
@@ -143,7 +156,6 @@ class CriarAcaoFragment : Fragment() {
             Toast.makeText(context, "Erro: usuário não autenticado!", Toast.LENGTH_SHORT).show()
             return
         }
-
 
         if (nome.isEmpty()) {
             binding.inputNomeAcao.error = "Digite o nome da ação"
@@ -162,34 +174,30 @@ class CriarAcaoFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            // insere a ação e obtém o ID
             val idNovaAcao: Int = acaoViewModel.inserirRetornandoId(
                 AcaoEntity(
-                    nome       = nome,
-                    descricao  = descricao,
+                    nome = nome,
+                    descricao = descricao,
                     dataInicio = Date(),
-                    dataPrazo  = dataPrazoSelecionada!!,
-                    pilarId    = pilarId,
-                    status      = StatusAcao.PLANEJADA,
-                    criadoPor   = funcionarioLogado.id, // <- pegue o ID real do usuário logado
+                    dataPrazo = dataPrazoSelecionada!!,
+                    pilarId = pilarId,
+                    status = StatusAcao.PLANEJADA,
+                    criadoPor = funcionarioLogado.id,
                     dataCriacao = Date()
-
                 )
             )
-            // relaciona cada funcionário à ação
+
             funcionariosSelecionados.forEach { func ->
                 acaoFuncionarioViewModel.inserir(
                     AcaoFuncionarioEntity(
-                        acaoId        = idNovaAcao,
+                        acaoId = idNovaAcao,
                         funcionarioId = func.id
                     )
                 )
             }
-            Toast.makeText(requireContext(),
-                "Ação criada com sucesso!",
-                Toast.LENGTH_SHORT
-            ).show()
-            parentFragmentManager.popBackStack()  // volta à TelaPilar
+
+            Toast.makeText(requireContext(), "Ação criada com sucesso!", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.popBackStack()
         }
     }
 
