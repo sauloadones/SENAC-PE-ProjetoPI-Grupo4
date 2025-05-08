@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient">
+    android:background="#FFFFFF">
 
-    <!-- Topo: Logo e Notificação -->
+    <!-- Topo -->
     <include
         android:id="@+id/header"
         layout="@layout/view_top_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- Capa + Foto de Perfil (com espaço para sobreposição) -->
+    <!-- Banner + Foto de perfil -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:layout_marginBottom="0dp">
+        android:layout_height="220dp">
 
-        <!-- Banner -->
         <ImageView
             android:id="@+id/banner"
             android:layout_width="match_parent"
@@ -27,26 +23,36 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_imagemfundo" />
 
-        <!-- Foto de perfil (sobreposta) -->
+        <ImageButton
+            android:id="@+id/edit_banner_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="46dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_pencil"
+            android:contentDescription="Editar banner"
+            android:scaleType="centerInside" />
+
         <ImageView
             android:id="@+id/profile_pic"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="bottom|start"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="0dp"
             android:scaleType="centerCrop"
             android:background="@drawable/profile_border"
             android:src="@drawable/ic_icone_perfil"
             android:elevation="8dp" />
     </FrameLayout>
 
-    <!-- Nome e Botão Editar (com paddingTop para compensar sobreposição) -->
+    <!-- Nome e Botão -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="40dp"
+        android:paddingTop="17dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
@@ -67,69 +73,27 @@
             android:textSize="14sp"
             android:textColor="#FFFFFF"
             android:backgroundTint="#0062FF"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp" />
     </LinearLayout>
 
-    <!-- Abas -->
-    <LinearLayout
+    <!-- TabLayout -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#2C2C2E">
+        android:background="#1E1E1E"
+        android:layout_marginTop="13dp"
+        app:tabIndicatorHeight="1dp"
+        app:tabIndicatorColor="#FFFFFF"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabTextColor="#AAAAAA" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Detalhes"
-            android:textColor="#FFFFFF"
-            android:gravity="center"
-            android:padding="12dp"
-            android:background="#3C3C3E"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Trabalhos"
-            android:textColor="#666666"
-            android:gravity="center"
-            android:padding="12dp"/>
-    </LinearLayout>
-
-    <!-- Informações -->
-    <LinearLayout
+    <!-- ViewPager2 para as abas -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#00000000" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_work"
-            android:text="Coordenador na empresa SENAC"
-            android:textColor="#FFFFFF"
-            android:drawablePadding="8dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_email"
-            android:text="exampleemail@gmail.com"
-            android:textColor="#FFFFFF"
-            android:drawablePadding="8dp"
-            android:layout_marginTop="8dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_phone"
-            android:text="+55 (81) 9 4002-8922"
-            android:textColor="#FFFFFF"
-            android:drawablePadding="8dp"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>
