@@ -6,56 +6,64 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
 
-    <!-- Header fixo no topo -->
+    <!-- Header -->
     <include
         android:id="@+id/header"
         layout="@layout/view_top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- Título encostado nas bordas -->
-    <TextView
-        android:id="@+id/tituloAtividade"
+    <!-- Título -->
+    <FrameLayout
+        android:id="@+id/headerNovaAtividade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Identificação dos Riscos"
-        android:textColor="#FFFFFF"
         android:background="#1E4B78"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textAlignment="center" />
+        android:padding="12dp"
+        android:layout_marginTop="0dp">
 
-    <!-- Conteúdo scrollável com padding -->
+        <TextView
+            android:id="@+id/tituloAtividade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Identificação dos Riscos"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <!-- Conteúdo -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:paddingHorizontal="1dp">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp">
 
-            <!-- Descrição com ícone (bg_card aplicado) -->
+            <!-- Descrição -->
             <LinearLayout
+                android:id="@+id/areaDescricao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="top"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="8dp"
                 android:padding="12dp"
                 android:background="@drawable/bg_card">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_text"
                     android:layout_marginEnd="8dp"
-                    app:tint="#FFFFFF"/>
+                    app:tint="#FFFFFF" />
 
                 <TextView
                     android:id="@+id/descricaoAtividade"
@@ -64,32 +72,33 @@
                     android:layout_weight="1"
                     android:text="Descrição detalhada da atividade."
                     android:textColor="#CCCCCC"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
             </LinearLayout>
+
 
             <!-- Linha divisória -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#555555"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginTop="12dp"
+                android:background="#444444" />
 
-            <!-- Barra de prioridade (bg_card já incluso como bg_prioridade) -->
+            <!-- Prioridade -->
             <LinearLayout
                 android:id="@+id/layoutPrioridade"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_prioridade">
+                android:padding="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:id="@+id/iconPrioridade"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_priority"
                     android:layout_marginEnd="8dp"
                     app:tint="@android:color/white" />
@@ -104,20 +113,21 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Responsáveis (bg_card aplicado) -->
+            <!-- Responsáveis -->
             <LinearLayout
+                android:id="@+id/areaResponsaveis"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp"
                 android:padding="12dp"
-                android:background="@drawable/bg_card"
-                android:weightSum="1">
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_card">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_person"
                     android:layout_marginEnd="8dp"
                     app:tint="#FFFFFF" />
@@ -127,29 +137,32 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="end"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    android:gravity="end" />
             </LinearLayout>
 
-            <!-- Datas (bg_card aplicado) -->
+            <!-- Datas -->
             <LinearLayout
+                android:id="@+id/areaDatas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="24dp"
                 android:padding="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="8dp"
                 android:background="@drawable/bg_card">
 
+                <!-- Data de início -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="4dp">
 
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_clock"
                         android:layout_marginEnd="8dp"
                         app:tint="#FFFFFF" />
@@ -163,63 +176,63 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
+                <!-- Linha divisória -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="8dp"
+                    android:background="#444444" />
+
+                <!-- Data de término -->
                 <TextView
                     android:id="@+id/textDataPrazo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Prazo até: ..."
                     android:textColor="#CCCCCC"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:layout_marginStart="28dp" />
             </LinearLayout>
 
-            <!-- Botão Adicionar Item -->
-            <Button
-                android:id="@+id/btnAdicionarItemChecklist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Adicionar"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#3C82F6"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:drawableStart="@drawable/ic_checklist"
-                android:drawablePadding="8dp"/>
-
+            <!-- Checklist -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerChecklist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="8dp" />
 
             <!-- Botões de ação -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_horizontal">
+                android:gravity="center"
+                android:layout_marginTop="24dp">
 
                 <Button
                     android:id="@+id/btnEditar"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Editar atividade"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#3C82F6"
                     android:visibility="gone"
-                    android:layout_marginEnd="16dp" />
-
+                    android:layout_marginEnd="8dp" />
 
                 <Button
                     android:id="@+id/btnDeletar"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Deletar"
                     android:textColor="#FFFFFF"
+                    android:backgroundTint="#E74C3C"
                     android:visibility="gone"
-                    android:backgroundTint="#E74C3C" />
+                    android:layout_marginStart="8dp" />
             </LinearLayout>
-            <!-- Card para COORDENADOR / GESTOR: Confirmar diretamente -->
+            <!-- Card Coordenador -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardConfirmarAtividade"
                 android:layout_width="match_parent"
@@ -242,10 +255,10 @@
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:padding="10dp"/>
+                    android:padding="10dp" />
             </androidx.cardview.widget.CardView>
 
-            <!-- Card para APOIO: Solicitar confirmação -->
+            <!-- Card Apoio -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardPedirConfirmacao"
                 android:layout_width="match_parent"
@@ -268,9 +281,8 @@
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:padding="10dp"/>
+                    android:padding="10dp" />
             </androidx.cardview.widget.CardView>
-
 
         </LinearLayout>
     </ScrollView>
