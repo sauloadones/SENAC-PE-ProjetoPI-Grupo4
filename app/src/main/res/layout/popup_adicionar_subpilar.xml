@@ -1,69 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="24dp"
-    android:background="#2C2C2C">
+    android:padding="24dp">
 
-    <!-- Nome do Subpilar -->
-    <EditText
-        android:id="@+id/inputNomeSubpilar"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome do Subpilar"
-        android:background="@drawable/bg_input_box"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#CCCCCC"
-        android:padding="12dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:background="@drawable/rounded_popup"
+        android:padding="24dp"
+        android:elevation="6dp">
 
-    <!-- Descrição -->
-    <EditText
-        android:id="@+id/inputDescricaoSubpilar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Descrição do Subpilar"
-        android:background="@drawable/bg_input_box"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#CCCCCC"
-        android:padding="12dp"
-        android:gravity="start|top"
-        android:minHeight="100dp"
-        app:layout_constraintTop_toBottomOf="@id/inputNomeSubpilar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        <TextView
+            android:id="@+id/titleSubpilar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Criar Subpilar"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="0dp" />
 
-    <!-- Botão para escolher Data -->
-    <Button
-        android:id="@+id/buttonPickDateSubpilar"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="Selecionar Prazo"
-        android:backgroundTint="#8D8D8D"
-        android:textColor="#525252"
-        android:drawableStart="@drawable/ic_calendar"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/inputDescricaoSubpilar"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <EditText
+            android:id="@+id/inputNomeSubpilar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Nome do Subpilar"
+            android:background="@drawable/bg_input_box"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#CCCCCC"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/titleSubpilar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Botão Confirmar -->
-    <Button
-        android:id="@+id/buttonConfirmarSubpilar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Confirmar Subpilar"
-        android:backgroundTint="#164773"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonPickDateSubpilar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <EditText
+            android:id="@+id/inputDescricaoSubpilar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Descrição do Subpilar"
+            android:background="@drawable/bg_input_box"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#CCCCCC"
+            android:padding="12dp"
+            android:gravity="start|top"
+            android:minHeight="100dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/inputNomeSubpilar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/buttonPickDateSubpilar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Selecionar Prazo"
+            android:background="@drawable/rounded_button_calendar"
+            android:textColor="#CCCCCC"
+            android:drawableEnd="@drawable/ic_calendar"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/inputDescricaoSubpilar"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/buttonConfirmarSubpilar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Criar Subpilar"
+            android:backgroundTint="#164773"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/buttonPickDateSubpilar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

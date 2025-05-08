@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
-
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 
@@ -35,31 +35,27 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Define a cor da status bar
+        requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.graybar)
+
         configurarBotaoSino(view, parentFragmentManager)
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
                     binding.cardAdicionarPilar.visibility = View.GONE
-
                 }
-
                 Cargo.COORDENADOR -> {
                     binding.cardAdicionarPilar.visibility = View.VISIBLE
-
                 }
                 Cargo.GESTOR -> {
                     binding.cardAdicionarPilar.visibility = View.GONE
-
-
                 }
-
                 else -> {
                     binding.cardAdicionarPilar.visibility = View.GONE
-
                 }
             }
         }
@@ -71,17 +67,14 @@ class HomeFragment : Fragment() {
             abrirTelaPilar(pilar)
         }
 
-
-
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-            adapter.submitList(lista) }
+            adapter.submitList(lista)
+        }
 
         funcionarioLogadoId = arguments?.getInt("funcionarioId") ?: -1
-
-
 
         cardAdicionarPilar.setOnClickListener {
             val fragment = CriarPilarFragment().apply {
@@ -109,6 +102,7 @@ class HomeFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
