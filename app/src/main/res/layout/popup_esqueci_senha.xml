@@ -3,7 +3,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/rounded_popup"
-    android:padding="24dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp"
     android:layout_gravity="center">
 
     <ImageView
@@ -32,22 +35,24 @@
 
     <EditText
         android:id="@+id/editTextIdRecuperacao"
-        android:layout_width="280dp"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:hint="ID"
         android:textColor="#FFFFFF"
-        android:textColorHint="#EAEAEA"
+        android:textColorHint="#B4B4B4"
         android:background="@drawable/rounded_input"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/buttonRecuperar"
-        android:layout_width="280dp"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="Entrar"
+        android:text="Enviar"
         android:layout_marginTop="24dp"
-        android:background="@drawable/roudend_button"
+        android:background="@drawable/bg_button_confirmar"
         android:textColor="#FFFFFF"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

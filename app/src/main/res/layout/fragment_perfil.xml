@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
+<<<<<<< Updated upstream
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -11,3 +12,98 @@
         android:textSize="20sp"
         android:layout_gravity="center"/>
 </FrameLayout>
+=======
+    <!-- Topo -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_top_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Banner + Foto de perfil -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="220dp">
+
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_imagemfundo" />
+
+        <ImageButton
+            android:id="@+id/edit_banner_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="46dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_pencil"
+            android:contentDescription="Editar banner"
+            android:scaleType="centerInside" />
+
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="16dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/profile_border"
+            android:src="@drawable/ic_icone_perfil"
+            android:elevation="8dp" />
+    </FrameLayout>
+
+    <!-- Nome e Botão -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="17dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nome de Usuario"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_edit_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editar Perfil"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#0062FF"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- TabLayout -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1E1E1E"
+        android:layout_marginTop="13dp"
+        app:tabIndicatorHeight="1dp"
+        app:tabIndicatorColor="#FFFFFF"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabTextColor="#AAAAAA" />
+
+    <!-- ViewPager2 para as abas -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#00000000" />
+
+</LinearLayout>
+>>>>>>> Stashed changes
