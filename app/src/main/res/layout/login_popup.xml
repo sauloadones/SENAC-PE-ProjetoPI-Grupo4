@@ -32,16 +32,14 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
-<<<<<<< Updated upstream
-        android:hint="ID"
-=======
         android:hint="ID de Acesso"
->>>>>>> Stashed changes
         android:textColor="#FFFFFF"
         android:textColorHint="#B4B4B4"
         android:backgroundTint="#1F1F1F"
         android:background="@drawable/rounded_input"
         android:paddingStart="12dp"
+        android:inputType="textNoSuggestions|textEmailAddress"
+
         android:layout_gravity="center_horizontal" />
 
     <EditText

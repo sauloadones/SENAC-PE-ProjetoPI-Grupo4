@@ -1,13 +1,113 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/baseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@drawable/background_gradient"
+    tools:context=".RelatorioFragment">
+
+    <include
+        android:id="@+id/topBarRelatorio"
+        layout="@layout/view_top_bar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
+        android:id="@+id/tituloTipoRelatorio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Relatórios"
-        android:textSize="20sp"
-        android:layout_gravity="center"/>
-</FrameLayout>
+        android:layout_marginStart="20dp"
+        android:text="Tipo de Relatório"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/topBarRelatorio"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/inputRelatorio"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_card"
+        android:drawableEnd="@drawable/abrir_arqs"
+        android:drawablePadding="12dp"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
+        app:layout_constraintTop_toBottomOf="@id/tituloTipoRelatorio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/labelArquivo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Arquivo"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/inputRelatorio"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/inputArquivo"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_card"
+        android:drawableEnd="@drawable/abrir_arqs"
+        android:drawablePadding="12dp"
+        android:inputType="text"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
+        app:layout_constraintTop_toBottomOf="@id/labelArquivo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/dataIntervalo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data Inicial - Data Final"
+        android:textColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/inputArquivo"
+        app:layout_constraintStart_toEndOf="@id/imageView24"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="12dp" />
+
+    <ImageView
+        android:id="@+id/imageView24"
+        android:layout_width="29dp"
+        android:layout_height="24dp"
+        app:srcCompat="@drawable/calendarioblack"
+        app:layout_constraintTop_toTopOf="@id/dataIntervalo"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp" />
+
+    <Button
+        android:id="@+id/btnGerarRelatorio"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"
+        android:backgroundTint="#1353A4"
+        android:text="Gerar Relatório"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/dataIntervalo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

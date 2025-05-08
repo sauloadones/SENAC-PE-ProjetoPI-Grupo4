@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:spacing="8dp">
+
+        <!-- Tipo da Requisição -->
+        <TextView
+            android:id="@+id/textTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Requisição"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Pilar -->
+        <TextView
+            android:id="@+id/textPilar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pilar: ..."
+            android:textSize="16sp" />
+
+        <!-- Solicitante -->
+        <TextView
+            android:id="@+id/textSolicitante"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Solicitante: ..."
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Nome -->
+        <TextView
+            android:id="@+id/textNome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nome"
+            android:textStyle="bold"
+            android:textSize="17sp" />
+
+        <!-- Descrição -->
+        <TextView
+            android:id="@+id/textDescricao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descrição"
+            android:layout_marginTop="6dp" />
+
+        <!-- Data Início -->
+        <TextView
+            android:id="@+id/textDataInicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data de Início"
+            android:layout_marginTop="6dp" />
+
+        <!-- Data Entrega / Prazo -->
+        <TextView
+            android:id="@+id/textDataPrazo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data de Entrega/Prazo" />
+
+        <!-- Prioridade -->
+        <TextView
+            android:id="@+id/textPrioridade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Prioridade" />
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Status da Atividade ou Ação" />
+
+        <!-- Responsáveis -->
+        <TextView
+            android:id="@+id/textResponsaveis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Responsáveis" />
+
+        <!-- Botões -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/btnAceitar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aceitar"
+                android:layout_marginEnd="12dp"
+                android:backgroundTint="@android:color/holo_green_dark"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnRecusar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recusar"
+                android:backgroundTint="@android:color/holo_red_dark"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

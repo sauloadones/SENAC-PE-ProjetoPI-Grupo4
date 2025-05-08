@@ -7,7 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-import com.example.appsenkaspi.Converters.Cargo
+
 import kotlinx.parcelize.Parcelize
 
 

@@ -14,7 +14,7 @@
         layout="@layout/view_top_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/container_historico"
@@ -73,13 +73,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_pilar" />
 
+    <!-- FADE BOTTOM -->
+    <View
+        android:id="@+id/fadeBottom"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:background="@drawable/fade_bottom"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerViewPilares"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Botão "+" fixo acima do menu -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardAdicionarPilar"
         android:layout_width="240dp"
         android:layout_height="80dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="48dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -104,11 +113,6 @@
                 android:scaleType="centerInside"
                 app:tint="#FFFFFF" />
         </FrameLayout>
-
     </androidx.cardview.widget.CardView>
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C2C2C"
-    android:padding="16dp">
+    android:background="@drawable/background_gradient">
 
     <!-- TopBar -->
     <include
@@ -25,9 +24,10 @@
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/inputNomePilar"
@@ -38,10 +38,11 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#CCCCCC"
         android:padding="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/tituloNomePilar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Descrição -->
     <TextView
@@ -52,9 +53,10 @@
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/inputNomePilar"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/inputDescricao"
@@ -66,10 +68,11 @@
         android:textColorHint="#CCCCCC"
         android:padding="12dp"
         android:gravity="start|top"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/tituloDescricao"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Data de Prazo -->
     <TextView
@@ -80,9 +83,10 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp"
         android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/inputDescricao"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/buttonPickDate"
@@ -96,9 +100,10 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/tituloDataPrazo"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Botão Adicionar Subpilar -->
     <LinearLayout
@@ -109,9 +114,10 @@
         android:gravity="center_vertical"
         android:clickable="true"
         android:focusable="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/buttonPickDate"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp"
         tools:ignore="UseCompoundDrawables">
 
         <TextView
@@ -121,28 +127,28 @@
             android:text="Adicionar subpilar (Opcional)"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/iconAddSubpilar"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/ic_add_circle_custom"/>
+            android:src="@drawable/ic_add_circle_custom" />
     </LinearLayout>
 
-    <!-- 🛠 Aqui: container para exibir os Subpilares criados -->
+    <!-- RecyclerView dos Subpilares -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSubpilares"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="80dp"
         android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/buttonAddSubpilar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_subpilar" />
-
 
     <!-- Botão Confirmar Pilar -->
     <FrameLayout
@@ -153,11 +159,13 @@
         android:background="@drawable/bg_button_confirmar"
         android:clickable="true"
         android:focusable="true"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/recyclerViewSubpilares"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/textConfirmarPilar"
@@ -167,12 +175,10 @@
             android:text="Confirmar Pilar"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-<<<<<<< Updated upstream
-            android:fontFamily="sans-serif-medium"/>
-=======
             android:fontFamily="sans-serif-medium" />
-
     </FrameLayout>
+
+    <!-- Botão Pedir Confirmação -->
     <FrameLayout
         android:id="@+id/pedirConfirmarButtonWrapper"
         android:layout_width="0dp"
@@ -184,9 +190,9 @@
         android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp"
         android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/recyclerViewSubpilares"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
@@ -198,7 +204,6 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:fontFamily="sans-serif-medium" />
->>>>>>> Stashed changes
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

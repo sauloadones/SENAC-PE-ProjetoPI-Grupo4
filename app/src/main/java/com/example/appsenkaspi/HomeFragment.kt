@@ -10,19 +10,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
-<<<<<<< Updated upstream
-
-=======
+import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 
 @Suppress("DEPRECATION")
->>>>>>> Stashed changes
 class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var cardAdicionarPilar: CardView
     private lateinit var adapter: PilarAdapter
-
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
     private val pilarViewModel: PilarViewModel by activityViewModels()
 
     private var funcionarioLogadoId: Int = -1
@@ -31,13 +31,12 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-<<<<<<< Updated upstream
-=======
 
         // Define a cor da status bar
         requireActivity().window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.graybar)
@@ -60,7 +59,6 @@ class HomeFragment : Fragment() {
                 }
             }
         }
->>>>>>> Stashed changes
 
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
@@ -104,12 +102,9 @@ class HomeFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-<<<<<<< Updated upstream
-=======
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
->>>>>>> Stashed changes
 }

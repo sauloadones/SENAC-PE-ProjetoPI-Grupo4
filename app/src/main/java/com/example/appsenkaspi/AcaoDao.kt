@@ -1,18 +1,30 @@
 package com.example.appsenkaspi
 
-import androidx.lifecycle.LiveData
+
 import androidx.room.*
 import com.example.appsenkaspi.data.AcaoComStatus
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 @Dao
 interface AcaoDao {
+
+
 
     /**
      * Insere uma Ação no banco e retorna o ID gerado.
      * Usa REPLACE para conflitos.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserirAcao(acao: AcaoEntity): Long
+    @Insert
+    suspend fun inserirAcao(acao: AcaoEntity)
+
+    @Transaction
+    @Query("SELECT * FROM acoes WHERE id = :acaoId")
+    suspend fun buscarComFuncionarios(acaoId: Int): AcaoComFuncionarios
+
 
     /**
      * Atualiza uma Ação existente.
@@ -32,21 +44,29 @@ interface AcaoDao {
     @Query("SELECT * FROM acoes WHERE pilarId = :pilarId")
     fun listarAcoesPorPilar(pilarId: Int): LiveData<List<AcaoEntity>>
 
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getAcaoByIdNow(id: Int): AcaoEntity?
+
     /**
      * Busca uma Ação pelo ID.
      */
     @Query("SELECT * FROM acoes WHERE id = :id")
     suspend fun buscarAcaoPorId(id: Int): AcaoEntity?
 
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    fun getAcaoById(id: Int): LiveData<AcaoEntity?>
+
+
+
     /**
      * Retorna a Ação junto com os Funcionários relacionados.
      */
     @Transaction
-    @Query("SELECT * FROM acoes WHERE id = :acaoId")
-    fun buscarAcaoComFuncionarios(acaoId: Int): LiveData<AcaoComFuncionarios>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserirRetornandoId(acao: AcaoEntity): Long
+
+    @Insert
+    suspend fun inserirComRetorno(acao: AcaoEntity): Long
+
 
 
 
@@ -74,6 +94,62 @@ interface AcaoDao {
     GROUP BY a.id
 """)
     fun listarPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>>
+
+    @Query("SELECT * FROM acoes WHERE id = :acaoId LIMIT 1")
+    suspend fun getAcaoPorIdDireto(acaoId: Int): AcaoEntity?
+
+    @Query("""
+    SELECT 
+        a.id AS acaoId,
+        COUNT(at.id) AS totalAtividades,
+        CASE 
+            WHEN COUNT(at.id) = 0 THEN 0.0
+            ELSE CAST(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(at.id)
+        END AS progresso
+    FROM acoes a
+    LEFT JOIN atividades at ON at.acaoId = a.id
+    WHERE a.pilarId = :pilarId
+    GROUP BY a.id
+""")
+    suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    fun buscarPorId(id: Int): AcaoEntity?
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getById(id: Int): AcaoEntity
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(acao: AcaoEntity)
+
+    @Update
+    suspend fun update(acao: AcaoEntity)
+
+
+    @Delete
+    suspend fun delete(acao: AcaoEntity)
+
+
+
+
+    @Query("SELECT * FROM acoes WHERE id = :id")
+    suspend fun getAcaoPorId(id: Int): AcaoEntity?
+
+
+
+    @Query("SELECT * FROM acoes")
+    fun listarTodas(): LiveData<List<AcaoEntity>>
+
+
+
+
+
+
+
+
 
 }
 

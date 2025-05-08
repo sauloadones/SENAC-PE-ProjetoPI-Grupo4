@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:background="#252525"
-    android:elevation="8dp">
+    android:elevation="8dp"
+    android:layout_gravity="bottom"
+    android:fitsSystemWindows="false">
 
     <!-- Container dos itens -->
     <LinearLayout
@@ -27,7 +29,7 @@
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/icon_relatorio"
@@ -57,7 +59,7 @@
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/icon_dashboard"
@@ -87,7 +89,7 @@
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/icon_home"
@@ -117,7 +119,7 @@
             android:gravity="center"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="@android:color/transparent">
 
             <ImageView
                 android:id="@+id/icon_perfil"
@@ -138,11 +140,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Indicador visual ajustado -->
+    <!-- Indicador visual -->
     <View
         android:id="@+id/indicatorSlider"
-        android:layout_width="30dp"
-        android:layout_height="4dp"
+        android:layout_width="80dp"
+        android:layout_height="10dp"
         android:layout_gravity="bottom"
         android:layout_marginBottom="68dp"
         android:background="@drawable/indicador_nav"

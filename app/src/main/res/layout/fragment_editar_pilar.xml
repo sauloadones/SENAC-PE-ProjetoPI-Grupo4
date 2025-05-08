@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C2C2C"
-    android:padding="16dp">
+    android:background="@drawable/background_gradient">
 
     <!-- TopBar -->
     <include
@@ -13,9 +12,9 @@
         layout="@layout/view_top_bar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Texto "Mudar Nome do Pilar" -->
+    <!-- Título: Nome -->
     <TextView
         android:id="@+id/tituloNomeEdicao"
         android:layout_width="wrap_content"
@@ -25,23 +24,24 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Botão Menu Superior Direito -->
+    <!-- Ícone de Menu -->
     <ImageView
         android:id="@+id/iconeMenuEdicao"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:src="@drawable/ic_more_vert"
         android:contentDescription="Menu"
-        android:tint="#FFFFFF"
+        app:tint="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Campo Nome -->
+    <!-- Input Nome -->
     <EditText
         android:id="@+id/inputNomeEdicao"
         android:layout_width="0dp"
@@ -51,25 +51,27 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#CCCCCC"
         android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/tituloNomeEdicao"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Texto "Mudar Descrição" -->
+    <!-- Título: Descrição -->
     <TextView
         android:id="@+id/tituloDescricaoEdicao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mudar Descrição"
+        android:text="Mudar descrição"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/inputNomeEdicao"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Campo Descrição -->
+    <!-- Input Descrição -->
     <EditText
         android:id="@+id/inputDescricaoEdicao"
         android:layout_width="0dp"
@@ -80,44 +82,45 @@
         android:textColorHint="#CCCCCC"
         android:padding="12dp"
         android:gravity="start|top"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/tituloDescricaoEdicao"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Texto "Mudar Prazo do Pilar" -->
+    <!-- Título: Prazo -->
     <TextView
         android:id="@+id/tituloPrazoEdicao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mudar Prazo do Pilar"
+        android:text="Mudar data de prazo do Pilar"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textSize="12sp"
         android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/inputDescricaoEdicao"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Botão Escolher Nova Data -->
+    <!-- Botão Selecionar Nova Data -->
     <Button
         android:id="@+id/buttonPickDateEdicao"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:text="Selecionar Nova Data"
-<<<<<<< Updated upstream
-        android:backgroundTint="#8D8D8D"
-        android:textColor="#000000"
-        android:layout_marginTop="8dp"
-=======
         android:background="@drawable/rounded_button_calendar"
         android:textColor="#CCCCCC"
->>>>>>> Stashed changes
         android:drawableEnd="@drawable/ic_calendar"
         android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintTop_toBottomOf="@id/tituloPrazoEdicao"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Botão Confirmar Edição -->
+    <!-- Botão Confirmar -->
     <FrameLayout
         android:id="@+id/confirmarButtonWrapperEdicao"
         android:layout_width="0dp"
@@ -127,8 +130,11 @@
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintTop_toBottomOf="@id/buttonPickDateEdicao"
         app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
@@ -139,7 +145,35 @@
             android:text="Confirmar Edição"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
-            android:fontFamily="sans-serif-medium" />
+            android:fontFamily="sans-serif-medium"/>
+    </FrameLayout>
+
+    <!-- Botão Pedir Confirmação -->
+    <FrameLayout
+        android:id="@+id/pedirConfirmarButtonWrapperEdicao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:background="@drawable/bg_button_confirmar"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/buttonPickDateEdicao"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/textPedirConfirmarEdicao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Pedir Confirmação Edição"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

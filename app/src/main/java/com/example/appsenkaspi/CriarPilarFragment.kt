@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.appsenkaspi.Converters.StatusPilar
 import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -23,6 +22,7 @@ class CriarPilarFragment : Fragment() {
 
     private val pilarViewModel: PilarViewModel        by activityViewModels()
     private val subpilarViewModel: SubpilarViewModel  by activityViewModels()
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
 
     private var dataPrazoSelecionada: Date? = null
     private val calendario = Calendar.getInstance()
@@ -41,6 +41,34 @@ class CriarPilarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        configurarBotaoVoltar(view)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            when (funcionario?.cargo) {
+                Cargo.APOIO -> {
+                    binding.confirmarButtonWrapper.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.VISIBLE
+                }
+
+                Cargo.COORDENADOR -> {
+                    binding.confirmarButtonWrapper.visibility = View.VISIBLE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+
+                }
+                Cargo.GESTOR -> {
+                    binding.confirmarButtonWrapper.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+
+                }
+
+                else -> {
+                    binding.confirmarButtonWrapper.visibility = View.GONE
+                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+
+                }
+            }
+        }
+
 
         // configura RecyclerView de subpilares
         subpilarAdapter = SubpilarAdapter(listaSubpilares)
@@ -87,6 +115,8 @@ class CriarPilarFragment : Fragment() {
         }
     }
 
+
+
     private fun confirmarCriacaoPilar() {
         val nome      = binding.inputNomePilar.text.toString().trim()
         val descricao = binding.inputDescricao.text.toString().trim()
@@ -100,18 +130,24 @@ class CriarPilarFragment : Fragment() {
             binding.buttonPickDate.error = "Escolha um prazo"
             return
         }
+        val prefs = requireContext().getSharedPreferences("funcionario_prefs", android.content.Context.MODE_PRIVATE)
+        val funcionarioId = prefs.getInt("funcionario_id", -1)
+        if (funcionarioId == -1) {
+            Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
+            return
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             // insere pilar e obtém ID
             val idLong = pilarViewModel.inserirRetornandoId(
                 PilarEntity(
-                    nome       = nome,
-                    descricao  = descricao,
+                    nome = nome,
+                    descricao = descricao,
                     dataInicio = Date(),
-                    dataPrazo  = prazo,
-                    status      = StatusPilar.VENCIDO,
-                    dataCriacao = Date()
-
+                    dataPrazo = prazo,
+                    status = StatusPilar.VENCIDO,
+                    dataCriacao = Date(),
+                    criadoPor = funcionarioId
                 )
             )
             val novoId = idLong.toInt()

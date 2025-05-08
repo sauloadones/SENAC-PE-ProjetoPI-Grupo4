@@ -2,6 +2,7 @@ package com.example.appsenkaspi
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
 
@@ -14,7 +15,8 @@ import java.util.Date
             childColumns = ["pilarId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("pilarId")]
 )
 data class SubpilarEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
