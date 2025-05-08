@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:background="#252525"
-    android:elevation="8dp">
+    android:elevation="8dp"
+    android:layout_gravity="bottom"
+    android:fitsSystemWindows="false">
 
     <!-- Container dos itens -->
     <LinearLayout
@@ -138,7 +140,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Indicador visual ajustado -->
+    <!-- Indicador visual -->
     <View
         android:id="@+id/indicatorSlider"
         android:layout_width="80dp"

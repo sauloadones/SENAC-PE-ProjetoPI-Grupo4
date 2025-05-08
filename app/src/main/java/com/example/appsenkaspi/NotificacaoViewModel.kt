@@ -148,15 +148,13 @@
 
                         }
 
-                        TipoRequisicao.EDITAR_ACAO -> {
+                        TipoRequisicao.CRIAR_ACAO -> {
                             val acao = Gson().fromJson(requisicao.acaoJson, AcaoEntity::class.java)
-                            val acaoExistente = acaoDao.getAcaoById(acao.id)
-
-                            if (acaoExistente != null) {
-                                Log.d("Requisicao", "Editando ação existente: ${acao.id}")
-                                acaoDao.update(acao)
-                            } else {
-                                Log.e("Requisicao", "Erro: ação não encontrada para edição")
+                            try {
+                                acaoDao.insert(acao)
+                                Log.d("Requisicao", "Ação criada com sucesso: ${acao.nome}")
+                            } catch (e: Exception) {
+                                Log.e("Requisicao", "Erro ao criar ação: ${e.message}", e)
                             }
                         }
 

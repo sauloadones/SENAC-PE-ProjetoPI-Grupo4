@@ -88,6 +88,15 @@ abstract class AppDatabase : RoomDatabase() {
                                         senha = "senha123",
                                         idAcesso = 2
                                     ),
+                                    FuncionarioEntity(
+                                        nomeCompleto = "Eu mesmo",
+                                        email = "eumesmo.oliveira@example.com",
+                                        cargo = Cargo.APOIO,
+                                        fotoPerfil = "https://i.pravatar.cc/150?img=3",
+                                        nomeUsuario = "fernanda.oliveira",
+                                        senha = "senha123",
+                                        idAcesso = 4
+                                    ),
                                     // adicione quantos quiser…
                                 )
                                     // outros funcionários...
