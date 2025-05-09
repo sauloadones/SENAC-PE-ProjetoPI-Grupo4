@@ -250,7 +250,6 @@ class CriarAtividadeFragment : Fragment() {
         val nome = binding.inputNomeAtividade.text.toString().trim()
         val descricao = binding.inputDescricao.text.toString().trim()
         val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
-
         when {
             nome.isEmpty() -> {
                 binding.inputNomeAtividade.error = "Nome obrigatório"
