@@ -16,8 +16,9 @@ Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pila
 ## Tecnologia Utilizadas
 
 * Backend: A definir
-* Banco de Dados: PostresSQL
+* Banco de Dados: SQLite
 * Mobile: Kotlin
+* Python: API
 
 ## Requisitos do Sistema
 

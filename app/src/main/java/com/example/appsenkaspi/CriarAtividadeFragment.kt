@@ -250,12 +250,7 @@ class CriarAtividadeFragment : Fragment() {
         val nome = binding.inputNomeAtividade.text.toString().trim()
         val descricao = binding.inputDescricao.text.toString().trim()
         val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
-        val prefs = requireContext().getSharedPreferences("funcionario_prefs", android.content.Context.MODE_PRIVATE)
-        val funcionarioId = prefs.getInt("funcionarioId", -1)
-        if (funcionarioId == -1) {
-            Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
-            return
-        }
+
         when {
             nome.isEmpty() -> {
                 binding.inputNomeAtividade.error = "Nome obrigatório"

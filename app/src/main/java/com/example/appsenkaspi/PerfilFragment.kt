@@ -11,11 +11,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class PerfilFragment : Fragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.fragment_perfil, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+
+     val view = inflater.inflate(R.layout.fragment_perfil, container, false)
 
         val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
         val viewPager = view.findViewById<ViewPager2>(R.id.viewPager)
@@ -33,5 +34,5 @@ class PerfilFragment : Fragment() {
         }.attach()
 
         return view
-    }
+  }
 }

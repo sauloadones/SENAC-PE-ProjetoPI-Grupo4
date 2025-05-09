@@ -36,15 +36,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Badge de notificação -->
-    <View
-        android:id="@+id/notificationBadge"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:background="@drawable/badge_red_circle"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/notificationIcon"
-        app:layout_constraintTop_toTopOf="@id/notificationIcon"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="2dp" />
+  <!-- Badge de notificação com contador -->
+  <TextView
+    android:id="@+id/notificationBadge"
+    android:layout_width="18dp"
+    android:layout_height="18dp"
+    android:background="@drawable/badge_red_circle"
+    android:visibility="gone"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="2dp"
+    android:gravity="center"
+    android:textColor="@android:color/white"
+    android:textSize="10sp"
+    android:textStyle="bold"
+    app:layout_constraintEnd_toEndOf="@id/notificationIcon"
+    app:layout_constraintTop_toTopOf="@id/notificationIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

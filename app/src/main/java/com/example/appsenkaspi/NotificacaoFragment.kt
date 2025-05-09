@@ -12,49 +12,56 @@ import androidx.recyclerview.widget.RecyclerView
 
 class NotificacaoFragment : Fragment() {
 
-    private val viewModel: NotificacaoViewModel by activityViewModels()
-    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-    private lateinit var adapter: RequisicaoAdapter
+  private val viewModel: NotificacaoViewModel by activityViewModels()
+  private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val atividadeViewModel: AtividadeViewModel by activityViewModels()
+  private lateinit var adapter: RequisicaoAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_notificacoes, container, false)
-    }
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+  ): View {
+    return inflater.inflate(R.layout.fragment_notificacoes, container, false)
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
+    recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
-            val modoCoordenador = funcionario?.cargo == Cargo.COORDENADOR
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      val modoCoordenador = funcionario?.cargo == Cargo.COORDENADOR
 
-            adapter = RequisicaoAdapter(modoCoordenador) { requisicao ->
-                if (modoCoordenador) {
-                    val fragment = DetalheNotificacaoFragment().apply {
-                        arguments = Bundle().apply {
-                            putInt("requisicaoId", requisicao.id)
-                        }
-                    }
-                    requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_container, fragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
+      adapter = RequisicaoAdapter(modoCoordenador) { requisicao ->
+        if (modoCoordenador) {
+          val fragment = DetalheNotificacaoFragment().apply {
+            arguments = Bundle().apply {
+              putInt("requisicaoId", requisicao.id)
             }
-
-            recyclerView.adapter = adapter
-
-            if (modoCoordenador) {
-                viewModel.getRequisicoesPendentes().observe(viewLifecycleOwner) { lista ->
-                    adapter.submitList(lista)
-                }
-            } else {
-                val funcionarioId = funcionario?.id ?: -1
-                viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
-                    adapter.submitList(lista)
-                }
-            }
+          }
+          requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.main_container, fragment)
+            .addToBackStack(null)
+            .commit()
         }
+      }
+
+      recyclerView.adapter = adapter
+
+      if (modoCoordenador) {
+        viewModel.getRequisicoesPendentes().observe(viewLifecycleOwner) { lista ->
+          adapter.submitList(lista)
+        }
+      } else {
+        val funcionarioId = funcionario?.id ?: -1
+
+        // ✅ Verificação automática de atividades com prazo próximo
+        atividadeViewModel.verificarAtividadesComPrazoProximo()
+
+        viewModel.marcarTodasComoVistas(funcionarioId)
+
+        viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
+          adapter.submitList(lista)
+        }
+      }
     }
+  }
 }

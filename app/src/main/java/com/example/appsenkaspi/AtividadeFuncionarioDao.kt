@@ -18,9 +18,13 @@ interface AtividadeFuncionarioDao {
         suspend fun getResponsaveisByAtividadeId(atividadeId: Int): List<FuncionarioEntity>
     }
 
+  @Query("SELECT f.* FROM funcionarios f INNER JOIN atividades_funcionarios af ON f.id = af.funcionarioId WHERE af.atividadeId = :atividadeId")
+  suspend fun getResponsaveisDaAtividade(atividadeId: Int): List<FuncionarioEntity>
 
 
-    @Delete
+
+
+  @Delete
     suspend fun deletarAtividadeFuncionario(atividadeFuncionario: AtividadeFuncionarioEntity)
 
     @Query("SELECT funcionarioId FROM atividades_funcionarios WHERE atividadeId = :atividadeId")

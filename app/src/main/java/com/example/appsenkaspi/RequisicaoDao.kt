@@ -27,4 +27,43 @@ interface RequisicaoDao {
     @Query("SELECT * FROM requisicoes WHERE solicitanteId = :usuarioId ORDER BY dataSolicitacao DESC")
     fun getNotificacoesDoApoio(usuarioId: Int): LiveData<List<RequisicaoEntity>>
 
+  @Query("""
+    SELECT * FROM requisicoes
+    WHERE atividadeId = :atividadeId
+    AND solicitanteId = :solicitanteId
+    AND tipo = :tipo
+    AND status = 'PENDENTE'
+    LIMIT 1
+""")
+  suspend fun getRequisicaoPorAtividade(
+    atividadeId: Int,
+    solicitanteId: Int,
+    tipo: TipoRequisicao
+  ): RequisicaoEntity?
+
+
+
+    @Insert
+    suspend fun insert(requisicao: RequisicaoEntity)
+
+  @Query("""
+    SELECT * FROM requisicoes
+    WHERE solicitanteId = :usuarioId AND foiVista = 0
+""")
+  fun getNotificacoesNaoVistas(usuarioId: Int): LiveData<List<RequisicaoEntity>>
+
+  @Query("SELECT COUNT(*) FROM requisicoes WHERE solicitanteId = :usuarioId AND foiVista = 0")
+  fun getQuantidadeNaoVistas(usuarioId: Int): LiveData<Int>
+
+  @Query("UPDATE requisicoes SET foiVista = 1 WHERE solicitanteId = :usuarioId AND foiVista = 0")
+  suspend fun marcarComoVista(usuarioId: Int)
+
+  @Query("SELECT EXISTS(SELECT 1 FROM requisicoes WHERE atividadeId = :atividadeId AND tipo = :tipo AND status = 'PENDENTE')")
+  suspend fun existeRequisicaoPendenteParaAtividade(atividadeId: Int, tipo: TipoRequisicao): Boolean
+
+  // Outras funções...
+
+
+
+
 }

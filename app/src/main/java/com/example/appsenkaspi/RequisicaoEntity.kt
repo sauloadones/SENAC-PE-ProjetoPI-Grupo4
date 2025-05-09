@@ -18,6 +18,8 @@ data class RequisicaoEntity(
     val dataSolicitacao: Date = Date(),
     val dataResposta: Date? = null,
     val coordenadorId: Int? = null,
-    val mensagemResposta: String? = null
+    val mensagemResposta: String? = null,
+    val foiVista: Boolean = false
+
 )
 

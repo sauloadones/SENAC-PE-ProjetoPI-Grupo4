@@ -42,7 +42,7 @@ class TelaPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        configurarBotaoSino(view, parentFragmentManager)
+
 
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->

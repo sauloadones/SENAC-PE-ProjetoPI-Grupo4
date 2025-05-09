@@ -18,7 +18,7 @@ interface AtividadeDao {
 
     @Transaction
     @Query("""
-        SELECT * FROM atividades 
+        SELECT * FROM atividades
         WHERE acaoId = :acaoId
     """)
     fun listarAtividadesComFuncionariosPorAcao(acaoId: Int): LiveData<List<AtividadeComFuncionarios>>
@@ -63,7 +63,7 @@ interface AtividadeDao {
     @Query("""
     SELECT a.* FROM atividades a
     INNER JOIN atividades_funcionarios af ON af.atividadeId = a.id
-    WHERE af.funcionarioId = :funcionarioId 
+    WHERE af.funcionarioId = :funcionarioId
 """)
     fun listarAtividadesPorFuncionario(funcionarioId: Int): LiveData<List<AtividadeEntity>>
 
@@ -111,6 +111,17 @@ interface AtividadeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirRelacaoFuncionario(relacao: AtividadeFuncionarioEntity)
+
+  @Query("""
+    SELECT a.* FROM atividades a
+    INNER JOIN atividades_funcionarios af ON a.id = af.atividadeId
+    WHERE af.funcionarioId = :funcionarioId
+""")
+  suspend fun getAtividadesComPrazoPorFuncionario(funcionarioId: Int): List<AtividadeEntity>
+
+  @Query("SELECT * FROM atividades WHERE dataPrazo IS NOT NULL")
+  suspend fun getTodasAtividadesComDataPrazo(): List<AtividadeEntity>
+
 
 
 

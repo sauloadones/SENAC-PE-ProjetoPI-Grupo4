@@ -174,7 +174,12 @@
             }
         }
 
-        private fun getFuncionarioLogadoId(context: Context): Int {
+      fun getQuantidadeNaoVistas(usuarioId: Int): LiveData<Int> {
+        return requisicaoDao.getQuantidadeNaoVistas(usuarioId)
+      }
+
+
+      private fun getFuncionarioLogadoId(context: Context): Int {
             val prefs = context.getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
             return prefs.getInt("funcionarioId", -1)
         }
@@ -186,6 +191,13 @@
         fun getNotificacoesDoApoio(usuarioId: Int): LiveData<List<RequisicaoEntity>> {
             return requisicaoDao.getNotificacoesDoApoio(usuarioId)
         }
+
+        fun marcarTodasComoVistas(usuarioId: Int) {
+          viewModelScope.launch {
+            requisicaoDao.marcarComoVista(usuarioId)
+          }
+        }
+
 
     }
 
