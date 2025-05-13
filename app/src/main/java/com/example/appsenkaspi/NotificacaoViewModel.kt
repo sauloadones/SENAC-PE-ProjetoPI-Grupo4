@@ -198,6 +198,11 @@
           }
         }
 
+      fun getQuantidadePendentesParaCoordenador(): LiveData<Int> {
+        return requisicaoDao.getQuantidadePendentesParaCoordenador()
+      }
+
+
 
     }
 

@@ -1,3 +1,5 @@
+package com.example.appsenkaspi
+
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +15,9 @@ import com.example.appsenkaspi.StatusRequisicao
 import com.example.appsenkaspi.TipoRequisicao
 
 class RequisicaoAdapter(
-  private val modoCoordenador: Boolean,
-  private val onClick: (RequisicaoEntity) -> Unit = {}
+  private val funcionarioIdLogado: Int,
+  var modoCoordenador: Boolean,
+  var onItemClick: (RequisicaoEntity) -> Unit = {}
 ) : ListAdapter<RequisicaoEntity, RequisicaoAdapter.ViewHolder>(DIFF_CALLBACK) {
 
   inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -32,27 +35,40 @@ class RequisicaoAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val requisicao = getItem(position)
 
+    // 🔔 Mostrar ATIVIDADE_PARA_VENCER apenas para o responsável
+    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER) {
+      if (requisicao.solicitanteId != funcionarioIdLogado) {
+        holder.itemView.visibility = View.GONE
+        holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
+        return
+      }
+
+      holder.textoTitulo.text = "Prazo Próximo"
+      holder.textoMensagem.text = requisicao.mensagemResposta ?: "Atividade próxima do vencimento"
+      holder.iconStatus.setImageResource(R.drawable.ic_info)
+      holder.iconStatus.setColorFilter(Color.parseColor("#2196F3"))
+      holder.itemView.setOnClickListener(null)
+      return
+    }
+
     val titulo = when (requisicao.tipo) {
       TipoRequisicao.CRIAR_ATIVIDADE -> "Criação de Atividade"
       TipoRequisicao.EDITAR_ATIVIDADE -> "Edição de Atividade"
       TipoRequisicao.COMPLETAR_ATIVIDADE -> "Conclusão de Atividade"
       TipoRequisicao.CRIAR_ACAO -> "Criação de Ação"
       TipoRequisicao.EDITAR_ACAO -> "Edição de Ação"
-      TipoRequisicao.ATIVIDADE_PARA_VENCER -> "Atividade Proxima do Prazo"
       else -> "Requisição"
     }
 
     holder.textoTitulo.text = titulo
 
     if (modoCoordenador) {
-      // Visual do Coordenador: sempre pendente
       holder.iconStatus.setImageResource(R.drawable.ic_help)
-      holder.iconStatus.setColorFilter(Color.parseColor("#FFC107")) // Amarelo
-      holder.textoMensagem.text = "Solicitação pendente de aprovação"
-      holder.itemView.setOnClickListener { onClick(requisicao) }
-
+      holder.iconStatus.setColorFilter(Color.parseColor("#FFC107"))
+      holder.textoMensagem.text = requisicao.mensagemResposta?.takeIf { it.isNotBlank() }
+        ?: "Solicitação pendente de aprovação"
+      holder.itemView.setOnClickListener { onItemClick(requisicao) }
     } else {
-      // Visual do Apoio: usa mensagem personalizada se existir
       val (icone, cor) = when (requisicao.status) {
         StatusRequisicao.ACEITA -> R.drawable.ic_check_circle to "#4CAF50"
         StatusRequisicao.RECUSADA -> R.drawable.ic_cancel to "#F44336"
@@ -68,7 +84,7 @@ class RequisicaoAdapter(
       holder.iconStatus.setImageResource(icone)
       holder.iconStatus.setColorFilter(Color.parseColor(cor))
       holder.textoMensagem.text = mensagem
-      holder.itemView.setOnClickListener(null) // sem ação no modo apoio
+      holder.itemView.setOnClickListener(null)
     }
   }
 

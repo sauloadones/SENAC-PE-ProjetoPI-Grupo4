@@ -249,43 +249,52 @@ class EditarAtividadeFragment : Fragment() {
         }
     }
 
-    private fun salvarAlteracoes() {
-        val nome = binding.inputNomeAtividade.text.toString().trim()
-        val descricao = binding.inputDescricao.text.toString().trim()
+  private fun salvarAlteracoes() {
+    val nome = binding.inputNomeAtividade.text.toString().trim()
+    val descricao = binding.inputDescricao.text.toString().trim()
 
-        if (nome.isEmpty() || descricao.isEmpty() || dataInicio == null || dataFim == null || prioridadeSelecionada == null || funcionariosSelecionados.isEmpty()) {
-            Toast.makeText(requireContext(), "Preencha todos os campos obrigatórios.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val atividadeAtualizada = atividadeOriginal.copy(
-            nome = nome,
-            descricao = descricao,
-            dataInicio = dataInicio!!,
-            dataPrazo = dataFim!!,
-            prioridade = prioridadeSelecionada!!,
-            funcionarioId = funcionariosSelecionados.first().id
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            atividadeViewModel.atualizar(atividadeAtualizada)
-            atividadeViewModel.deletarRelacoesPorAtividade(atividadeId)
-            funcionariosSelecionados.forEach { funcionario ->
-                val relacao = AtividadeFuncionarioEntity(
-                    atividadeId = atividadeId,
-                    funcionarioId = funcionario.id
-                )
-                atividadeViewModel.inserirRelacaoFuncionario(relacao)
-            }
-
-            acaoViewModel.atualizarStatusAcaoAutomaticamente(atividadeAtualizada.acaoId)
-        }
-
-        Toast.makeText(requireContext(), "Atividade atualizada com sucesso!", Toast.LENGTH_SHORT).show()
-        parentFragmentManager.popBackStack()
+    if (nome.isEmpty() || descricao.isEmpty() || dataInicio == null || dataFim == null || prioridadeSelecionada == null || funcionariosSelecionados.isEmpty()) {
+      Toast.makeText(requireContext(), "Preencha todos os campos obrigatórios.", Toast.LENGTH_SHORT).show()
+      return
     }
 
-    override fun onDestroyView() {
+    val atividadeAtualizada = atividadeOriginal.copy(
+      nome = nome,
+      descricao = descricao,
+      dataInicio = dataInicio!!,
+      dataPrazo = dataFim!!,
+      prioridade = prioridadeSelecionada!!,
+      funcionarioId = funcionariosSelecionados.first().id
+    )
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      // Atualiza a atividade no banco
+      atividadeViewModel.atualizar(atividadeAtualizada)
+
+      // Atualiza os responsáveis
+      atividadeViewModel.deletarRelacoesPorAtividade(atividadeId)
+      funcionariosSelecionados.forEach { funcionario ->
+        val relacao = AtividadeFuncionarioEntity(
+          atividadeId = atividadeId,
+          funcionarioId = funcionario.id
+        )
+        atividadeViewModel.inserirRelacaoFuncionario(relacao)
+      }
+
+      // Atualiza o status da ação relacionada
+      acaoViewModel.atualizarStatusAcaoAutomaticamente(atividadeAtualizada.acaoId)
+
+      // ✅ Gera notificação se o prazo estiver próximo e o status for pendente
+      atividadeViewModel.verificarAtividadesComPrazoProximo()
+
+      // Interface
+      Toast.makeText(requireContext(), "Atividade atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+      parentFragmentManager.popBackStack()
+    }
+  }
+
+
+  override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

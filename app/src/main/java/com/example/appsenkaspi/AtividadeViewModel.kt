@@ -1,12 +1,12 @@
 package com.example.appsenkaspi
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 
 class AtividadeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -84,7 +84,9 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
     return atividadeDao.listarAtividadesComResponsaveis(funcionarioId)
   }
 
+  // ✅ Gera notificações de prazo apenas para os responsáveis ainda não notificados
   fun verificarAtividadesComPrazoProximo() {
+    Log.d("DEBUG_NOTIF", "verificando prazos...")
     viewModelScope.launch {
       val hoje = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
@@ -109,29 +111,31 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
         ) {
           val diasRestantes = ((prazo.time - hoje.time) / (1000 * 60 * 60 * 24)).toInt()
           val mensagem =
-            "A atividade está a $diasRestantes dia${if (diasRestantes != 1) "s" else ""} do prazo final e aguarda sua atenção."
+            "A atividade '${atividade.nome}' está a $diasRestantes dia${if (diasRestantes != 1) "s" else ""} do prazo final e aguarda sua atenção."
 
           val responsaveis = atividadeFuncionarioDao.getResponsaveisDaAtividade(atividade.id)
 
           for (responsavel in responsaveis) {
-            val jaExiste = requisicaoDao.getRequisicaoPorAtividade(
+            val jaExisteHoje = requisicaoDao.existeRequisicaoHojeParaAtividade(
               atividadeId = atividade.id,
               solicitanteId = responsavel.id,
               tipo = TipoRequisicao.ATIVIDADE_PARA_VENCER
             )
 
-            if (jaExiste == null) {
-              requisicaoDao.insert(
+            if (!jaExisteHoje) {
+              requisicaoDao.inserir(
                 RequisicaoEntity(
                   tipo = TipoRequisicao.ATIVIDADE_PARA_VENCER,
                   atividadeId = atividade.id,
                   solicitanteId = responsavel.id,
-                  status = StatusRequisicao.PENDENTE,
+                  status = StatusRequisicao.ACEITA,
                   dataSolicitacao = Date(),
-                  mensagemResposta = mensagem
+                  mensagemResposta = mensagem,
+                  foiVista = false
                 )
               )
             }
+
           }
         }
       }

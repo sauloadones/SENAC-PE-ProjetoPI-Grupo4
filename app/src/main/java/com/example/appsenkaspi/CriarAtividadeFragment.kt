@@ -246,67 +246,72 @@ class CriarAtividadeFragment : Fragment() {
         }
     }
 
-    private fun confirmarCriacaoAtividade() {
-        val nome = binding.inputNomeAtividade.text.toString().trim()
-        val descricao = binding.inputDescricao.text.toString().trim()
-        val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
-        when {
-            nome.isEmpty() -> {
-                binding.inputNomeAtividade.error = "Nome obrigatório"
-                return
-            }
-            dataInicio == null || dataFim == null -> {
-                Toast.makeText(requireContext(), "Preencha as datas", Toast.LENGTH_SHORT).show()
-                return
-            }
-            prioridadeSelecionada == null -> {
-                Toast.makeText(requireContext(), "Selecione uma prioridade", Toast.LENGTH_SHORT).show()
-                return
-            }
-            funcionariosSelecionados.isEmpty() -> {
-                Toast.makeText(requireContext(), "Selecione ao menos um responsável", Toast.LENGTH_SHORT).show()
-                return
-            }
-            funcionarioCriador == null -> {
-                Toast.makeText(requireContext(), "Erro de autenticação!", Toast.LENGTH_SHORT).show()
-                return
-            }
-        }
+  private fun confirmarCriacaoAtividade() {
+    val nome = binding.inputNomeAtividade.text.toString().trim()
+    val descricao = binding.inputDescricao.text.toString().trim()
+    val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
 
-        val novaAtividade = AtividadeEntity(
-            nome = nome,
-            descricao = descricao,
-            dataInicio = dataInicio!!,
-            dataPrazo = dataFim!!,
-            acaoId = acaoId,
-            funcionarioId = funcionariosSelecionados.first().id,
-            status = StatusAtividade.PENDENTE,
-            prioridade = prioridadeSelecionada!!,
-            criadoPor = funcionarioCriador.id,
-            dataCriacao = Date(),
-
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val id = atividadeViewModel.inserirComRetorno(novaAtividade)
-
-            funcionariosSelecionados.forEach { funcionario ->
-                val relacao = AtividadeFuncionarioEntity(
-                    atividadeId = id,
-                    funcionarioId = funcionario.id
-                )
-                atividadeViewModel.inserirRelacaoFuncionario(relacao)
-            }
-
-            // ✅ Atualiza o status da ação após criar nova atividade
-            acaoViewModel.atualizarStatusAcaoAutomaticamente(acaoId)
-
-            Toast.makeText(requireContext(), "Atividade criada com sucesso!", Toast.LENGTH_SHORT).show()
-            parentFragmentManager.popBackStack()
-        }
+    when {
+      nome.isEmpty() -> {
+        binding.inputNomeAtividade.error = "Nome obrigatório"
+        return
+      }
+      dataInicio == null || dataFim == null -> {
+        Toast.makeText(requireContext(), "Preencha as datas", Toast.LENGTH_SHORT).show()
+        return
+      }
+      prioridadeSelecionada == null -> {
+        Toast.makeText(requireContext(), "Selecione uma prioridade", Toast.LENGTH_SHORT).show()
+        return
+      }
+      funcionariosSelecionados.isEmpty() -> {
+        Toast.makeText(requireContext(), "Selecione ao menos um responsável", Toast.LENGTH_SHORT).show()
+        return
+      }
+      funcionarioCriador == null -> {
+        Toast.makeText(requireContext(), "Erro de autenticação!", Toast.LENGTH_SHORT).show()
+        return
+      }
     }
 
-    override fun onDestroyView() {
+    val novaAtividade = AtividadeEntity(
+      nome = nome,
+      descricao = descricao,
+      dataInicio = dataInicio!!,
+      dataPrazo = dataFim!!,
+      acaoId = acaoId,
+      funcionarioId = funcionariosSelecionados.first().id,
+      status = StatusAtividade.PENDENTE,
+      prioridade = prioridadeSelecionada!!,
+      criadoPor = funcionarioCriador.id,
+      dataCriacao = Date()
+    )
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      val id = atividadeViewModel.inserirComRetorno(novaAtividade)
+
+      // Associa todos os responsáveis
+      funcionariosSelecionados.forEach { funcionario ->
+        val relacao = AtividadeFuncionarioEntity(
+          atividadeId = id,
+          funcionarioId = funcionario.id
+        )
+        atividadeViewModel.inserirRelacaoFuncionario(relacao)
+      }
+
+      // Atualiza o status da ação após nova atividade
+      acaoViewModel.atualizarStatusAcaoAutomaticamente(acaoId)
+
+      // ✅ Gera notificação de prazo para os responsáveis, se aplicável
+      atividadeViewModel.verificarAtividadesComPrazoProximo()
+
+      Toast.makeText(requireContext(), "Atividade criada com sucesso!", Toast.LENGTH_SHORT).show()
+      parentFragmentManager.popBackStack()
+    }
+  }
+
+
+  override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

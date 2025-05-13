@@ -1,10 +1,11 @@
+// ✅ NotificacaoFragment.kt atualizado
 package com.example.appsenkaspi
 
-import RequisicaoAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,12 +26,16 @@ class NotificacaoFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
+    val vazio = view.findViewById<TextView>(R.id.textVazioNotificacoes)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       val modoCoordenador = funcionario?.cargo == Cargo.COORDENADOR
 
-      adapter = RequisicaoAdapter(modoCoordenador) { requisicao ->
+      adapter = RequisicaoAdapter(
+        funcionarioIdLogado = funcionario?.id ?: -1,
+        modoCoordenador = modoCoordenador
+      ) { requisicao ->
         if (modoCoordenador) {
           val fragment = DetalheNotificacaoFragment().apply {
             arguments = Bundle().apply {
@@ -46,20 +51,26 @@ class NotificacaoFragment : Fragment() {
 
       recyclerView.adapter = adapter
 
+      // Controla visibilidade do texto vazio
+      adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        override fun onChanged() {
+          vazio.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+        }
+      })
+
       if (modoCoordenador) {
         viewModel.getRequisicoesPendentes().observe(viewLifecycleOwner) { lista ->
           adapter.submitList(lista)
         }
       } else {
-        val funcionarioId = funcionario?.id ?: -1
-
-        // ✅ Verificação automática de atividades com prazo próximo
-        atividadeViewModel.verificarAtividadesComPrazoProximo()
-
-        viewModel.marcarTodasComoVistas(funcionarioId)
-
+        val funcionarioId = funcionario?.id ?: return@observe
         viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
           adapter.submitList(lista)
+          if (lista.isNotEmpty()) {
+            recyclerView.post {
+              viewModel.marcarTodasComoVistas(funcionarioId)
+            }
+          }
         }
       }
     }

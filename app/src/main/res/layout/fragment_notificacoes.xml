@@ -42,6 +42,17 @@
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+  <TextView
+    android:id="@+id/textVazioNotificacoes"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Nenhuma notificação no momento"
+    android:gravity="center"
+    android:visibility="gone"
+    android:layout_marginTop="16dp"
+    android:textColor="@android:color/darker_gray"
+    android:textSize="16sp"/>
+
     <!-- RecyclerView para notificações -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotificacoes"

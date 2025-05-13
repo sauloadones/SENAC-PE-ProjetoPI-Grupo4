@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -45,57 +48,70 @@ class HomeFragment : Fragment() {
         val funcionarioId = it.id
         funcionarioLogadoId = funcionarioId
 
-        // ✅ Verifica e gera requisições de conclusão automática
+        // 🔁 Geração de notificação de prazo: apenas 1x por dia por funcionário
+        val prefs = requireContext().getSharedPreferences("notificacoes_prazo", Context.MODE_PRIVATE)
+        val ultimaExecucaoKey = "ultima_execucao_funcionario_$funcionarioId"
+        val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val ultimaExecucao = prefs.getString(ultimaExecucaoKey, null)
+
+        if (ultimaExecucao != hoje) {
+          atividadeViewModel.verificarAtividadesComPrazoProximo()
+          prefs.edit().putString(ultimaExecucaoKey, hoje).apply()
+        }
+
+        // ✅ Badge de notificação (bolinha com contador)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+          funcionario?.let {
+            configurarNotificacaoBadge(
+              rootView = view,
+              lifecycleOwner = viewLifecycleOwner,
+              fragmentManager = parentFragmentManager,
+              funcionarioId = it.id,
+              cargo = it.cargo,
+              viewModel = notificacaoViewModel
+            )
+          }
+        }
+
+        // ✅ Botão do sino
 
 
-        // ✅ Configura o contador de notificações não vistas no badge
-        inicializarNotificacaoBadge(
-          rootView = view,
-          lifecycleOwner = viewLifecycleOwner,
-          fragmentManager = parentFragmentManager,
-          funcionarioId = funcionarioLogadoId,
-          viewModel = notificacaoViewModel
-        )
-
-        // ✅ Configura botão do sino
-        configurarBotaoSino(view, parentFragmentManager, funcionarioId, notificacaoViewModel)
-
-        // ✅ Visibilidade do botão "Adicionar Pilar" conforme o cargo
+        // ✅ Controle de visibilidade do botão "Adicionar Pilar"
         binding.cardAdicionarPilar.visibility = when (it.cargo) {
           Cargo.COORDENADOR -> View.VISIBLE
           else -> View.GONE
         }
-      }
-    }
 
-    // ✅ RecyclerView de pilares
-    recyclerView = view.findViewById(R.id.recyclerViewPilares)
-    cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
+        // ✅ RecyclerView de pilares
+        recyclerView = view.findViewById(R.id.recyclerViewPilares)
+        cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
 
-    adapter = PilarAdapter { pilar -> abrirTelaPilar(pilar) }
-    recyclerView.layoutManager = LinearLayoutManager(requireContext())
-    recyclerView.adapter = adapter
+        adapter = PilarAdapter { pilar -> abrirTelaPilar(pilar) }
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
 
-    pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-      adapter.submitList(lista)
-    }
-
-    // ✅ Ação do botão para adicionar pilar
-    cardAdicionarPilar.setOnClickListener {
-      val fragment = CriarPilarFragment().apply {
-        arguments = Bundle().apply {
-          putInt("funcionarioId", funcionarioLogadoId)
+        pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
+          adapter.submitList(lista)
         }
-      }
-      parentFragmentManager.beginTransaction()
-        .replace(R.id.main_container, fragment)
-        .addToBackStack(null)
-        .commit()
-    }
 
-    // ✅ Cor da status bar
-    requireActivity().window.statusBarColor =
-      ContextCompat.getColor(requireContext(), R.color.graybar)
+        // ✅ Botão para criar novo pilar
+        cardAdicionarPilar.setOnClickListener {
+          val fragment = CriarPilarFragment().apply {
+            arguments = Bundle().apply {
+              putInt("funcionarioId", funcionarioLogadoId)
+            }
+          }
+          parentFragmentManager.beginTransaction()
+            .replace(R.id.main_container, fragment)
+            .addToBackStack(null)
+            .commit()
+        }
+
+        // ✅ Cor da barra de status do Android
+        requireActivity().window.statusBarColor =
+          ContextCompat.getColor(requireContext(), R.color.graybar)
+      }
+    }
   }
 
   private fun abrirTelaPilar(pilar: PilarEntity) {

@@ -25,7 +25,7 @@ class TelaPilarFragment : Fragment() {
     private val pilarViewModel: PilarViewModel by activityViewModels()
     private val acaoViewModel: AcaoViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
     private var pilarId: Int = -1
     private lateinit var acaoAdapter: AcaoAdapter
@@ -42,6 +42,18 @@ class TelaPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+          funcionario?.let {
+            configurarNotificacaoBadge(
+              rootView = view,
+              lifecycleOwner = viewLifecycleOwner,
+              fragmentManager = parentFragmentManager,
+              funcionarioId = it.id,
+              cargo = it.cargo,
+              viewModel = notificacaoViewModel
+            )
+          }
+        }
 
 
 
