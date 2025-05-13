@@ -16,6 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import kotlinx.coroutines.launch
 
 class LoginDialogFragment : DialogFragment() {
@@ -32,7 +34,25 @@ class LoginDialogFragment : DialogFragment() {
         val buttonEntrar = view.findViewById<Button>(R.id.buttonEntrar)
         val textEsqueceu = view.findViewById<TextView>(R.id.textEsqueceuSenha)
 
-        // Lógica de mostrar/ocultar senha
+        // Setup seguro para armazenamento criptografado
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            "login_secure_prefs",
+            masterKeyAlias,
+            requireContext(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        // Preencher os campos se "lembrar de mim" estiver ativado
+        val lembrarLogin = sharedPreferences.getBoolean("lembrarLogin", false)
+        if (lembrarLogin) {
+            editTextId.setText(sharedPreferences.getString("idAcesso", ""))
+            editTextSenha.setText(sharedPreferences.getString("senha", ""))
+            checkBox.isChecked = true
+        }
+
+        // Mostrar/ocultar senha
         var senhaVisivel = false
         editTextSenha.setOnTouchListener { v, event ->
             val DRAWABLE_END = 2
@@ -72,13 +92,22 @@ class LoginDialogFragment : DialogFragment() {
                 val funcionario = dao.autenticar(idAcesso, senha)
 
                 if (funcionario != null) {
-                    // Salva login no SharedPreferences
+                    // Salva o login de forma segura
+                    val editor = sharedPreferences.edit()
+                    if (checkBox.isChecked) {
+                        editor.putString("idAcesso", idAcesso.toString())
+                        editor.putString("senha", senha)
+                        editor.putBoolean("lembrarLogin", true)
+                    } else {
+                        editor.clear()
+                    }
+                    editor.apply()
+
+                    // Salva ID do funcionário para uso geral (não precisa criptografar aqui)
                     val prefs = requireContext().getSharedPreferences("funcionario_prefs", Context.MODE_PRIVATE)
                     prefs.edit().putInt("funcionario_id", funcionario.id).apply()
-                    prefs.edit().putBoolean("lembrarLogin", checkBox.isChecked).apply()
 
                     funcionarioViewModel.logarFuncionario(funcionario)
-
                     startActivity(Intent(requireContext(), TelaPrincipalActivity::class.java))
                     dismiss()
                 } else {
