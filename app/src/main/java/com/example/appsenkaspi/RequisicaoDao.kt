@@ -118,7 +118,7 @@ interface RequisicaoDao {
   @Query("""
     SELECT COUNT(*) FROM requisicoes
     WHERE status = 'pendente'
-    AND tipo IN ('criar_atvidade', 'editar_atividade', 'criar_acao', 'editar_acao', 'completar_atividade')
+    AND tipo IN ('criar_atividade', 'editar_atividade', 'criar_acao', 'editar_acao', 'completar_atividade')
 """)
   fun getQuantidadePendentesParaCoordenador(): LiveData<Int>
 
