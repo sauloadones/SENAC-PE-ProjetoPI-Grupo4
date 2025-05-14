@@ -8,7 +8,7 @@ interface RequisicaoDao {
 
   // ✅ Inserção única com substituição em conflito
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun inserir(requisicao: RequisicaoEntity)
+  suspend fun inserir(requisicao: RequisicaoEntity): Long
 
 
 
@@ -122,8 +122,22 @@ interface RequisicaoDao {
 """)
   fun getQuantidadePendentesParaCoordenador(): LiveData<Int>
 
+  @Query("""
+    SELECT COUNT(*) FROM requisicoes
+    WHERE solicitanteId = :userId
+    AND foiVista = 0
+    AND tipo = 'atividade_para_vencer'
+""")
+  fun getQuantidadeNotificacoesPrazoNaoVistas(userId: Int): LiveData<Int>
 
-
+  @Query("""
+    UPDATE requisicoes
+    SET foiVista = 1
+    WHERE solicitanteId = :usuarioId
+    AND foiVista = 0
+    AND tipo = 'atividade_para_vencer'
+""")
+  suspend fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int)
 
 
 }

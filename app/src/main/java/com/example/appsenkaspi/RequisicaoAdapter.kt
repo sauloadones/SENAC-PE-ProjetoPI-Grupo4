@@ -37,6 +37,7 @@ class RequisicaoAdapter(
 
     // 🔔 Mostrar ATIVIDADE_PARA_VENCER apenas para o responsável
     if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER) {
+      // Mostrar a notificação se o requisitante for o logado, independentemente do modo
       if (requisicao.solicitanteId != funcionarioIdLogado) {
         holder.itemView.visibility = View.GONE
         holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)

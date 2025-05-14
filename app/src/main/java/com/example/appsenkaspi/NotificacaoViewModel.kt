@@ -202,6 +202,14 @@
         return requisicaoDao.getQuantidadePendentesParaCoordenador()
       }
 
+      fun getQuantidadeNotificacoesPrazoNaoVistas(usuarioId: Int): LiveData<Int> {
+        return requisicaoDao.getQuantidadeNotificacoesPrazoNaoVistas(usuarioId)
+      }
+      fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int) {
+        viewModelScope.launch {
+          requisicaoDao.marcarNotificacoesDePrazoComoVistas(usuarioId)
+        }
+      }
 
 
     }

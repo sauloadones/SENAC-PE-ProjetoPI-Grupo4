@@ -25,14 +25,18 @@ fun configurarNotificacaoBadge(
   val badgeView = rootView.findViewById<TextView>(R.id.notificationBadge)
   val notificationIcon = rootView.findViewById<ImageView>(R.id.notificationIcon)
 
-  // Atualiza badge com base no tipo de usuário
   if (cargo == Cargo.COORDENADOR) {
-    viewModel.getQuantidadePendentesParaCoordenador()
-      .observe(lifecycleOwner) { quantidade ->
-        Log.d("NOTIF_COORD", "Quantas pendentes: $quantidade")
-        badgeView.visibility = if (quantidade > 0) View.VISIBLE else View.GONE
-        badgeView.text = if (quantidade > 9) "9+" else quantidade.toString()
+    val pendentesLiveData = viewModel.getQuantidadePendentesParaCoordenador()
+    val prazoLiveData = viewModel.getQuantidadeNotificacoesPrazoNaoVistas(funcionarioId)
+
+    pendentesLiveData.observe(lifecycleOwner) { pendentes ->
+      prazoLiveData.observe(lifecycleOwner) { prazo ->
+        val total = pendentes + prazo
+        Log.d("NOTIF_BADGE", "Pendentes: $pendentes | Prazo: $prazo | Total: $total")
+        badgeView.visibility = if (total > 0) View.VISIBLE else View.GONE
+        badgeView.text = if (total > 9) "9+" else total.toString()
       }
+    }
   } else {
     viewModel.getQuantidadeNaoVistas(funcionarioId)
       .observe(lifecycleOwner) { quantidade ->
@@ -41,7 +45,6 @@ fun configurarNotificacaoBadge(
       }
   }
 
-  // Ação ao clicar no sino
   notificationIcon?.setOnClickListener {
     fragmentManager.beginTransaction()
       .replace(R.id.main_container, NotificacaoFragment())
@@ -49,4 +52,3 @@ fun configurarNotificacaoBadge(
       .commit()
   }
 }
-

@@ -1,4 +1,3 @@
-// ✅ NotificacaoFragment.kt atualizado
 package com.example.appsenkaspi
 
 import android.os.Bundle
@@ -15,8 +14,10 @@ class NotificacaoFragment : Fragment() {
 
   private val viewModel: NotificacaoViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
-  private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private lateinit var adapter: RequisicaoAdapter
+
+  // ✅ Guarda o ID do funcionário logado para uso no onStop
+  private var funcionarioIdAtual: Int? = null
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -30,13 +31,15 @@ class NotificacaoFragment : Fragment() {
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
-      val modoCoordenador = funcionario?.cargo == Cargo.COORDENADOR
+      val funcionarioId = funcionario?.id ?: return@observe
+      funcionarioIdAtual = funcionarioId  // ✅ Armazena para uso posterior
+      val modoCoordenador = funcionario.cargo == Cargo.COORDENADOR
 
       adapter = RequisicaoAdapter(
-        funcionarioIdLogado = funcionario?.id ?: -1,
+        funcionarioIdLogado = funcionarioId,
         modoCoordenador = modoCoordenador
       ) { requisicao ->
-        if (modoCoordenador) {
+        if (modoCoordenador && requisicao.tipo != TipoRequisicao.ATIVIDADE_PARA_VENCER) {
           val fragment = DetalheNotificacaoFragment().apply {
             arguments = Bundle().apply {
               putInt("requisicaoId", requisicao.id)
@@ -51,7 +54,7 @@ class NotificacaoFragment : Fragment() {
 
       recyclerView.adapter = adapter
 
-      // Controla visibilidade do texto vazio
+      // ✅ Atualiza visibilidade da mensagem de "vazio"
       adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
         override fun onChanged() {
           vazio.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
@@ -59,11 +62,19 @@ class NotificacaoFragment : Fragment() {
       })
 
       if (modoCoordenador) {
-        viewModel.getRequisicoesPendentes().observe(viewLifecycleOwner) { lista ->
-          adapter.submitList(lista)
+        val pendentesLiveData = viewModel.getRequisicoesPendentes()
+        val pessoaisLiveData = viewModel.getNotificacoesDoApoio(funcionarioId)
+
+        pendentesLiveData.observe(viewLifecycleOwner) { pendentes ->
+          pessoaisLiveData.observe(viewLifecycleOwner) { pessoais ->
+            val notificacoesDePrazo = pessoais.filter {
+              it.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER
+            }
+            val listaFinal = pendentes + notificacoesDePrazo
+            adapter.submitList(listaFinal)
+          }
         }
       } else {
-        val funcionarioId = funcionario?.id ?: return@observe
         viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
           adapter.submitList(lista)
           if (lista.isNotEmpty()) {
@@ -73,6 +84,14 @@ class NotificacaoFragment : Fragment() {
           }
         }
       }
+    }
+  }
+
+  // ✅ Marca notificações de prazo como vistas apenas ao sair da tela
+  override fun onStop() {
+    super.onStop()
+    funcionarioIdAtual?.let { id ->
+      viewModel.marcarNotificacoesDePrazoComoVistas(id)
     }
   }
 }

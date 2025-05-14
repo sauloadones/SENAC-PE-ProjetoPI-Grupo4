@@ -123,22 +123,25 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
             )
 
             if (!jaExisteHoje) {
-              requisicaoDao.inserir(
-                RequisicaoEntity(
-                  tipo = TipoRequisicao.ATIVIDADE_PARA_VENCER,
-                  atividadeId = atividade.id,
-                  solicitanteId = responsavel.id,
-                  status = StatusRequisicao.ACEITA,
-                  dataSolicitacao = Date(),
-                  mensagemResposta = mensagem,
-                  foiVista = false
-                )
+              val requisicao = RequisicaoEntity(
+                tipo = TipoRequisicao.ATIVIDADE_PARA_VENCER,
+                atividadeId = atividade.id,
+                solicitanteId = responsavel.id,
+                status = StatusRequisicao.ACEITA,
+                dataSolicitacao = Date(),
+                mensagemResposta = mensagem,
+                foiVista = false
               )
-            }
 
+              val id = requisicaoDao.inserir(requisicao).toInt()
+
+              // ✅ Notificação nativa
+              enviarNotificacaoDePrazo(getApplication(), id, responsavel.nomeCompleto, mensagem)
+            }
           }
         }
       }
     }
   }
+
 }
