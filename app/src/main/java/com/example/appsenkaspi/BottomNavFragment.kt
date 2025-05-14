@@ -12,6 +12,7 @@ class BottomNavFragment : Fragment() {
 
     private lateinit var binding: FragmentBottomNavBinding
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private var currentSelectedId: Int = R.id.nav_home
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -30,7 +31,7 @@ class BottomNavFragment : Fragment() {
 
                 val atual = parentFragmentManager.findFragmentById(R.id.main_container)
                 if (atual == null) {
-                    navigateTo(HomeFragment()) // ✅ Direciona todos para o mesmo fragmento
+                    navigateTo(HomeFragment(), R.id.nav_home)
                 }
             }
         }
@@ -39,22 +40,22 @@ class BottomNavFragment : Fragment() {
     private fun setupClickListeners() {
         binding.navRelatorio.setOnClickListener {
             updateIndicator(R.id.nav_relatorio)
-            navigateTo(RelatorioFragment())
+            navigateTo(RelatorioFragment(), R.id.nav_relatorio)
         }
 
         binding.navDashboard.setOnClickListener {
             updateIndicator(R.id.nav_dashboard)
-            navigateTo(DashboardFragment())
+            navigateTo(DashboardFragment(), R.id.nav_dashboard)
         }
 
         binding.navHome.setOnClickListener {
             updateIndicator(R.id.nav_home)
-            navigateTo(HomeFragment()) // ✅ Apoio e demais cargos voltam para o padrão
+            navigateTo(HomeFragment(), R.id.nav_home)
         }
 
         binding.navPerfil.setOnClickListener {
             updateIndicator(R.id.nav_perfil)
-            navigateTo(PerfilFragment())
+            navigateTo(PerfilFragment(), R.id.nav_perfil)
         }
     }
 
@@ -89,9 +90,41 @@ class BottomNavFragment : Fragment() {
         }
     }
 
-    private fun navigateTo(fragment: Fragment) {
+    private fun navigateTo(fragment: Fragment, selectedId: Int) {
+        if (selectedId == currentSelectedId) return
+
+        val orderMap = mapOf(
+            R.id.nav_relatorio to 0,
+            R.id.nav_dashboard to 1,
+            R.id.nav_home to 2,
+            R.id.nav_perfil to 3
+        )
+
+        val currentIndex = orderMap[currentSelectedId] ?: 0
+        val newIndex = orderMap[selectedId] ?: 0
+
+        val (enterAnim, exitAnim, popEnterAnim, popExitAnim) = if (newIndex > currentIndex) {
+            listOf(
+                R.anim.slide_fade_in_right,
+                R.anim.slide_fade_out_left,
+                R.anim.slide_fade_in_left,
+                R.anim.slide_fade_out_right
+            )
+        } else {
+            listOf(
+                R.anim.slide_fade_in_left,
+                R.anim.slide_fade_out_right,
+                R.anim.slide_fade_in_right,
+                R.anim.slide_fade_out_left
+            )
+        }
+
+        currentSelectedId = selectedId
+
         requireActivity().supportFragmentManager.beginTransaction()
+            .setCustomAnimations(enterAnim, exitAnim, popEnterAnim, popExitAnim)
             .replace(R.id.main_container, fragment)
+            .addToBackStack(null)
             .commit()
     }
 }
