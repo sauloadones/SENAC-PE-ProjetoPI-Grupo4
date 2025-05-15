@@ -1,17 +1,14 @@
 package com.example.appsenkaspi
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,9 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Response
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
+import java.io.OutputStream
 
 class RelatorioFragment : Fragment() {
     private var _binding: FragmentRelatorioBinding? = null
@@ -46,7 +41,6 @@ class RelatorioFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        checkStoragePermission()
         carregarPilaresNoSpinner()
 
         binding.textSelecionarPilar.visibility = View.GONE
@@ -69,11 +63,11 @@ class RelatorioFragment : Fragment() {
         }
 
         binding.btnWord.setOnClickListener {
-            gerarRelatorio("word")
+            gerarRelatorio("docx")
         }
 
         binding.btnExcel.setOnClickListener {
-            gerarRelatorio("excel")
+            gerarRelatorio("xlsx")
         }
     }
 
@@ -84,12 +78,10 @@ class RelatorioFragment : Fragment() {
             }
 
             listaPilares = pilares
-
             val nomes = pilares.map { it.nome }
 
             pilarAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nomes)
             pilarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
             binding.spinnerPilares.adapter = pilarAdapter
         }
     }
@@ -119,8 +111,8 @@ class RelatorioFragment : Fragment() {
 
                 val response: Response<ResponseBody>? = when (tipo) {
                     "pdf" -> apiService.gerarPdf(request)
-                    "word" -> apiService.gerarWord(request)
-                    "excel" -> apiService.gerarExcel(request)
+                    "docx" -> apiService.gerarWord(request)
+                    "xlsx" -> apiService.gerarExcel(request)
                     else -> null
                 }
 
@@ -142,43 +134,58 @@ class RelatorioFragment : Fragment() {
     private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String) {
         if (body == null) return
 
-        val path = requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-        val arquivo = File(path, nomeArquivo)
-
-        try {
-            val inputStream: InputStream = body.byteStream()
-            val outputStream = FileOutputStream(arquivo)
-            val buffer = ByteArray(4096)
-            var bytesRead: Int
-
-            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                outputStream.write(buffer, 0, bytesRead)
-            }
-
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
-
-            Toast.makeText(requireContext(), "Arquivo salvo em ${arquivo.absolutePath}", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "Erro ao salvar arquivo", Toast.LENGTH_SHORT).show()
+        val resolver = requireContext().contentResolver
+        val mimeType = when {
+            nomeArquivo.endsWith(".pdf") -> "application/pdf"
+            nomeArquivo.endsWith(".docx") -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            nomeArquivo.endsWith(".xlsx") -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            else -> "application/octet-stream"
         }
-    }
 
-    private fun checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    100
-                )
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, nomeArquivo)
+            put(MediaStore.Downloads.MIME_TYPE, mimeType)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Downloads.IS_PENDING, 1)
             }
+        }
+
+        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Files.getContentUri("external")
+        }
+
+        val itemUri = resolver.insert(collection, contentValues)
+
+        if (itemUri != null) {
+            try {
+                val outputStream: OutputStream? = resolver.openOutputStream(itemUri)
+                val inputStream = body.byteStream()
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    outputStream?.write(buffer, 0, bytesRead)
+                }
+
+                outputStream?.flush()
+                outputStream?.close()
+                inputStream.close()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+                    resolver.update(itemUri, contentValues, null, null)
+                }
+
+                Toast.makeText(requireContext(), "Arquivo salvo em Downloads", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(requireContext(), "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(requireContext(), "Erro ao acessar a pasta Downloads", Toast.LENGTH_SHORT).show()
         }
     }
 
