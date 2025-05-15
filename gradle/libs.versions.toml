@@ -16,9 +16,15 @@ room = "2.6.1"
 
 # ViewModel + Lifecycle
 lifecycle = "2.7.0"
+lifecycle-runtime = "2.4.0" # 👈 adicionada
 
 # Coroutines
 coroutines = "1.8.0"
+
+# Retrofit & OkHttp
+retrofit = "2.9.0"
+okhttp = "4.9.3"
+gson = "2.10.1"
 
 # Testes
 junit = "4.13.2"
@@ -41,9 +47,19 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # ViewModel Lifecycle
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime" }
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# Retrofit & OkHttp
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+# JSON
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Testes
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -54,4 +70,3 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-

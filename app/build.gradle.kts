@@ -1,14 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.kapt") // ou alias se configurado no toml
+    id("org.jetbrains.kotlin.kapt")
     id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
 android {
     namespace = "com.example.appsenkaspi"
     compileSdk = 35
-
     defaultConfig {
         applicationId = "com.example.appsenkaspi"
         minSdk = 34
@@ -43,7 +42,8 @@ android {
 }
 
 dependencies {
-    // AndroidX e Material
+
+// AndroidX e Material
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -56,21 +56,31 @@ dependencies {
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
-    // ViewModel e Lifecycle
+// ViewModel e Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
 
-    // Coroutines
+// Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
-    // Glide
+// Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation ("com.google.code.gson:gson:2.10.1")
-    implementation ("androidx.security:security-crypto:1.1.0-alpha03")
 
-    // Testes
+// Segurança e JSON
+    implementation(libs.gson)
+    implementation("androidx.security:security-crypto:1.1.0-alpha03")
+
+// Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+
+// Testes
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }

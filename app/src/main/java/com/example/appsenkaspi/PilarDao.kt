@@ -26,6 +26,9 @@ interface PilarDao {
     suspend fun deletarPilar(pilar: PilarEntity)
 
     @Query("SELECT * FROM pilares")
+    suspend fun getTodosPilares(): List<PilarEntity>
+
+    @Query("SELECT * FROM pilares")
     fun listarTodosPilares(): LiveData<List<PilarEntity>>
 
     @Insert
@@ -40,7 +43,6 @@ interface PilarDao {
 
     @Query("SELECT nome FROM pilares WHERE id = :id")
     suspend fun getNomePilarPorId(id: Int): String?
-
 
 
 
