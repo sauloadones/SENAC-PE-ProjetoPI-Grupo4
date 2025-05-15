@@ -1,7 +1,9 @@
 package com.example.appsenkaspi
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -86,8 +88,10 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
 
   // ✅ Gera notificações de prazo apenas para os responsáveis ainda não notificados
   fun verificarAtividadesComPrazoProximo() {
-    Log.d("DEBUG_NOTIF", "verificando prazos...")
     viewModelScope.launch {
+      val context = getApplication<Application>().applicationContext
+      val notificationManager = NotificationManagerCompat.from(context)
+
       val hoje = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
@@ -95,31 +99,60 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
         set(Calendar.MILLISECOND, 0)
       }.time
 
-      val seteDias = Calendar.getInstance().apply {
-        time = hoje
-        add(Calendar.DAY_OF_YEAR, 7)
-      }.time
-
       val atividades = atividadeDao.getTodasAtividadesComDataPrazo()
 
       for (atividade in atividades) {
         val prazo = atividade.dataPrazo ?: continue
 
-        if (
-          atividade.status != StatusAtividade.CONCLUIDA &&
-          (prazo == hoje || (prazo.after(hoje) && prazo.before(seteDias)))
-        ) {
-          val diasRestantes = ((prazo.time - hoje.time) / (1000 * 60 * 60 * 24)).toInt()
-          val mensagem =
-            "A atividade '${atividade.nome}' está a $diasRestantes dia${if (diasRestantes != 1) "s" else ""} do prazo final e aguarda sua atenção."
+        // 1. Se a atividade estiver concluída → marcar notificações como resolvidas
+        if (atividade.status == StatusAtividade.CONCLUIDA) {
+          val antigas = requisicaoDao.getRequisicoesDePrazoPorAtividade(atividade.id)
+          for (req in antigas) {
+            notificationManager.cancel(req.id) // <- agora está definido corretamente
+            requisicaoDao.marcarComoResolvida(req.id)
+          }
+          continue
+        }
 
-          val responsaveis = atividadeFuncionarioDao.getResponsaveisDaAtividade(atividade.id)
+        val responsaveis = atividadeFuncionarioDao.getResponsaveisDaAtividade(atividade.id)
+        val diasRestantes = ((prazo.time - hoje.time) / (1000 * 60 * 60 * 24)).toInt()
+
+        // 2. Se já venceu
+        if (prazo.before(hoje)) {
+          val mensagem = "A atividade '${atividade.nome}' está vencida. O prazo foi $prazo."
+          for (responsavel in responsaveis) {
+            val jaExiste = requisicaoDao.existeRequisicaoDeVencida(atividade.id, responsavel.id)
+            if (!jaExiste) {
+              val requisicao = RequisicaoEntity(
+                tipo = TipoRequisicao.ATIVIDADE_VENCIDA,
+                atividadeId = atividade.id,
+                solicitanteId = responsavel.id,
+                status = StatusRequisicao.ACEITA,
+                dataSolicitacao = Date(),
+                mensagemResposta = mensagem,
+                foiVista = false
+              )
+              val id = requisicaoDao.inserir(requisicao).toInt()
+              enviarNotificacaoDePrazo(getApplication(), id, responsavel.nomeCompleto, mensagem)
+            }
+          }
+          continue
+        }
+
+        // 3. Se ainda não venceu, avaliamos os marcos de notificação
+        val marcos = listOf(30, 15, 7)
+        val notificarHoje = diasRestantes in marcos || diasRestantes in 1..6
+
+        if (notificarHoje) {
+          val mensagem = if (diasRestantes in marcos) {
+            "A atividade '${atividade.nome}' está a $diasRestantes dias do prazo final."
+          } else {
+            "Faltam $diasRestantes dias para o fim da atividade '${atividade.nome}'."
+          }
 
           for (responsavel in responsaveis) {
             val jaExisteHoje = requisicaoDao.existeRequisicaoHojeParaAtividade(
-              atividadeId = atividade.id,
-              solicitanteId = responsavel.id,
-              tipo = TipoRequisicao.ATIVIDADE_PARA_VENCER
+              atividade.id, responsavel.id, TipoRequisicao.ATIVIDADE_PARA_VENCER
             )
 
             if (!jaExisteHoje) {
@@ -132,10 +165,7 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
                 mensagemResposta = mensagem,
                 foiVista = false
               )
-
               val id = requisicaoDao.inserir(requisicao).toInt()
-
-              // ✅ Notificação nativa
               enviarNotificacaoDePrazo(getApplication(), id, responsavel.nomeCompleto, mensagem)
             }
           }
@@ -143,5 +173,19 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
       }
     }
   }
+
+
+
+  fun cancelarNotificacoesDePrazo(context: Context, atividadeId: Int) = viewModelScope.launch {
+    val requisicoes = requisicaoDao.getRequisicoesDePrazoPorAtividade(atividadeId)
+    val notificationManager = NotificationManagerCompat.from(context)
+
+    for (req in requisicoes) {
+      notificationManager.cancel(req.id)
+      requisicaoDao.marcarComoResolvida(req.id)   // ✅ agora define resolvida = 1
+    }
+  }
+
+
 
 }

@@ -284,7 +284,10 @@ class EditarAtividadeFragment : Fragment() {
       // Atualiza o status da ação relacionada
       acaoViewModel.atualizarStatusAcaoAutomaticamente(atividadeAtualizada.acaoId)
 
-      // ✅ Gera notificação se o prazo estiver próximo e o status for pendente
+      // ✅ Cancela notificações antigas antes de reavaliar o novo prazo
+      atividadeViewModel.cancelarNotificacoesDePrazo(requireContext(), atividadeAtualizada.id)
+
+      // ✅ Reavalia o novo prazo para gerar notificação adequada
       atividadeViewModel.verificarAtividadesComPrazoProximo()
 
       // Interface
@@ -292,6 +295,7 @@ class EditarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
     }
   }
+
 
 
   override fun onDestroyView() {

@@ -106,7 +106,7 @@ interface RequisicaoDao {
         WHERE atividadeId = :atividadeId
         AND solicitanteId = :solicitanteId
         AND tipo = :tipo
-        AND date(dataSolicitacao / 1000, 'unixepoch') = date('now')
+        AND date(datetime(dataSolicitacao / 1000, 'unixepoch')) = date('now')
     )
 """)
   suspend fun existeRequisicaoHojeParaAtividade(
@@ -139,6 +139,30 @@ interface RequisicaoDao {
 """)
   suspend fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int)
 
+  @Query("""
+  SELECT EXISTS (
+    SELECT 1 FROM requisicoes
+    WHERE atividadeId = :atividadeId
+    AND solicitanteId = :solicitanteId
+    AND tipo = 'atividade_vencida'
+  )
+""")
+  suspend fun existeRequisicaoDeVencida(
+    atividadeId: Int,
+    solicitanteId: Int
+  ): Boolean
+
+  @Query("SELECT * FROM requisicoes WHERE atividadeId = :atividadeId AND (tipo = 'atividade_para_vencer' OR tipo = 'atividade_vencidade')")
+  suspend fun getRequisicoesDePrazoPorAtividade(atividadeId: Int): List<RequisicaoEntity>
+  @Query("""
+      UPDATE requisicoes
+      SET foiVista = 1
+      WHERE id = :requisicaoId
+    """)
+  suspend fun marcarComoOculta(requisicaoId: Int)
+
+  @Query("UPDATE requisicoes SET resolvida = 1 WHERE id = :requisicaoId")
+  suspend fun marcarComoResolvida(requisicaoId: Int)
 
 }
 

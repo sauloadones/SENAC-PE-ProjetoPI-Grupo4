@@ -26,5 +26,9 @@ interface AcaoFuncionarioDao {
     """)
         suspend fun getResponsaveisByAcaoId(acaoId: Int): List<FuncionarioEntity>
 
+  @Query("DELETE FROM acoes_funcionarios WHERE acaoId = :acaoId")
+  suspend fun deletarResponsaveisPorAcao(acaoId: Int)
+
+
 
 }

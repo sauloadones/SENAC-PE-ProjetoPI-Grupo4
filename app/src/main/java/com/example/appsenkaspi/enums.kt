@@ -48,7 +48,8 @@ enum class TipoRequisicao {
     COMPLETAR_ATIVIDADE,
     CRIAR_ACAO,
     EDITAR_ACAO,
-    ATIVIDADE_PARA_VENCER
+    ATIVIDADE_PARA_VENCER,
+    ATIVIDADE_VENCIDA
 }
 
 enum class StatusNotificacao {

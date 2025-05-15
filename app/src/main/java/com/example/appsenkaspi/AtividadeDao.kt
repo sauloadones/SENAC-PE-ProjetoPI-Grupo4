@@ -122,6 +122,9 @@
     @Query("SELECT * FROM atividades WHERE dataPrazo IS NOT NULL")
     suspend fun getTodasAtividadesComDataPrazo(): List<AtividadeEntity>
 
+    @Query("DELETE FROM atividades_funcionarios WHERE atividadeId = :atividadeId")
+    suspend fun deletarRelacoesPorAtividade(atividadeId: Int)
+
 
 
 

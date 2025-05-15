@@ -110,8 +110,9 @@ class CriarAcaoFragment : Fragment() {
                     dataSolicitacao = Date()
                 )
 
-                requisicaoViewModel.inserirRequisicao(requisicao)
-                Toast.makeText(requireContext(), "Requisição de ação enviada para aprovação!", Toast.LENGTH_SHORT).show()
+              AppDatabase.getDatabase(requireContext()).requisicaoDao().inserir(requisicao)
+
+              Toast.makeText(requireContext(), "Requisição de ação enviada para aprovação!", Toast.LENGTH_SHORT).show()
                 parentFragmentManager.popBackStack()
             }
         }
