@@ -120,7 +120,7 @@ class TelaPilarFragment : Fragment() {
         binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
         binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
 
-        // 🚀 Chamada para calcular progresso real
+        // Chamada para calcular progresso real
         pilarViewModel.calcularProgressoDoPilar(pilar.id) { progresso ->
             animarProgresso((progresso * 100).toInt())
         }

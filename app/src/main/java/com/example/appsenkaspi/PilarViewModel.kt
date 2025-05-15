@@ -13,14 +13,9 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
 
-    fun getPilarById(id: Int): LiveData<PilarEntity?> =
-        pilarDao.getPilarById(id)
+    fun getPilarById(id: Int): LiveData<PilarEntity?> = pilarDao.getPilarById(id)
 
-
-
-    fun listarTodosPilares(): LiveData<List<PilarEntity>> {
-        return pilarDao.listarTodosPilares()  // ✅ Corrigido o nome aqui
-    }
+    fun listarTodosPilares(): LiveData<List<PilarEntity>> = pilarDao.listarTodosPilares()
 
     fun inserir(pilar: PilarEntity) = viewModelScope.launch {
         pilarDao.inserirPilar(pilar)
@@ -34,30 +29,29 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         pilarDao.deletarPilar(pilar)
     }
 
-    suspend fun inserirRetornandoId(pilar: PilarEntity): Long =
-        pilarDao.inserirPilar(pilar)
+    suspend fun inserirRetornandoId(pilar: PilarEntity): Long = pilarDao.inserirPilar(pilar)
 
     fun calcularProgressoDoPilar(pilarId: Int, callback: (Float) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val lista = acaoDao.listarProgressoPorPilar(pilarId)
-
-            val (somaPesos, somaTotalAtividades) = lista.fold(0f to 0) { acc, item ->
-                val pesoAtual = item.progresso * item.totalAtividades
-                (acc.first + pesoAtual) to (acc.second + item.totalAtividades)
-            }
-
-            val progressoFinal = if (somaTotalAtividades > 0) somaPesos / somaTotalAtividades else 0f
-
+            val progresso = calcularProgressoInterno(pilarId)
             withContext(Dispatchers.Main) {
-                callback(progressoFinal)
+                callback(progresso)
             }
         }
     }
 
+    // Função suspensa reutilizável
+    suspend fun calcularProgressoInterno(pilarId: Int): Float {
+        val lista = acaoDao.listarProgressoPorPilar(pilarId)
+        val (somaPesos, somaTotalAtividades) = lista.fold(0f to 0) { acc, item ->
+            val pesoAtual = item.progresso * item.totalAtividades
+            (acc.first + pesoAtual) to (acc.second + item.totalAtividades)
+        }
+        return if (somaTotalAtividades > 0) somaPesos / somaTotalAtividades else 0f
+    }
 
-
-
-
-
+    suspend fun getTodosPilares(): List<PilarEntity> = withContext(Dispatchers.IO) {
+        pilarDao.getTodosPilares()
+    }
 
 }
