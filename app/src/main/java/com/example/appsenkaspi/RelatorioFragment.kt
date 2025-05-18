@@ -1,5 +1,7 @@
 package com.example.appsenkaspi
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
@@ -9,18 +11,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.example.appsenkaspi.databinding.FragmentRelatorioBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Response
-import java.io.OutputStream
 
 class RelatorioFragment : Fragment() {
+
     private var _binding: FragmentRelatorioBinding? = null
     private val binding get() = _binding!!
     private val pilarViewModel: PilarViewModel by viewModels()
@@ -40,60 +45,162 @@ class RelatorioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarSpinners()
+        configurarBotoes()
+        carregarPilares()
 
-        carregarPilaresNoSpinner()
+        // Forçar medida inicial dos campos ocultos para evitar desalinhamento
+        binding.textSelecionarPilar.measure(
+            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        binding.layoutSpinnerPilares.measure(
+            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+
+        binding.textSelecionarPilar.alpha = 0f
+        binding.layoutSpinnerPilares.alpha = 0f
+    }
+
+    private fun configurarSpinners() {
+        val tipoArquivoAdapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.tipos_arquivo,
+            R.layout.spinner_dropdown_item
+        )
+        binding.spinnerTipoArquivo.setAdapter(tipoArquivoAdapter)
 
         binding.textSelecionarPilar.visibility = View.GONE
-        binding.spinnerPilares.visibility = View.GONE
+        binding.layoutSpinnerPilares.visibility = View.GONE
+    }
+
+    private fun configurarBotoes() {
+        updateButtonSelection(binding.btnRelatorioGeral, binding.btnRelatorioPorPilar)
 
         binding.btnRelatorioGeral.setOnClickListener {
             isGeral = true
+            updateButtonSelection(binding.btnRelatorioGeral, binding.btnRelatorioPorPilar)
+
+            animateLayoutChange(binding.baseLayout)
+
             binding.textSelecionarPilar.visibility = View.GONE
-            binding.spinnerPilares.visibility = View.GONE
+            binding.layoutSpinnerPilares.visibility = View.GONE
         }
 
         binding.btnRelatorioPorPilar.setOnClickListener {
             isGeral = false
+            updateButtonSelection(binding.btnRelatorioPorPilar, binding.btnRelatorioGeral)
+
+            binding.textSelecionarPilar.alpha = 0f
+            binding.layoutSpinnerPilares.alpha = 0f
             binding.textSelecionarPilar.visibility = View.VISIBLE
-            binding.spinnerPilares.visibility = View.VISIBLE
+            binding.layoutSpinnerPilares.visibility = View.VISIBLE
+
+            animateLayoutChange(binding.baseLayout)
+
+            binding.textSelecionarPilar.animate().alpha(1f).setDuration(300).start()
+            binding.layoutSpinnerPilares.animate().alpha(1f).setDuration(300).setStartDelay(50).start()
         }
 
-        binding.btnPdf.setOnClickListener {
-            gerarRelatorio("pdf")
-        }
+        binding.btnGerarRelatorio.setOnClickListener {
+            animateButtonClick(binding.btnGerarRelatorio) {
+                val tipoSelecionado = when (binding.spinnerTipoArquivo.text.toString()) {
+                    "PDF" -> "pdf"
+                    "Excel" -> "xlsx"
+                    "Word" -> "docx"
+                    else -> ""
+                }
 
-        binding.btnWord.setOnClickListener {
-            gerarRelatorio("docx")
-        }
-
-        binding.btnExcel.setOnClickListener {
-            gerarRelatorio("xlsx")
+                if (tipoSelecionado.isNotEmpty()) {
+                    gerarRelatorio(tipoSelecionado)
+                } else {
+                    Toast.makeText(requireContext(), "Selecione um tipo de arquivo", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
-    private fun carregarPilaresNoSpinner() {
+    private fun animateLayoutChange(root: ViewGroup) {
+        val transition = AutoTransition()
+        transition.duration = 300
+        TransitionManager.beginDelayedTransition(root, transition)
+    }
+
+    private fun updateButtonSelection(selected: View, deselected: View) {
+        selected.isSelected = true
+        deselected.isSelected = false
+
+        val selectedColor = ContextCompat.getColor(requireContext(), R.color.azulSelecionado)
+        val defaultColor = ContextCompat.getColor(requireContext(), R.color.cardNormal)
+
+        val fromColorSelected = (selected as? com.google.android.material.card.MaterialCardView)
+            ?.cardBackgroundColor?.defaultColor ?: defaultColor
+
+        val fromColorDeselected = (deselected as? com.google.android.material.card.MaterialCardView)
+            ?.cardBackgroundColor?.defaultColor ?: selectedColor
+
+        animateBackgroundColor(selected, fromColorSelected, selectedColor)
+        animateBackgroundColor(deselected, fromColorDeselected, defaultColor)
+    }
+
+    private fun animateBackgroundColor(view: View, fromColor: Int, toColor: Int) {
+        val animator = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
+        animator.duration = 300
+        animator.addUpdateListener { animation ->
+            val color = animation.animatedValue as Int
+            (view as? com.google.android.material.card.MaterialCardView)?.setCardBackgroundColor(color)
+        }
+        animator.start()
+    }
+
+    private fun animateButtonClick(view: View, onEnd: (() -> Unit)? = null) {
+        view.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(80)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(80)
+                    .withEndAction {
+                        onEnd?.invoke()
+                    }
+                    .start()
+            }
+            .start()
+    }
+
+    private fun carregarPilares() {
         lifecycleScope.launch {
-            val pilares = withContext(Dispatchers.IO) {
+            listaPilares = withContext(Dispatchers.IO) {
                 pilarViewModel.getTodosPilares()
             }
 
-            listaPilares = pilares
-            val nomes = pilares.map { it.nome }
+            val nomes = listaPilares.map { it.nome }
 
-            pilarAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nomes)
-            pilarAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinnerPilares.adapter = pilarAdapter
+            pilarAdapter = ArrayAdapter(
+                requireContext(),
+                R.layout.spinner_dropdown_item,
+                nomes
+            )
+
+            binding.spinnerPilares.setAdapter(pilarAdapter)
         }
     }
 
     private fun gerarRelatorio(tipo: String) {
         lifecycleScope.launch {
             try {
-                val pilaresSelecionados: List<PilarEntity> = if (isGeral) {
+                binding.progressBar.visibility = View.VISIBLE
+
+                val pilaresSelecionados = if (isGeral) {
                     withContext(Dispatchers.IO) { pilarViewModel.getTodosPilares() }
                 } else {
-                    val posicao = binding.spinnerPilares.selectedItemPosition
-                    listOf(listaPilares[posicao])
+                    val nomeSelecionado = binding.spinnerPilares.text.toString()
+                    val pilarSelecionado = listaPilares.find { it.nome == nomeSelecionado }
+                    if (pilarSelecionado != null) listOf(pilarSelecionado) else emptyList()
                 }
 
                 val listaDTO = pilaresSelecionados.map {
@@ -125,8 +232,10 @@ class RelatorioFragment : Fragment() {
                 }
 
             } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Erro inesperado: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
-                Toast.makeText(requireContext(), "Erro inesperado", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.progressBar.visibility = View.GONE
             }
         }
     }
@@ -158,25 +267,23 @@ class RelatorioFragment : Fragment() {
 
         val itemUri = resolver.insert(collection, contentValues)
 
-        if (itemUri != null) {
+        itemUri?.let { uri ->
             try {
-                val outputStream: OutputStream? = resolver.openOutputStream(itemUri)
-                val inputStream = body.byteStream()
-                val buffer = ByteArray(4096)
-                var bytesRead: Int
-
-                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                    outputStream?.write(buffer, 0, bytesRead)
+                resolver.openOutputStream(uri).use { outputStream ->
+                    body.byteStream().use { inputStream ->
+                        val buffer = ByteArray(4096)
+                        var bytesRead: Int
+                        while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                            outputStream?.write(buffer, 0, bytesRead)
+                        }
+                        outputStream?.flush()
+                    }
                 }
-
-                outputStream?.flush()
-                outputStream?.close()
-                inputStream.close()
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     contentValues.clear()
                     contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-                    resolver.update(itemUri, contentValues, null, null)
+                    resolver.update(uri, contentValues, null, null)
                 }
 
                 Toast.makeText(requireContext(), "Arquivo salvo em Downloads", Toast.LENGTH_LONG).show()
@@ -184,13 +291,13 @@ class RelatorioFragment : Fragment() {
                 e.printStackTrace()
                 Toast.makeText(requireContext(), "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
             }
-        } else {
+        } ?: run {
             Toast.makeText(requireContext(), "Erro ao acessar a pasta Downloads", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }

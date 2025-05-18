@@ -10,6 +10,11 @@
     <string name="relat_rio">Relatório</string>
     <string name="descricao_lista_pilares">Lista de pilares exibida na tela</string>
     <string name="historico_icon">Ícone de acesso ao histórico</string>
+    <string-array name="tipos_arquivo">
+        <item>PDF</item>
+        <item>Excel</item>
+        <item>Word</item>
+    </string-array>
 
 
 

@@ -12,6 +12,11 @@
         <color name="selecionado">#335D8E</color>
         <color name="nao_selecionado">#1E1E1E</color>
         <color name="cinza_claro">#CCCCCC</color>
+        <color name="purple500">#6200EE</color>
+        <color name="azulSelecionado">#164773</color>
+        <color name="cardNormal">#1E1E1E</color>
+        <color name="rippleLight">#33FFFFFF</color>
+
 
         <color name="cinza_escuro">#2A2A2A</color>
 

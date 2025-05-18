@@ -31,11 +31,11 @@
         </activity>
 
         <!-- Tela principal após login -->
-        <activity
-            android:name=".TelaPrincipalActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-        android:exported="true" />
+      <activity
+          android:name=".TelaPrincipalActivity"
+          android:theme="@style/Theme.AppSenkasPI"
+          android:windowSoftInputMode="adjustPan"
+          android:exported="true" />
 
         <!-- (Opcional) Se você quiser depois ter atividades específicas, como editar pilares, adicionar telas novas -->
         <!-- <activity android:name=".OutraActivity" android:exported="true" /> -->
