@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
+    implementation("com.google.android.material:material:1.11.0")
 
     // Room
     implementation(libs.room.runtime)
