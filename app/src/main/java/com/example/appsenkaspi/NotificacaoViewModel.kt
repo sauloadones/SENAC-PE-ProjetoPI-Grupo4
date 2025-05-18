@@ -3,7 +3,6 @@ package com.example.appsenkaspi
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,22 +11,17 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
-import kotlin.getValue
+import androidx.lifecycle.distinctUntilChanged
 
 class NotificacaoViewModel(application: Application) : AndroidViewModel(application) {
 
-  private val requisicaoDao = AppDatabase.getDatabase(application).requisicaoDao()
-  private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
-  private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
-  private val acaoFuncionarioDao = AppDatabase.getDatabase(application).acaoFuncionarioDao()
+  private val db = AppDatabase.getDatabase(application)
+  private val requisicaoDao = db.requisicaoDao()
+  private val atividadeDao = db.atividadeDao()
+  private val acaoDao = db.acaoDao()
+  private val acaoFuncionarioDao = db.acaoFuncionarioDao()
 
-  fun getRequisicoesPendentes(): LiveData<List<RequisicaoEntity>> {
-    return requisicaoDao.getRequisicoesPendentes()
-  }
-
-  fun getRequisicoesDoUsuario(userId: Int): LiveData<List<RequisicaoEntity>> {
-    return requisicaoDao.getRequisicoesDoUsuario(userId)
-  }
+  fun getRequisicoesPendentes(): LiveData<List<RequisicaoEntity>> = requisicaoDao.getRequisicoesPendentes()
 
   fun getRequisicaoPorId(id: Int): LiveData<RequisicaoEntity> {
     val result = MutableLiveData<RequisicaoEntity>()
@@ -48,252 +42,201 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       )
       requisicaoDao.update(novaRequisicao)
 
-      if (aceitar) {
-        when (requisicao.tipo) {
-          TipoRequisicao.CRIAR_ATIVIDADE -> {
-            val atividadeJson = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-            val acao = acaoDao.getAcaoById(atividadeJson.acaoId)
-            val criador = AppDatabase.getDatabase(context).funcionarioDao()
-              .getFuncionarioById(atividadeJson.criadoPor)
-            val funcionarioId = atividadeJson.responsaveis.firstOrNull()
+      if (!aceitar) return@launch
 
-            if (acao != null && criador != null && funcionarioId != null) {
-              val novaAtividade = AtividadeEntity(
-                nome = atividadeJson.nome,
-                descricao = atividadeJson.descricao,
-                dataInicio = atividadeJson.dataInicio,
-                dataPrazo = atividadeJson.dataPrazo,
-                acaoId = atividadeJson.acaoId,
-                funcionarioId = funcionarioId,
-                status = atividadeJson.status,
-                prioridade = atividadeJson.prioridade,
-                criadoPor = atividadeJson.criadoPor,
-                dataCriacao = atividadeJson.dataCriacao
-              )
-              val atividadeId = atividadeDao.insertComRetorno(novaAtividade).toInt()
-
-              // ✅ Primeiro insere os responsáveis
-              atividadeJson.responsaveis.forEach { idResp ->
-                atividadeDao.inserirRelacaoFuncionario(
-                  AtividadeFuncionarioEntity(
-                    atividadeId = atividadeId,
-                    funcionarioId = idResp
-                  )
-                )
-              }
-
-              // ✅ Depois gera as notificações (agora os responsáveis já estão no banco)
-              val atividadeViewModel = AtividadeViewModel(getApplication())
-              atividadeViewModel.verificarAtividadesComPrazoProximo()
-
-            } else {
-              Log.e("Requisicao", "Erro ao aceitar atividade: dados ausentes ou inválidos.")
-            }
-          }
-
-
-          TipoRequisicao.EDITAR_ATIVIDADE -> {
-            val atividadeJson = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-            val acao = acaoDao.getAcaoById(atividadeJson.acaoId)
-            val criador = AppDatabase.getDatabase(context).funcionarioDao()
-              .getFuncionarioById(atividadeJson.criadoPor)
-            val funcionarioId = atividadeJson.responsaveis.firstOrNull()
-            val idOriginal = atividadeJson.id
-
-            if (idOriginal == null) {
-              Log.e("Requisicao", "Erro: atividade sem ID para editar")
-              return@launch
-            }
-
-            if (acao != null && criador != null && funcionarioId != null) {
-              val novaAtividade = AtividadeEntity(
-                id = idOriginal,
-                nome = atividadeJson.nome,
-                descricao = atividadeJson.descricao,
-                dataInicio = atividadeJson.dataInicio,
-                dataPrazo = atividadeJson.dataPrazo,
-                acaoId = atividadeJson.acaoId,
-                funcionarioId = funcionarioId,
-                status = atividadeJson.status,
-                prioridade = atividadeJson.prioridade,
-                criadoPor = atividadeJson.criadoPor,
-                dataCriacao = atividadeJson.dataCriacao
-              )
-
-              atividadeDao.update(novaAtividade)
-
-              atividadeDao.deletarRelacoesPorAtividade(idOriginal)
-              atividadeJson.responsaveis.forEach { idResp ->
-                atividadeDao.inserirRelacaoFuncionario(
-                  AtividadeFuncionarioEntity(
-                    atividadeId = idOriginal,
-                    funcionarioId = idResp
-                  )
-                )
-              }
-
-              // ✅ Cancelar notificações antigas
-              val atividadeViewModel = AtividadeViewModel(getApplication())
-              atividadeViewModel.cancelarNotificacoesDePrazo(context, idOriginal)
-
-              // ✅ Gerar novas notificações conforme novo prazo
-              atividadeViewModel.verificarAtividadesComPrazoProximo()
-            } else {
-              Log.e("Requisicao", "Erro ao aceitar edição: dados inválidos")
-            }
-          }
-
-          TipoRequisicao.COMPLETAR_ATIVIDADE -> {
-            val hoje = Calendar.getInstance().apply {
-              set(Calendar.HOUR_OF_DAY, 0)
-              set(Calendar.MINUTE, 0)
-              set(Calendar.SECOND, 0)
-              set(Calendar.MILLISECOND, 0)
-            }.time
-
-
-            val atividadeJson = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-            val idOriginal = atividadeJson.id
-            if (idOriginal == null) {
-              Log.e("Requisicao", "Erro: atividade sem ID para completar")
-              return@launch
-            }
-            if (atividadeJson.dataPrazo.before(hoje)) {
-              val requisicaoNegada = requisicao.copy(
-                status = StatusRequisicao.RECUSADA,
-                dataResposta = Date(),
-                mensagemResposta = "Atividade está vencida. Ajuste o prazo antes de marcar como concluída.",
-                coordenadorId = getFuncionarioLogadoId(context)
-              )
-              requisicaoDao.update(requisicaoNegada)
-              return@launch
-            }
-            val atividadeConcluida = AtividadeEntity(
-              id = idOriginal,
-              nome = atividadeJson.nome,
-              descricao = atividadeJson.descricao,
-              dataInicio = atividadeJson.dataInicio,
-              dataPrazo = atividadeJson.dataPrazo,
-              acaoId = atividadeJson.acaoId,
-              funcionarioId = atividadeJson.responsaveis.firstOrNull() ?: return@launch,
-              status = StatusAtividade.CONCLUIDA,
-              prioridade = atividadeJson.prioridade,
-              criadoPor = atividadeJson.criadoPor,
-              dataCriacao = atividadeJson.dataCriacao
-            )
-            atividadeDao.update(atividadeConcluida)
-            val atividadeViewModel = AtividadeViewModel(getApplication())
-            atividadeViewModel.verificarAtividadesComPrazoProximo()
-          }
-
-          TipoRequisicao.CRIAR_ACAO -> {
-            val acaoJson = Gson().fromJson(requisicao.acaoJson, AcaoJson::class.java)
-            val novaAcao = AcaoEntity(
-              nome = acaoJson.nome,
-              descricao = acaoJson.descricao,
-              dataInicio = acaoJson.dataInicio,
-              dataPrazo = acaoJson.dataPrazo,
-              status = acaoJson.status,
-              criadoPor = acaoJson.criadoPor,
-              dataCriacao = acaoJson.dataCriacao,
-              pilarId = acaoJson.pilarId
-            )
-
-
-            val idAcao = acaoDao.inserirComRetorno(novaAcao)
-
-
-            acaoJson.responsaveis.forEach { idResp ->
-              acaoFuncionarioDao.inserirAcaoFuncionario(
-                AcaoFuncionarioEntity(acaoId = idAcao.toInt(), funcionarioId = idResp)
-              )
-            }
-
-            Log.d("Requisicao", "Ação criada com sucesso: ${novaAcao.nome}")
-          }
-
-
-          TipoRequisicao.EDITAR_ACAO -> {
-            val acaoJson = Gson().fromJson(requisicao.acaoJson, AcaoJson::class.java)
-            val acaoExistente = acaoDao.getAcaoById(acaoJson.id!!)
-
-            if (acaoExistente != null) {
-              val novaAcao = AcaoEntity(
-                id = acaoJson.id!!,
-                nome = acaoJson.nome,
-                descricao = acaoJson.descricao,
-                dataInicio = acaoJson.dataInicio,
-                dataPrazo = acaoJson.dataPrazo,
-                status = acaoJson.status,
-                criadoPor = acaoJson.criadoPor,
-                dataCriacao = acaoJson.dataCriacao,
-                pilarId = acaoJson.pilarId
-              )
-
-              acaoDao.update(novaAcao)
-
-              // Atualizar responsáveis
-              acaoFuncionarioDao.deletarResponsaveisPorAcao(novaAcao.id)
-              acaoJson.responsaveis.forEach { idResp ->
-                acaoFuncionarioDao.inserirAcaoFuncionario(
-                  AcaoFuncionarioEntity(acaoId = novaAcao.id, funcionarioId = idResp)
-                )
-              }
-
-              // ❗ Aqui não há notificações automáticas associadas a ações,
-              // mas se quiser implementar lógica de vencimento para ações, adicione aqui futuramente.
-
-              Log.d("Requisicao", "Ação editada com sucesso: ${novaAcao.nome}")
-            } else {
-              Log.e("Requisicao", "Erro: ação não encontrada para edição")
-            }
-          }
-
-
-
-          else -> {}
-        }
+      when (requisicao.tipo) {
+        TipoRequisicao.CRIAR_ATIVIDADE -> salvarAtividade(context, requisicao.atividadeJson!!, isEdicao = false)
+        TipoRequisicao.EDITAR_ATIVIDADE -> salvarAtividade(context, requisicao.atividadeJson!!, isEdicao = true)
+        TipoRequisicao.COMPLETAR_ATIVIDADE -> completarAtividade(context, requisicao)
+        TipoRequisicao.CRIAR_ACAO -> salvarAcao(requisicao.acaoJson!!, isEdicao = false)
+        TipoRequisicao.EDITAR_ACAO -> salvarAcao(requisicao.acaoJson!!, isEdicao = true)
+        else -> {}
       }
     }
   }
 
-    fun getQuantidadeNaoVistas(usuarioId: Int): LiveData<Int> {
-      return requisicaoDao.getQuantidadeNaoVistas(usuarioId)
+  private suspend fun salvarAtividade(context: Context, json: String, isEdicao: Boolean) {
+    val atividadeJson = Gson().fromJson(json, AtividadeJson::class.java)
+    val responsaveis = atividadeJson.responsaveis ?: emptyList()
+    val funcionarioId = responsaveis.firstOrNull()
+
+    if (funcionarioId == null) {
+      Log.e("Requisicao", "Erro: nenhum responsável encontrado para a atividade")
+      return
     }
 
-    fun getFuncionarioLogadoId(context: Context): Int {
-      val prefs = context.getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
-      return prefs.getInt("funcionarioId", -1)
-    }
+    val novaAtividade = AtividadeEntity(
+      id = if (isEdicao) atividadeJson.id
+        ?: throw IllegalStateException("ID da atividade ausente para edição") else null,
+      nome = atividadeJson.nome,
+      descricao = atividadeJson.descricao,
+      dataInicio = atividadeJson.dataInicio,
+      dataPrazo = atividadeJson.dataPrazo,
+      acaoId = atividadeJson.acaoId,
+      funcionarioId = funcionarioId,
+      status = if (isEdicao) atividadeJson.status else StatusAtividade.PENDENTE,
+      prioridade = atividadeJson.prioridade,
+      criadoPor = atividadeJson.criadoPor,
+      dataCriacao = atividadeJson.dataCriacao
+    )
 
-    fun inserirRequisicao(requisicao: RequisicaoEntity) {
-      viewModelScope.launch {
-        AppDatabase.getDatabase(getApplication()).requisicaoDao().inserir(requisicao)
+    if (!isEdicao) {
+      novaAtividade.id = null // Garante que Room vai gerar o ID
+      val idAtividade = atividadeDao.insertComRetorno(novaAtividade).toInt()
+      novaAtividade.id = idAtividade
+    } else {
+      val id = atividadeJson.id!!
+      val antigaAtividade = atividadeDao.getAtividadePorIdDireto(id)
+
+      atividadeDao.update(novaAtividade)
+      atividadeDao.deletarRelacoesPorAtividade(id)
+
+      // ⏩ Primeiro insere os responsáveis no banco
+      responsaveis.forEach { idResp ->
+        atividadeDao.inserirRelacaoFuncionario(
+          AtividadeFuncionarioEntity(
+            atividadeId = id,
+            funcionarioId = idResp
+          )
+        )
       }
+
+      // ✅ Agora sim: chama o método que depende dos responsáveis estarem salvos
+      val atualizada = atividadeDao.getAtividadePorIdDireto(id)
+      val atividadeRepository = AtividadeRepository(
+        atividadeDao,
+        db.atividadeFuncionarioDao(),
+        requisicaoDao
+      )
+      atividadeRepository.tratarAlteracaoPrazo(atualizada, antigaAtividade)
+      return
     }
 
-    fun getNotificacoesDoApoio(usuarioId: Int): LiveData<List<RequisicaoEntity>> {
-      return requisicaoDao.getNotificacoesDoApoio(usuarioId)
-    }
-
-    fun marcarTodasComoVistas(usuarioId: Int) {
-      viewModelScope.launch {
-        requisicaoDao.marcarComoVista(usuarioId)
-      }
-    }
-
-    fun getQuantidadePendentesParaCoordenador(): LiveData<Int> {
-      return requisicaoDao.getQuantidadePendentesParaCoordenador()
-    }
-
-    fun getQuantidadeNotificacoesPrazoNaoVistas(usuarioId: Int): LiveData<Int> {
-      return requisicaoDao.getQuantidadeNotificacoesPrazoNaoVistas(usuarioId)
-    }
-
-    fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int) {
-      viewModelScope.launch {
-        requisicaoDao.marcarNotificacoesDePrazoComoVistas(usuarioId)
-      }
+    // ⚠️ Inserção dos responsáveis no caso de nova atividade (não edição)
+    responsaveis.forEach { idResp ->
+      atividadeDao.inserirRelacaoFuncionario(
+        AtividadeFuncionarioEntity(
+          atividadeId = novaAtividade.id!!,
+          funcionarioId = idResp
+        )
+      )
     }
   }
 
+
+
+  private suspend fun completarAtividade(context: Context, requisicao: RequisicaoEntity) {
+    val hoje = Calendar.getInstance().apply {
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
+
+    val atividadeJson = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
+    val responsaveis = atividadeJson.responsaveis ?: emptyList()
+    val funcionarioId = responsaveis.firstOrNull()
+
+    if (atividadeJson.id == null || atividadeJson.dataPrazo.before(hoje) || funcionarioId == null) {
+      requisicaoDao.update(
+        requisicao.copy(
+          status = StatusRequisicao.RECUSADA,
+          dataResposta = Date(),
+          mensagemResposta = "Atividade vencida ou sem responsável. Ajuste antes de concluir.",
+          coordenadorId = getFuncionarioLogadoId(context)
+        )
+      )
+      return
+    }
+
+    val concluida = AtividadeEntity(
+      id = atividadeJson.id,
+      nome = atividadeJson.nome,
+      descricao = atividadeJson.descricao,
+      dataInicio = atividadeJson.dataInicio,
+      dataPrazo = atividadeJson.dataPrazo,
+      acaoId = atividadeJson.acaoId,
+      funcionarioId = funcionarioId,
+      status = StatusAtividade.CONCLUIDA,
+      prioridade = atividadeJson.prioridade,
+      criadoPor = atividadeJson.criadoPor,
+      dataCriacao = atividadeJson.dataCriacao
+    )
+    val atividadeRepository = AtividadeRepository(
+      atividadeDao,
+      db.atividadeFuncionarioDao(),
+      requisicaoDao
+    )
+    atividadeRepository.tratarConclusaoAtividade(concluida)
+
+
+  }
+
+  private suspend fun salvarAcao(json: String, isEdicao: Boolean) {
+    val acaoJson = Gson().fromJson(json, AcaoJson::class.java)
+    val acao = AcaoEntity(
+      id = if (isEdicao) acaoJson.id ?: throw IllegalStateException("ID da atividade ausente para edição") else null,
+      nome = acaoJson.nome,
+      descricao = acaoJson.descricao,
+      dataInicio = acaoJson.dataInicio,
+      dataPrazo = acaoJson.dataPrazo,
+      status = acaoJson.status,
+      criadoPor = acaoJson.criadoPor,
+      dataCriacao = acaoJson.dataCriacao,
+      pilarId = acaoJson.pilarId
+    )
+
+    val idAcao = if (isEdicao) {
+      acaoDao.update(acao)
+      acaoJson.id!!
+    } else {
+      acaoDao.inserirComRetorno(acao).toInt()
+    }
+
+    acaoFuncionarioDao.deletarResponsaveisPorAcao(idAcao)
+    acaoJson.responsaveis.forEach { idResp ->
+      acaoFuncionarioDao.inserirAcaoFuncionario(
+        AcaoFuncionarioEntity(acaoId = idAcao, funcionarioId = idResp)
+      )
+    }
+  }
+
+  fun getFuncionarioLogadoId(context: Context): Int {
+    val prefs = context.getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
+    return prefs.getInt("funcionarioId", -1)
+  }
+
+  fun inserirRequisicao(requisicao: RequisicaoEntity) {
+    viewModelScope.launch {
+      requisicaoDao.inserir(requisicao)
+    }
+  }
+
+  fun getNotificacoesDoApoio(usuarioId: Int): LiveData<List<RequisicaoEntity>> =
+    requisicaoDao.getNotificacoesDoApoio(usuarioId)
+
+  fun marcarTodasComoVistas(usuarioId: Int) {
+    viewModelScope.launch {
+      requisicaoDao.marcarComoVista(usuarioId)
+    }
+  }
+
+  fun getQuantidadeNaoVistas(usuarioId: Int): LiveData<Int> =
+    requisicaoDao.getQuantidadeNaoVistas(usuarioId)
+
+  fun getQuantidadePendentesParaCoordenador(): LiveData<Int> =
+    requisicaoDao.getQuantidadePendentesParaCoordenador()
+
+  fun getQuantidadeNotificacoesPrazoNaoVistas(usuarioId: Int): LiveData<Int> =
+    requisicaoDao.getQuantidadeNotificacoesPrazoNaoVistas(usuarioId)
+
+  fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int) {
+    viewModelScope.launch {
+      requisicaoDao.marcarNotificacoesDePrazoComoVistas(usuarioId)
+    }
+    fun getNotificacoesDoApoio(id: Int): LiveData<List<RequisicaoEntity>> {
+      return requisicaoDao.getNotificacoesDoFuncionario(id)
+        .distinctUntilChanged()  // <- força atualização mesmo se for a "mesma lista"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,24 +110,22 @@ class TelaAtividadeFragment : Fragment() {
     binding.cardConfirmarAtividade.setOnClickListener {
       atividadeViewModel.getAtividadeById(atividadeId).observe(viewLifecycleOwner) { atividade ->
         if (atividade != null) {
-          val hoje = Calendar.getInstance().time
-          val vencida = atividade.dataPrazo.before(hoje) && atividade.status != StatusAtividade.CONCLUIDA
+          if (atividade.status == StatusAtividade.CONCLUIDA) {
+            Toast.makeText(requireContext(), "A atividade já está concluída.", Toast.LENGTH_SHORT).show()
+            return@observe
+          }
 
-          val funcionario = funcionarioViewModel.funcionarioLogado.value
-
-          if (vencida && funcionario?.cargo == Cargo.COORDENADOR) {
-            Toast.makeText(
-              requireContext(),
-              "Atividade vencida. Altere a data de prazo para uma data atualizada antes de concluir.",
-              Toast.LENGTH_LONG
-            ).show()
+          if (atividade.status == StatusAtividade.VENCIDA) {
+            Toast.makeText(requireContext(), "A atividade está vencida. Edite o prazo antes de concluir.", Toast.LENGTH_LONG).show()
             return@observe
           }
 
           val atividadeAtualizada = atividade.copy(status = StatusAtividade.CONCLUIDA)
-          atividadeViewModel.atualizar(atividadeAtualizada)
+          Log.d("ATIVIDADE_OBSERVADA", "Status da atividade: ${atividade.status}")
+
+          atividadeViewModel.concluirAtividade(atividadeAtualizada)
           acaoViewModel.atualizarStatusAcaoAutomaticamente(atividade.acaoId)
-          atividadeViewModel.cancelarNotificacoesDePrazo(requireContext(), atividade.id)
+
           Toast.makeText(requireContext(), "Atividade marcada como concluída!", Toast.LENGTH_SHORT).show()
           parentFragmentManager.popBackStack()
         }
@@ -140,8 +139,23 @@ class TelaAtividadeFragment : Fragment() {
 
     binding.cardPedirConfirmacao.setOnClickListener {
       atividadeViewModel.getAtividadeComFuncionariosById(atividadeId).observe(viewLifecycleOwner) { atividade ->
-        val hoje = Calendar.getInstance().time
-        val vencida = atividade.atividade.dataPrazo.before(hoje) && atividade.atividade.status != StatusAtividade.CONCLUIDA
+
+        val hojeTruncado = Calendar.getInstance().apply {
+          set(Calendar.HOUR_OF_DAY, 0)
+          set(Calendar.MINUTE, 0)
+          set(Calendar.SECOND, 0)
+          set(Calendar.MILLISECOND, 0)
+        }.time
+
+        val dataPrazoTruncado = Calendar.getInstance().apply {
+          time = atividade.atividade.dataPrazo
+          set(Calendar.HOUR_OF_DAY, 0)
+          set(Calendar.MINUTE, 0)
+          set(Calendar.SECOND, 0)
+          set(Calendar.MILLISECOND, 0)
+        }.time
+
+        val vencida = dataPrazoTruncado.before(hojeTruncado) && atividade.atividade.status != StatusAtividade.CONCLUIDA
 
         if (atividade.atividade.status == StatusAtividade.CONCLUIDA) {
           Toast.makeText(requireContext(), "A atividade já está concluída.", Toast.LENGTH_SHORT).show()
@@ -149,7 +163,7 @@ class TelaAtividadeFragment : Fragment() {
         }
 
         if (vencida) {
-          Toast.makeText(requireContext(), "Esta atividade está vencida. Não é possível pedir confirmação.", Toast.LENGTH_LONG).show()
+          Toast.makeText(requireContext(), "Esta atividade está vencida. Não é possível pedir confirmação, atualize o prazo.", Toast.LENGTH_LONG).show()
           return@observe
         }
 
@@ -195,7 +209,6 @@ class TelaAtividadeFragment : Fragment() {
         }
       }
     }
-
   }
 
   private fun preencherCampos(atividade: AtividadeComFuncionarios) {

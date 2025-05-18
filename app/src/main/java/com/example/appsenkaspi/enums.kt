@@ -49,8 +49,12 @@ enum class TipoRequisicao {
     CRIAR_ACAO,
     EDITAR_ACAO,
     ATIVIDADE_PARA_VENCER,
-    ATIVIDADE_VENCIDA
+    ATIVIDADE_VENCIDA,
+    ATIVIDADE_CONCLUIDA,
+    PRAZO_ALTERADO
 }
+
+
 
 enum class StatusNotificacao {
     NAO_LIDA,
@@ -74,3 +78,4 @@ enum class TipoDeNotificacao {
     EDICAO_ATIVIDADE_ACEITA,
     CONFIRMACAO_ATIVIDADE_ACEITA
 }
+

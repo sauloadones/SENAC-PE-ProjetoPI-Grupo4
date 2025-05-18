@@ -65,11 +65,15 @@ class NotificacaoFragment : Fragment() {
 
         pendentesLiveData.observe(viewLifecycleOwner) { pendentes ->
           pessoaisLiveData.observe(viewLifecycleOwner) { pessoais ->
-            val notificacoesDePrazoOuVencida = pessoais.filter {
-              (it.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || it.tipo == TipoRequisicao.ATIVIDADE_VENCIDA)
-                && it.solicitanteId == funcionarioId
+            val notificacoesAuto = pessoais.filter {
+              it.tipo in listOf(
+                TipoRequisicao.ATIVIDADE_PARA_VENCER,
+                TipoRequisicao.ATIVIDADE_VENCIDA,
+                TipoRequisicao.PRAZO_ALTERADO,
+                TipoRequisicao.ATIVIDADE_CONCLUIDA
+              ) && it.solicitanteId == funcionarioId
             }
-            val listaFinal = (pendentes + notificacoesDePrazoOuVencida)
+            val listaFinal = (pendentes + notificacoesAuto).sortedBy { it.resolvida }
               .sortedBy { it.resolvida } // opcional: coloca resolvidas por último
             if (adapter.currentList != listaFinal) {
               adapter.submitList(listaFinal)
@@ -87,10 +91,9 @@ class NotificacaoFragment : Fragment() {
                 it.tipo == TipoRequisicao.ATIVIDADE_VENCIDA && !it.foiVista && it.solicitanteId == funcionarioId
               }.forEach { requisicao ->
                 notificationManager.cancel(requisicao.id)
-                viewModel.marcarTodasComoVistas(  requisicao.id)
+                viewModel.marcarTodasComoVistas(requisicao.id)
               }
 
-              // Marcar todas como vistas, se você ainda quiser
               viewModel.marcarTodasComoVistas(funcionarioId)
             }
           }
@@ -110,8 +113,13 @@ class NotificacaoFragment : Fragment() {
       pendentesLiveData.observe(viewLifecycleOwner) { pendentes ->
         pessoaisLiveData.observe(viewLifecycleOwner) { pessoais ->
           val notificacoesDePrazoOuVencida = pessoais.filter {
-            (it.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || it.tipo == TipoRequisicao.ATIVIDADE_VENCIDA)
-              && it.solicitanteId == funcionarioId
+            it.tipo in listOf(
+              TipoRequisicao.ATIVIDADE_PARA_VENCER,
+              TipoRequisicao.ATIVIDADE_VENCIDA,
+              TipoRequisicao.PRAZO_ALTERADO,
+              TipoRequisicao.ATIVIDADE_CONCLUIDA
+
+            ) && it.solicitanteId == funcionarioId
           }
           val listaFinal = (pendentes + notificacoesDePrazoOuVencida)
             .sortedBy { it.resolvida }

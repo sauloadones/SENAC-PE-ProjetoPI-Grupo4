@@ -125,6 +125,9 @@
     @Query("DELETE FROM atividades_funcionarios WHERE atividadeId = :atividadeId")
     suspend fun deletarRelacoesPorAtividade(atividadeId: Int)
 
+    @Query("SELECT * FROM atividades WHERE id = :id")
+    suspend fun getAtividadePorIdDireto(id: Int): AtividadeEntity
+
 
 
 

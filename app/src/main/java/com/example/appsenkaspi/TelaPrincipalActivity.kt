@@ -1,29 +1,50 @@
 package com.example.appsenkaspi
 
+import android.R.attr.data
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.ActivityTelaPrincipalBinding
 import kotlinx.coroutines.launch
+import android.provider.Settings
+import android.net.Uri
+import androidx.activity.viewModels
+import androidx.fragment.app.activityViewModels
+import kotlin.getValue
 
 class TelaPrincipalActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityTelaPrincipalBinding
   private lateinit var funcionarioViewModel: FuncionarioViewModel
+  private val atividadeViewModel: AtividadeViewModel by viewModels()
+
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    atividadeViewModel.checarPrazos()
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
       if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
         != android.content.pm.PackageManager.PERMISSION_GRANTED) {
         requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 100)
       }
     }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      if (!alarmManager.canScheduleExactAlarms()) {
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+          data = Uri.parse("package:$packageName")
+        }
+        startActivity(intent) // dentro de uma Activity!
+      }
+    }
 
 
-    criarCanalDeNotificacao() // ✅ ESSENCIAL
+    // ✅ Criar canal de notificação
 
 
     binding = ActivityTelaPrincipalBinding.inflate(layoutInflater)
@@ -47,6 +68,9 @@ class TelaPrincipalActivity : AppCompatActivity() {
 
       if (funcionario != null) {
         funcionarioViewModel.logarFuncionario(funcionario)
+
+        // ✅ Verificar notificações de prazo
+
       } else {
         prefs.edit().clear().apply()
         startActivity(Intent(this@TelaPrincipalActivity, MainActivity::class.java))
@@ -54,51 +78,27 @@ class TelaPrincipalActivity : AppCompatActivity() {
         return@launch
       }
 
+      val requisicaoId = intent.getIntExtra("requisicao_id", -1)
+      val abrirNotificacoes = intent.getBooleanExtra("abrir_notificacoes", false)
+
       if (savedInstanceState == null) {
         supportFragmentManager.popBackStack(
           null,
           androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
         )
 
-        supportFragmentManager.beginTransaction()
-          .replace(R.id.main_container, HomeFragment())
-          .commit()
-      }
-
-      val requisicaoId = intent.getIntExtra("requisicao_id", -1)
-      val abrirNotificacoes = intent.getBooleanExtra("abrir_notificacoes", false)
-
-      if (abrirNotificacoes && requisicaoId != -1) {
-        val fragment = DetalheNotificacaoFragment().apply {
-          arguments = Bundle().apply {
-            putInt("requisicaoId", requisicaoId)
+        val fragment = when {
+          abrirNotificacoes && requisicaoId != -1 -> DetalheNotificacaoFragment().apply {
+            arguments = Bundle().apply { putInt("requisicaoId", requisicaoId) }
           }
+          abrirNotificacoes -> NotificacaoFragment()
+          else -> HomeFragment()
         }
 
         supportFragmentManager.beginTransaction()
           .replace(R.id.main_container, fragment)
-          .addToBackStack(null)
-          .commit()
-      } else if (abrirNotificacoes) {
-        supportFragmentManager.beginTransaction()
-          .replace(R.id.main_container, NotificacaoFragment())
-          .addToBackStack(null)
           .commit()
       }
-    }
-  }
-  private fun criarCanalDeNotificacao() {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-      val canal = android.app.NotificationChannel(
-        "prazo_channel", // ID usado na notificação
-        "Notificações de Prazo", // Nome visível para o usuário
-        android.app.NotificationManager.IMPORTANCE_DEFAULT
-      ).apply {
-        description = "Alertas de atividades próximas do prazo"
-      }
-
-      val manager = getSystemService(android.app.NotificationManager::class.java)
-      manager.createNotificationChannel(canal)
     }
   }
 }

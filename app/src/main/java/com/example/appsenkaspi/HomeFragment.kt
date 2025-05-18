@@ -15,6 +15,9 @@ import androidx.cardview.widget.CardView
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class HomeFragment : Fragment() {
 
@@ -42,6 +45,10 @@ class HomeFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    lifecycleScope.launch {
+      atividadeViewModel.checarPrazos()
+      atividadeViewModel.verificarVencimentos()
+    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       funcionario?.let {
@@ -55,7 +62,7 @@ class HomeFragment : Fragment() {
         val ultimaExecucao = prefs.getString(ultimaExecucaoKey, null)
 
         if (ultimaExecucao != hoje) {
-          atividadeViewModel.verificarAtividadesComPrazoProximo()
+
           prefs.edit().putString(ultimaExecucaoKey, hoje).apply()
         }
 
@@ -133,3 +140,5 @@ class HomeFragment : Fragment() {
     _binding = null
   }
 }
+
+

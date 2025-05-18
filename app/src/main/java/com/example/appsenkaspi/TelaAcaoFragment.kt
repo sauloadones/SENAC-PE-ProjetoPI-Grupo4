@@ -167,7 +167,7 @@ class TelaAcaoFragment : Fragment() {
         atividadeAdapter = AtividadeAdapter { atividadeComFuncionarios ->
             val fragment = TelaAtividadeFragment().apply {
                 arguments = Bundle().apply {
-                    putInt("atividadeId", atividadeComFuncionarios.atividade.id)
+                    putInt("atividadeId", atividadeComFuncionarios.atividade.id!!)
                 }
             }
 

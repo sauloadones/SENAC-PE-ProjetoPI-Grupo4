@@ -34,7 +34,7 @@ class RequisicaoAdapter(
     val requisicao = getItem(position)
 
     // 🔔 Notificações automáticas de prazo
-    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA) {
+    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA || requisicao.tipo == TipoRequisicao.PRAZO_ALTERADO || requisicao.tipo == TipoRequisicao.ATIVIDADE_CONCLUIDA) {
       if (requisicao.solicitanteId != funcionarioIdLogado) {
         holder.itemView.visibility = View.GONE
         holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
@@ -64,10 +64,17 @@ class RequisicaoAdapter(
         TipoRequisicao.ATIVIDADE_VENCIDA -> Quadruple(
           "Atividade Vencida", R.drawable.ic_warning, "#F44336", "A atividade ultrapassou o prazo."
         )
+        TipoRequisicao.PRAZO_ALTERADO -> Quadruple(
+          "Prazo Alterado", R.drawable.ic_update, "#FF9800", "A data de prazo da atividade foi modificada."
+        )
+        TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
+          "Atividade Concluida", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluida"
+        )
         else -> Quadruple(
           "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
         )
       }
+
 
       val (titulo, icone, corHex, mensagemPadrao) = tipoInfo
 

@@ -30,7 +30,7 @@ import java.util.Date
     ]
 )
 data class AcaoEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int? = 0,
     val nome: String,
     val descricao: String,
     val dataInicio: Date,

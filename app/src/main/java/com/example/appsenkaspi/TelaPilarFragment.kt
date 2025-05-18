@@ -193,7 +193,7 @@ class TelaPilarFragment : Fragment() {
 
     private fun abrirTelaAcao(acao: AcaoEntity) {
         val fragment = TelaAcaoFragment().apply {
-            arguments = Bundle().apply { putInt("acaoId", acao.id) }
+            arguments = Bundle().apply { putInt("acaoId", acao.id!!) }
         }
         parentFragmentManager.beginTransaction()
             .replace(R.id.main_container, fragment)
