@@ -16,17 +16,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/container_historico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_historico_box"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:elevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/texto_historico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Relatórios"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/textTipoRelatorio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="14dp"
         android:layout_marginStart="20dp"
         android:text="Tipo de Relatório:"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintTop_toBottomOf="@id/container_historico"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
@@ -152,7 +178,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:paddingEnd="12dp"
-            android:dropDownVerticalOffset="0dp"
+            android:dropDownVerticalOffset="-5dp"
             android:popupBackground="@drawable/bg_dropdown_popup"
             android:focusable="false"
             android:clickable="true" />
@@ -179,6 +205,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginHorizontal="16dp"
+        android:hint="Escolha o tipo de arquivo"
         app:boxCornerRadiusTopStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
@@ -199,11 +226,14 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:paddingEnd="12dp"
-            android:dropDownVerticalOffset="0dp"
+            android:elevation="4dp"
+            android:dropDownVerticalOffset="-5dp"
             android:popupBackground="@drawable/bg_dropdown_popup"
-            android:focusable="false"
-            android:clickable="true" />
-
+            android:focusable="true"
+            android:clickable="true"
+            android:drawableStart="@drawable/tiparquivo"
+            android:drawablePadding="8dp"
+            android:textColorHint="#CCCCCC" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
