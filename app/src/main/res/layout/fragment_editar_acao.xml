@@ -104,7 +104,7 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- Botão calendário -->
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonPickDateEdicao"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
