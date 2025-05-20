@@ -74,7 +74,7 @@ class RequisicaoAdapter(
           "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Adicionado"
         )
         TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
-          "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Removido"
+          "Responsavel Removido", R.drawable.ic_warning, "#FF9800", "Responsavel Removido"
         )
         else -> Quadruple(
           "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
