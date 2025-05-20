@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,9 +15,6 @@ import androidx.cardview.widget.CardView
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-
 
 class HomeFragment : Fragment() {
 
@@ -45,28 +42,22 @@ class HomeFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    lifecycleScope.launch {
-      atividadeViewModel.checarPrazos()
-      atividadeViewModel.verificarVencimentos()
-    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       funcionario?.let {
         val funcionarioId = it.id
         funcionarioLogadoId = funcionarioId
 
-        // 🔁 Geração de notificação de prazo: apenas 1x por dia por funcionário
         val prefs = requireContext().getSharedPreferences("notificacoes_prazo", Context.MODE_PRIVATE)
         val ultimaExecucaoKey = "ultima_execucao_funcionario_$funcionarioId"
         val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val ultimaExecucao = prefs.getString(ultimaExecucaoKey, null)
 
         if (ultimaExecucao != hoje) {
-
+          atividadeViewModel.verificarAtividadesComPrazoProximo()
           prefs.edit().putString(ultimaExecucaoKey, hoje).apply()
         }
 
-        // ✅ Badge de notificação (bolinha com contador)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
           funcionario?.let {
             configurarNotificacaoBadge(
@@ -80,16 +71,13 @@ class HomeFragment : Fragment() {
           }
         }
 
-        // ✅ Botão do sino
-
-
-        // ✅ Controle de visibilidade do botão "Adicionar Pilar"
+        // Visibilidade do botão "+"
         binding.cardAdicionarPilar.visibility = when (it.cargo) {
           Cargo.COORDENADOR -> View.VISIBLE
           else -> View.GONE
         }
 
-        // ✅ RecyclerView de pilares
+        // RecyclerView
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
 
@@ -101,7 +89,7 @@ class HomeFragment : Fragment() {
           adapter.submitList(lista)
         }
 
-        // ✅ Botão para criar novo pilar
+        // Botão "Adicionar Pilar"
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -114,7 +102,22 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
-        // ✅ Cor da barra de status do Android
+        // ✅ Botão "Histórico"
+        val boxHistorico = view.findViewById<LinearLayout>(R.id.box_historico)
+
+        boxHistorico.setOnClickListener {
+          val fragment = HistoricoFragment().apply {
+            arguments = Bundle().apply {
+              putInt("funcionarioId", funcionarioLogadoId)
+            }
+          }
+          parentFragmentManager.beginTransaction()
+            .replace(R.id.main_container, fragment)
+            .addToBackStack(null)
+            .commit()
+        }
+
+        // Cor da barra de status
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }
@@ -140,5 +143,3 @@ class HomeFragment : Fragment() {
     _binding = null
   }
 }
-
-

@@ -89,7 +89,7 @@
         app:layout_constraintTop_toBottomOf="@id/inputDescricaoAcao"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonPickDateAcao"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
