@@ -1,10 +1,13 @@
 package com.example.appsenkaspi
 
+import android.content.Context
+
 import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AtividadeRepository(
+  private val context: Context,
   private val atividadeDao: AtividadeDao,
   private val atividadeFuncionarioDao: AtividadeFuncionarioDao,
   private val requisicaoDao: RequisicaoDao
@@ -64,6 +67,12 @@ class AtividadeRepository(
               foiVista = false
             )
           )
+          NotificationUtils.mostrarNotificacao(
+            context,
+            "Prazo se aproximando",
+            mensagem,
+            id * 100 + responsavel.id
+          )
         }
       }
     }
@@ -85,6 +94,7 @@ class AtividadeRepository(
       requisicaoDao.deletarRequisicoesDeTipoPorAtividade(id, TipoRequisicao.ATIVIDADE_VENCIDA)
 
       for (responsavel in responsaveis) {
+        val mensagem = "A atividade '${atividade.nome}' venceu e não pode mais ser concluída."
         requisicaoDao.inserir(
           RequisicaoEntity(
             tipo = TipoRequisicao.ATIVIDADE_VENCIDA,
@@ -92,9 +102,15 @@ class AtividadeRepository(
             solicitanteId = responsavel.id,
             status = StatusRequisicao.ACEITA,
             dataSolicitacao = Date(),
-            mensagemResposta = "A atividade '${atividade.nome}' venceu e não pode mais ser concluída.",
+            mensagemResposta = mensagem,
             foiVista = false
           )
+        )
+        NotificationUtils.mostrarNotificacao(
+          context,
+          "Atividade vencida",
+          mensagem,
+          id * 100 + responsavel.id
         )
       }
     }
@@ -108,6 +124,7 @@ class AtividadeRepository(
     val dataConclusao = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR")).format(Date())
 
     for (responsavel in responsaveis) {
+      val mensagem = "A atividade '${atividade.nome}' foi concluída com sucesso em $dataConclusao."
       requisicaoDao.inserir(
         RequisicaoEntity(
           tipo = TipoRequisicao.ATIVIDADE_CONCLUIDA,
@@ -115,9 +132,15 @@ class AtividadeRepository(
           solicitanteId = responsavel.id,
           status = StatusRequisicao.ACEITA,
           dataSolicitacao = Date(),
-          mensagemResposta = "A atividade '${atividade.nome}' foi concluída com sucesso em $dataConclusao.",
+          mensagemResposta = mensagem,
           foiVista = false
         )
+      )
+      NotificationUtils.mostrarNotificacao(
+        context,
+        "Atividade concluída",
+        mensagem,
+        id * 100 + responsavel.id
       )
     }
   }
@@ -160,6 +183,12 @@ class AtividadeRepository(
               foiVista = false
             )
           )
+          NotificationUtils.mostrarNotificacao(
+            context,
+            "Prazo alterado",
+            mensagemAlteracao,
+            id * 100 + responsavel.id
+          )
         }
       }
 
@@ -193,11 +222,18 @@ class AtividadeRepository(
                 foiVista = false
               )
             )
+            NotificationUtils.mostrarNotificacao(
+              context,
+              "Prazo se aproximando",
+              mensagem,
+              id * 100 + responsavel.id
+            )
           }
         }
       }
     }
   }
+
   suspend fun notificarMudancaResponsaveis(
     atividade: AtividadeEntity,
     adicionados: List<FuncionarioEntity>,
@@ -226,6 +262,12 @@ class AtividadeRepository(
             foiVista = false
           )
         )
+        NotificationUtils.mostrarNotificacao(
+          context,
+          "Você foi atribuído",
+          mensagem,
+          (atividade.id ?: 0) * 10 + novo.id
+        )
       }
     }
 
@@ -249,9 +291,13 @@ class AtividadeRepository(
             foiVista = false
           )
         )
+        NotificationUtils.mostrarNotificacao(
+          context,
+          "Responsabilidade removida",
+          mensagem,
+          (atividade.id ?: 0) * 10 + removido.id
+        )
       }
     }
   }
-
-
 }

@@ -14,11 +14,17 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 class AtividadeViewModel(application: Application) : AndroidViewModel(application) {
+  val context = getApplication<Application>().applicationContext
 
   private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
   private val atividadeFuncionarioDao = AppDatabase.getDatabase(application).atividadeFuncionarioDao()
   private val requisicaoDao = AppDatabase.getDatabase(application).requisicaoDao()
-  val repository = AtividadeRepository(atividadeDao, atividadeFuncionarioDao, requisicaoDao)
+  val repository = AtividadeRepository(
+    context,
+    atividadeDao,
+    atividadeFuncionarioDao,
+    requisicaoDao
+  )
 
   fun deletarAtividadePorId(id: Int) = viewModelScope.launch {
     atividadeDao.deletarPorId(id)
@@ -103,6 +109,7 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
   fun verificarVencimentos() {
     viewModelScope.launch {
       val repo = AtividadeRepository(
+        context,
         AppDatabase.getDatabase(getApplication()).atividadeDao(),
         AppDatabase.getDatabase(getApplication()).atividadeFuncionarioDao(),
         AppDatabase.getDatabase(getApplication()).requisicaoDao()

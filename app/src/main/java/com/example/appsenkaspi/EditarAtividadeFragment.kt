@@ -186,7 +186,7 @@ class EditarAtividadeFragment : Fragment() {
       val requisicaoDao = appDb.requisicaoDao()
       val atividadeFuncionarioDao = appDb.atividadeFuncionarioDao()
 
-      val atividadeRepository = AtividadeRepository(atividadeDao, atividadeFuncionarioDao, requisicaoDao)
+      val atividadeRepository = AtividadeRepository(requireContext(), atividadeDao, atividadeFuncionarioDao, requisicaoDao)
 
       // Salva alterações principais da atividade
       atividadeViewModel.salvarEdicaoAtividade(atividadeAtualizada, atividadeOriginal)

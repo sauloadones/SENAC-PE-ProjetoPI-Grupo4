@@ -15,7 +15,14 @@ import android.provider.Settings
 import android.net.Uri
 import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import kotlin.getValue
+import java.time.Duration
+
 
 class TelaPrincipalActivity : AppCompatActivity() {
 
@@ -25,7 +32,11 @@ class TelaPrincipalActivity : AppCompatActivity() {
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
+
+    NotificationUtils.criarCanais(applicationContext)
+    agendarVerificacaoDePrazosDiaria(applicationContext)  // ✅ Aqui!
     super.onCreate(savedInstanceState)
+
     atividadeViewModel.checarPrazos()
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
       if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -42,6 +53,10 @@ class TelaPrincipalActivity : AppCompatActivity() {
         startActivity(intent) // dentro de uma Activity!
       }
     }
+
+
+
+
 
 
     // ✅ Criar canal de notificação
@@ -101,4 +116,26 @@ class TelaPrincipalActivity : AppCompatActivity() {
       }
     }
   }
+  private fun calcularDelayPara8h(): Long {
+    val agora = LocalDateTime.now()
+    val proximaExecucao = agora.withHour(8).withMinute(0).withSecond(0)
+      .let { if (it.isBefore(agora)) it.plusDays(1) else it }
+
+    return Duration.between(agora, proximaExecucao).toMillis()
+  }
+
+  private fun agendarVerificacaoDePrazosDiaria(context: Context) {
+    val delay = calcularDelayPara8h()
+
+    val workRequest = PeriodicWorkRequestBuilder<VerificacaoDePrazosWorker>(1, TimeUnit.DAYS)
+      .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+      .build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+      "VerificacaoDePrazosDiaria",
+      ExistingPeriodicWorkPolicy.UPDATE,
+      workRequest
+    )
+  }
+
 }

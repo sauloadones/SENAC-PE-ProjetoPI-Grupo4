@@ -51,8 +51,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation("com.google.android.material:material:1.11.0")
+    implementation ("androidx.work:work-runtime-ktx:2.9.0") // ou versão mais recente
 
-    // Room
+  // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)

@@ -13,6 +13,7 @@ import java.util.Calendar
 import java.util.Date
 import androidx.lifecycle.distinctUntilChanged
 
+
 class NotificacaoViewModel(application: Application) : AndroidViewModel(application) {
 
   private val db = AppDatabase.getDatabase(application)
@@ -42,6 +43,23 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
         mensagemResposta = if (aceitar) "Requisição aceita." else "Requisição recusada."
       )
       requisicaoDao.update(novaRequisicao)
+      val tipoDescricao = when (requisicao.tipo) {
+        TipoRequisicao.CRIAR_ATIVIDADE -> "criação de atividade"
+        TipoRequisicao.EDITAR_ATIVIDADE -> "edição de atividade"
+        TipoRequisicao.COMPLETAR_ATIVIDADE -> "conclusão de atividade"
+        TipoRequisicao.CRIAR_ACAO -> "criação de ação"
+        TipoRequisicao.EDITAR_ACAO -> "edição de ação"
+        else -> "requisição"
+      }
+
+      NotificationUtils.mostrarNotificacao(
+        context,
+        "Requisição ${if (aceitar) "aceita" else "recusada"}",
+        "Sua solicitação de $tipoDescricao foi ${if (aceitar) "aceita" else "recusada"}.",
+        requisicao.id * 100
+      )
+
+
 
       if (!aceitar) return@launch
 
@@ -111,6 +129,7 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
 // ✅ Agora sim: chama método de alteração de prazo
       val atualizada = atividadeDao.getAtividadePorIdDireto(id)
       val atividadeRepository = AtividadeRepository(
+        context,
         atividadeDao,
         db.atividadeFuncionarioDao(),
         requisicaoDao
@@ -168,6 +187,7 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       dataCriacao = atividadeJson.dataCriacao
     )
     val atividadeRepository = AtividadeRepository(
+      context,
       atividadeDao,
       db.atividadeFuncionarioDao(),
       requisicaoDao
