@@ -70,7 +70,9 @@ class NotificacaoFragment : Fragment() {
                 TipoRequisicao.ATIVIDADE_PARA_VENCER,
                 TipoRequisicao.ATIVIDADE_VENCIDA,
                 TipoRequisicao.PRAZO_ALTERADO,
-                TipoRequisicao.ATIVIDADE_CONCLUIDA
+                TipoRequisicao.ATIVIDADE_CONCLUIDA,
+                TipoRequisicao.RESPONSAVEL_REMOVIDO,
+                TipoRequisicao.RESPONSAVEL_ADICIONADO
               ) && it.solicitanteId == funcionarioId
             }
             val listaFinal = (pendentes + notificacoesAuto).sortedBy { it.resolvida }
@@ -117,7 +119,9 @@ class NotificacaoFragment : Fragment() {
               TipoRequisicao.ATIVIDADE_PARA_VENCER,
               TipoRequisicao.ATIVIDADE_VENCIDA,
               TipoRequisicao.PRAZO_ALTERADO,
-              TipoRequisicao.ATIVIDADE_CONCLUIDA
+              TipoRequisicao.ATIVIDADE_CONCLUIDA,
+              TipoRequisicao.RESPONSAVEL_REMOVIDO,
+              TipoRequisicao.RESPONSAVEL_ADICIONADO,
 
             ) && it.solicitanteId == funcionarioId
           }

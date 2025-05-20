@@ -20,6 +20,7 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
   private val atividadeDao = db.atividadeDao()
   private val acaoDao = db.acaoDao()
   private val acaoFuncionarioDao = db.acaoFuncionarioDao()
+  private val atividadeFuncionarioDao = db.atividadeFuncionarioDao()
 
   fun getRequisicoesPendentes(): LiveData<List<RequisicaoEntity>> = requisicaoDao.getRequisicoesPendentes()
 
@@ -87,11 +88,17 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
     } else {
       val id = atividadeJson.id!!
       val antigaAtividade = atividadeDao.getAtividadePorIdDireto(id)
+      val antigosResponsaveis = atividadeFuncionarioDao.getResponsaveisDaAtividade(id)
+      val antigosIds = antigosResponsaveis.map { it.id }
+      val novosIds = responsaveis
+
+      val adicionados = novosIds - antigosIds
+      val removidos = antigosIds - novosIds
 
       atividadeDao.update(novaAtividade)
       atividadeDao.deletarRelacoesPorAtividade(id)
 
-      // ⏩ Primeiro insere os responsáveis no banco
+// ⏩ Primeiro insere os responsáveis atualizados
       responsaveis.forEach { idResp ->
         atividadeDao.inserirRelacaoFuncionario(
           AtividadeFuncionarioEntity(
@@ -101,7 +108,7 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
         )
       }
 
-      // ✅ Agora sim: chama o método que depende dos responsáveis estarem salvos
+// ✅ Agora sim: chama método de alteração de prazo
       val atualizada = atividadeDao.getAtividadePorIdDireto(id)
       val atividadeRepository = AtividadeRepository(
         atividadeDao,
@@ -109,17 +116,15 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
         requisicaoDao
       )
       atividadeRepository.tratarAlteracaoPrazo(atualizada, antigaAtividade)
-      return
-    }
 
-    // ⚠️ Inserção dos responsáveis no caso de nova atividade (não edição)
-    responsaveis.forEach { idResp ->
-      atividadeDao.inserirRelacaoFuncionario(
-        AtividadeFuncionarioEntity(
-          atividadeId = novaAtividade.id!!,
-          funcionarioId = idResp
-        )
-      )
+// 🆕 Notifica adição/remoção de responsáveis
+      val funcionarioDao = db.funcionarioDao()
+      val adicionadosEntities = funcionarioDao.getByIds(adicionados)
+      val removidosEntities = funcionarioDao.getByIds(removidos)
+
+
+      atividadeRepository.notificarMudancaResponsaveis(atualizada, adicionadosEntities, removidosEntities)
+
     }
   }
 

@@ -126,7 +126,7 @@ interface RequisicaoDao {
     SELECT COUNT(*) FROM requisicoes
     WHERE solicitanteId = :userId
     AND foiVista = 0
-    AND tipo IN ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida')
+    AND tipo IN ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida', 'responsavel_adicionado', 'responsavel_removido')
 """)
   fun getQuantidadeNotificacoesPrazoNaoVistas(userId: Int): LiveData<Int>
 
@@ -135,7 +135,7 @@ interface RequisicaoDao {
     SET foiVista = 1
     WHERE solicitanteId = :usuarioId
     AND foiVista = 0
-    AND tipo in ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida')
+    AND tipo in ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida', 'responsavel_adicionado', 'responsavel_removido')
 """)
   suspend fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int)
 

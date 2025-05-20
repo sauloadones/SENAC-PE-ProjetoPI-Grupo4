@@ -180,14 +180,27 @@ class EditarAtividadeFragment : Fragment() {
     )
 
     viewLifecycleOwner.lifecycleScope.launch {
+      val appDb = AppDatabase.getDatabase(requireContext())
+      val atividadeDao = appDb.atividadeDao()
+      val funcionarioDao = appDb.funcionarioDao()
+      val requisicaoDao = appDb.requisicaoDao()
+      val atividadeFuncionarioDao = appDb.atividadeFuncionarioDao()
+
+      val atividadeRepository = AtividadeRepository(atividadeDao, atividadeFuncionarioDao, requisicaoDao)
+
+      // Salva alterações principais da atividade
       atividadeViewModel.salvarEdicaoAtividade(atividadeAtualizada, atividadeOriginal)
 
-      val idsOriginais = funcionariosOriginais.map { it.id }.sorted()
-      val idsSelecionados = funcionariosSelecionados.map { it.id }.sorted()
-      val houveAlteracaoDeResponsaveis = idsOriginais != idsSelecionados
+      // Verifica alterações nos responsáveis
+      val idsOriginais = funcionariosOriginais.map { it.id }
+      val idsNovos = funcionariosSelecionados.map { it.id }
 
-      if (houveAlteracaoDeResponsaveis) {
+      val adicionados = idsNovos - idsOriginais
+      val removidos = idsOriginais - idsNovos
+
+      if (adicionados.isNotEmpty() || removidos.isNotEmpty()) {
         atividadeViewModel.deletarRelacoesPorAtividade(atividadeId)
+
         for (funcionario in funcionariosSelecionados) {
           val relacao = AtividadeFuncionarioEntity(
             atividadeId = atividadeId,
@@ -195,16 +208,24 @@ class EditarAtividadeFragment : Fragment() {
           )
           atividadeViewModel.inserirRelacaoFuncionario(relacao)
         }
-        delay(150)
+
+        // Busca todos os dados completos dos funcionários adicionados e removidos
+        val adicionadosEntities = funcionarioDao.getFuncionariosPorIds(adicionados)
+        val removidosEntities = funcionarioDao.getFuncionariosPorIds(removidos)
+
+        delay(200) // Garante que os relacionamentos foram salvos antes da notificação
+        atividadeRepository.notificarMudancaResponsaveis(atividadeAtualizada, adicionadosEntities, removidosEntities)
       }
 
+      // Atualiza o status da ação associada (caso necessário)
       acaoViewModel.atualizarStatusAcaoAutomaticamente(atividadeAtualizada.acaoId)
-
 
       Toast.makeText(requireContext(), "Atividade atualizada com sucesso!", Toast.LENGTH_SHORT).show()
       parentFragmentManager.popBackStack()
     }
   }
+
+
 
   private fun preencherCampos(atividade: AtividadeComFuncionarios) {
     binding.inputNomeAtividade.setText(atividade.atividade.nome)

@@ -34,7 +34,7 @@ class RequisicaoAdapter(
     val requisicao = getItem(position)
 
     // 🔔 Notificações automáticas de prazo
-    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA || requisicao.tipo == TipoRequisicao.PRAZO_ALTERADO || requisicao.tipo == TipoRequisicao.ATIVIDADE_CONCLUIDA) {
+    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA || requisicao.tipo == TipoRequisicao.PRAZO_ALTERADO || requisicao.tipo == TipoRequisicao.ATIVIDADE_CONCLUIDA || requisicao.tipo == TipoRequisicao.RESPONSAVEL_ADICIONADO || requisicao.tipo == TipoRequisicao.RESPONSAVEL_REMOVIDO) {
       if (requisicao.solicitanteId != funcionarioIdLogado) {
         holder.itemView.visibility = View.GONE
         holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
@@ -69,6 +69,12 @@ class RequisicaoAdapter(
         )
         TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
           "Atividade Concluida", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluida"
+        )
+        TipoRequisicao.RESPONSAVEL_ADICIONADO -> Quadruple(
+          "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Adicionado"
+        )
+        TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
+          "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Removido"
         )
         else -> Quadruple(
           "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
