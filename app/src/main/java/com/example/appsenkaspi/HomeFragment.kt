@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -48,16 +48,13 @@ class HomeFragment : Fragment() {
         val funcionarioId = it.id
         funcionarioLogadoId = funcionarioId
 
-        val prefs = requireContext().getSharedPreferences("notificacoes_prazo", Context.MODE_PRIVATE)
-        val ultimaExecucaoKey = "ultima_execucao_funcionario_$funcionarioId"
-        val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val ultimaExecucao = prefs.getString(ultimaExecucaoKey, null)
+        // 🔁 Geração de notificação de prazo: apenas 1x por dia por funcionário
 
-        if (ultimaExecucao != hoje) {
-          atividadeViewModel.verificarAtividadesComPrazoProximo()
-          prefs.edit().putString(ultimaExecucaoKey, hoje).apply()
-        }
 
+
+
+
+        // ✅ Badge de notificação (bolinha com contador)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
           funcionario?.let {
             configurarNotificacaoBadge(
@@ -71,13 +68,16 @@ class HomeFragment : Fragment() {
           }
         }
 
-        // Visibilidade do botão "+"
+        // ✅ Botão do sino
+
+
+        // ✅ Controle de visibilidade do botão "Adicionar Pilar"
         binding.cardAdicionarPilar.visibility = when (it.cargo) {
           Cargo.COORDENADOR -> View.VISIBLE
           else -> View.GONE
         }
 
-        // RecyclerView
+        // ✅ RecyclerView de pilares
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
 
@@ -89,7 +89,7 @@ class HomeFragment : Fragment() {
           adapter.submitList(lista)
         }
 
-        // Botão "Adicionar Pilar"
+        // ✅ Botão para criar novo pilar
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -102,22 +102,7 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
-        // ✅ Botão "Histórico"
-        val boxHistorico = view.findViewById<LinearLayout>(R.id.box_historico)
-
-        boxHistorico.setOnClickListener {
-          val fragment = HistoricoFragment().apply {
-            arguments = Bundle().apply {
-              putInt("funcionarioId", funcionarioLogadoId)
-            }
-          }
-          parentFragmentManager.beginTransaction()
-            .replace(R.id.main_container, fragment)
-            .addToBackStack(null)
-            .commit()
-        }
-
-        // Cor da barra de status
+        // ✅ Cor da barra de status do Android
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }
