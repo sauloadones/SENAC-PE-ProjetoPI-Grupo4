@@ -17,9 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppSenkasPI">
 
-    <receiver
-      android:name=".NotificacaoReceiver"
-      android:exported="false" />
+
         <!-- Activity principal que inicia o app -->
         <activity
             android:name=".MainActivity"
