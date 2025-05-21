@@ -149,31 +149,6 @@
     </FrameLayout>
 
     <!-- Botão Pedir Confirmação -->
-    <FrameLayout
-        android:id="@+id/pedirConfirmarButtonWrapperEdicao"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:background="@drawable/bg_button_confirmar"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
-        android:layout_marginHorizontal="16dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonPickDateEdicao"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/textPedirConfirmarEdicao"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Pedir Confirmação Edição"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium"/>
-    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

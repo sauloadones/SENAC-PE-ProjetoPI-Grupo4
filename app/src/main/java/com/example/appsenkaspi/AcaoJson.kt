@@ -13,5 +13,7 @@ data class AcaoJson(
     val criadoPor: Int,
     val dataCriacao: Date,
     val nomePilar: String,
-    val pilarId: Int
+    val pilarId: Int? = null,        // ← aqui está o ponto importante
+    val subpilarId: Int? = null
+
 )

@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -24,5 +25,10 @@ data class SubpilarEntity(
     val descricao: String?,
     val dataInicio: Date,
     val dataPrazo: Date,
-    val pilarId: Int
+    val pilarId: Int,
+    val dataCriacao: Date,
+
+    @ColumnInfo(name = "status") val status: StatusSubPilar,
+    @ColumnInfo(name = "criado_por")
+    val criadoPor: Int,
 )

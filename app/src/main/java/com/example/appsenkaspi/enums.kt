@@ -9,9 +9,11 @@ enum class Cargo {
 }
 
 enum class StatusPilar {
-    ATIVO,
-    EXCLUIDO,
-    VENCIDO
+  PLANEJADA,
+  EM_ANDAMENTO,
+  CONCLUIDA,
+  EXCLUIDA,
+  VENCIDA
 }
 
 enum class StatusAcao {
@@ -56,7 +58,13 @@ enum class TipoRequisicao {
     RESPONSAVEL_REMOVIDO
 }
 
-
+enum class StatusSubPilar {
+  PLANJEADA,
+  EM_ANDAMENTO,
+  CONCLUIDA,
+  EXCLUIDA,
+  VENCIDA
+}
 
 enum class StatusNotificacao {
     NAO_LIDA,

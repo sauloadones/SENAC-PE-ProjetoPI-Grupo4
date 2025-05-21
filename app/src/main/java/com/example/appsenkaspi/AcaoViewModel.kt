@@ -14,11 +14,13 @@ import java.util.*
 
 class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
+    private val dao = AppDatabase.getDatabase(application).acaoDao()
 
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
     private val atividadeDao = AppDatabase.getDatabase(application).atividadeDao()
+    private val subpilarDao = AppDatabase.getDatabase(application).subpilarDao()
 
-    fun getAcaoById(id: Int): LiveData<AcaoEntity?> {
+  fun getAcaoById(id: Int): LiveData<AcaoEntity?> {
         return acaoDao.getAcaoById(id)
     }
     suspend fun getAcaoByIdNow(id: Int): AcaoEntity? {
@@ -30,7 +32,12 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
         return acaoDao.listarPorPilar(pilarId)
     }
 
-    fun inserir(acao: AcaoEntity) = viewModelScope.launch {
+  fun listarAcoesPorSubpilar(subpilarId: Int): LiveData<List<AcaoComStatus>> {
+    return acaoDao.listarPorSubpilar(subpilarId)
+  }
+
+
+  fun inserir(acao: AcaoEntity) = viewModelScope.launch {
         acaoDao.inserirAcao(acao)
     }
 
@@ -47,7 +54,9 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-    fun atualizarStatusAcaoAutomaticamente(acaoId: Int) {
+
+
+  fun atualizarStatusAcaoAutomaticamente(acaoId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val total = atividadeDao.contarTotalPorAcaoValor(acaoId)
             val concluidas = atividadeDao.contarConcluidasPorAcaoValor(acaoId)
@@ -69,9 +78,22 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    suspend fun buscarAcaoPorId(id: Int): AcaoEntity? {
+
+  suspend fun criarAcaoSegura(acao: AcaoEntity): Long {
+    val valido = (acao.pilarId != null) xor (acao.subpilarId != null)
+    if (!valido) {
+      throw IllegalArgumentException("A ação deve estar ligada a um pilar OU subpilar, nunca ambos ou nenhum.")
+    }
+    return dao.inserirRetornandoId(acao)
+  }
+  suspend fun buscarAcaoPorId(id: Int): AcaoEntity? {
         return acaoDao.getAcaoPorId(id)
     }
+
+  suspend fun buscarNomeSubpilarPorId(subpilarId: Int): String? {
+    return subpilarDao.buscarNomeSubpilarPorId(subpilarId)
+  }
+
 
     suspend fun buscarPilarPorId(id: Int): PilarEntity? {
         return pilarDao.getPilarPorId(id)

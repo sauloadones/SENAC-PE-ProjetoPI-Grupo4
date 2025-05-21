@@ -21,7 +21,7 @@ data class RequisicaoEntity(
   val atividadeJson: String? = null,
   val acaoJson: String? = null,
   val atividadeId: Int? = null,
-  val acaoId: Int? = null,
+  val acaoId: Long? = null,
   val solicitanteId: Int,
   val status: StatusRequisicao = StatusRequisicao.PENDENTE,
   val dataSolicitacao: Date = Date(),

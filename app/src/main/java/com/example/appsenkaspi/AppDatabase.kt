@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
         AcaoEntity::class,
         AtividadeEntity::class,
         FuncionarioEntity::class,
-        ChecklistItemEntity:: class,
+        ChecklistItemEntity::class,
         AcaoFuncionarioEntity::class,
         AtividadeFuncionarioEntity::class,
         RequisicaoEntity::class,
