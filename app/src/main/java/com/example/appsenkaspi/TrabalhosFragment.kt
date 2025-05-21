@@ -62,13 +62,13 @@ class TrabalhosFragment : Fragment() {
           putInt("atividadeId", atividadeComFuncionarios.atividade.id!!)
         }
       }
-      parentFragmentManager.beginTransaction()
+      requireActivity().supportFragmentManager.beginTransaction()
         .replace(R.id.main_container, fragment)
         .addToBackStack(null)
         .commit()
     }
 
-    binding.recyclerAtividades.layoutManager = LinearLayoutManager(requireContext())
+      binding.recyclerAtividades.layoutManager = LinearLayoutManager(requireContext())
     binding.recyclerAtividades.adapter = adapter
   }
 
