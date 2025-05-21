@@ -1,6 +1,5 @@
 package com.example.appsenkaspi
 
-import android.R.attr.data
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
@@ -14,7 +13,6 @@ import kotlinx.coroutines.launch
 import android.provider.Settings
 import android.net.Uri
 import androidx.activity.viewModels
-import androidx.fragment.app.activityViewModels
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager

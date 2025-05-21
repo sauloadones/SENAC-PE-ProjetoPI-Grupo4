@@ -22,20 +22,28 @@ import java.util.Date
             parentColumns = ["id"],
             childColumns = ["criado_por"],
             onDelete = ForeignKey.CASCADE
-        )
+        ),
+      ForeignKey(
+        entity = SubpilarEntity::class,
+        parentColumns = ["id"],
+        childColumns = ["subpilarId"],
+        onDelete = ForeignKey.CASCADE
+      )
     ],
     indices = [
         Index(value = ["pilarId"]),
-        Index(value = ["criado_por"])
+        Index(value = ["criado_por"]),
+        Index(value = ["subpilarId"])
     ]
 )
 data class AcaoEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int? = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val nome: String,
     val descricao: String,
     val dataInicio: Date,
     val dataPrazo: Date,
-    val pilarId: Int,
+    val pilarId: Int? = null,
+    val subpilarId: Int? = null,
     @ColumnInfo(name = "status") val status: StatusAcao,
 
     @ColumnInfo(name = "criado_por")

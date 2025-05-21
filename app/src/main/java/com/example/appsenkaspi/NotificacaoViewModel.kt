@@ -199,8 +199,9 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
 
   private suspend fun salvarAcao(json: String, isEdicao: Boolean) {
     val acaoJson = Gson().fromJson(json, AcaoJson::class.java)
+
     val acao = AcaoEntity(
-      id = if (isEdicao) acaoJson.id ?: throw IllegalStateException("ID da atividade ausente para edição") else null,
+      id = if (isEdicao) acaoJson.id ?: throw IllegalStateException("ID da ação ausente para edição") else null,
       nome = acaoJson.nome,
       descricao = acaoJson.descricao,
       dataInicio = acaoJson.dataInicio,
@@ -208,7 +209,8 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       status = acaoJson.status,
       criadoPor = acaoJson.criadoPor,
       dataCriacao = acaoJson.dataCriacao,
-      pilarId = acaoJson.pilarId
+      pilarId = if (acaoJson.subpilarId == null) acaoJson.pilarId else null,
+      subpilarId = acaoJson.subpilarId
     )
 
     val idAcao = if (isEdicao) {
@@ -221,10 +223,11 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
     acaoFuncionarioDao.deletarResponsaveisPorAcao(idAcao)
     acaoJson.responsaveis.forEach { idResp ->
       acaoFuncionarioDao.inserirAcaoFuncionario(
-        AcaoFuncionarioEntity(acaoId = idAcao, funcionarioId = idResp)
+        AcaoFuncionarioEntity(acaoId = idAcao.toLong(), funcionarioId = idResp)
       )
     }
   }
+
 
   fun getFuncionarioLogadoId(context: Context): Int {
     val prefs = context.getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
