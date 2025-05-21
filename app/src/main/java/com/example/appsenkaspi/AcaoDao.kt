@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 @Dao
 interface AcaoDao {
 
-
-
     /**
      * Insere uma Ação no banco e retorna o ID gerado.
      * Usa REPLACE para conflitos.
@@ -56,19 +54,13 @@ interface AcaoDao {
     @Query("SELECT * FROM acoes WHERE id = :id")
     fun getAcaoById(id: Int): LiveData<AcaoEntity?>
 
-
-
     /**
      * Retorna a Ação junto com os Funcionários relacionados.
      */
     @Transaction
 
-
     @Insert
     suspend fun inserirComRetorno(acao: AcaoEntity): Long
-
-
-
 
     @Query("""
     SELECT
@@ -130,14 +122,11 @@ interface AcaoDao {
 """)
     suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
 
-
     @Query("SELECT * FROM acoes WHERE id = :id")
     fun buscarPorId(id: Int): AcaoEntity?
 
-
     @Query("SELECT * FROM acoes WHERE id = :id")
     suspend fun getById(id: Int): AcaoEntity
-
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(acao: AcaoEntity)
@@ -145,17 +134,11 @@ interface AcaoDao {
     @Update
     suspend fun update(acao: AcaoEntity)
 
-
     @Delete
     suspend fun delete(acao: AcaoEntity)
 
-
-
-
     @Query("SELECT * FROM acoes WHERE id = :id")
     suspend fun getAcaoPorId(id: Int): AcaoEntity?
-
-
 
     @Query("SELECT * FROM acoes")
     fun listarTodas(): LiveData<List<AcaoEntity>>
@@ -202,13 +185,8 @@ interface AcaoDao {
 
 
 
-
-
-
-
-
-
-
+    @Query("SELECT * FROM acoes WHERE pilarId = :pilarId")
+    suspend fun getAcoesPorPilarDireto(pilarId: Int): List<AcaoEntity>
 
 }
 
