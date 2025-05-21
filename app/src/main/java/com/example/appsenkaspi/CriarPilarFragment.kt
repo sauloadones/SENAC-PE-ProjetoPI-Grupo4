@@ -138,7 +138,7 @@ class CriarPilarFragment : Fragment() {
           descricao = descricao,
           dataInicio = Date(),
           dataPrazo = prazo,
-          status = StatusPilar.PLANEJADA,
+          status = StatusPilar.PLANEJADO,
           dataCriacao = Date(),
           criadoPor = funcionarioId
         )
