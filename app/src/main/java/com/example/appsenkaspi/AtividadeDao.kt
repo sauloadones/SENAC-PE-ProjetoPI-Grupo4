@@ -26,11 +26,8 @@
       @Query("DELETE FROM atividades WHERE id = :id")
       suspend fun deletarPorId(id: Int)
 
-
       @Insert
       suspend fun inserirComRetorno(atividade: AtividadeEntity): Long
-
-
 
       @Query("SELECT * FROM atividades WHERE id = :atividadeId")
       fun getAtividadeById(atividadeId: Int): LiveData<AtividadeEntity>
@@ -128,17 +125,8 @@
     @Query("SELECT * FROM atividades WHERE id = :id")
     suspend fun getAtividadePorIdDireto(id: Int): AtividadeEntity
 
-
-
-
-
-
-
-
-
-
-
-
+    @Query("SELECT * FROM atividades WHERE acaoId = :acaoId")
+    suspend fun getAtividadesPorAcaoDireto(acaoId: Int): List<AtividadeEntity>
 
   }
 

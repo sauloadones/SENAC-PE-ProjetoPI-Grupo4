@@ -49,16 +49,6 @@ class RelatorioFragment : Fragment() {
         configurarBotoes()
         carregarPilares()
 
-        // Forçar medida inicial dos campos ocultos para evitar desalinhamento
-        binding.textSelecionarPilar.measure(
-            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        )
-        binding.layoutSpinnerPilares.measure(
-            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        )
-
         binding.textSelecionarPilar.alpha = 0f
         binding.layoutSpinnerPilares.alpha = 0f
     }
@@ -81,9 +71,7 @@ class RelatorioFragment : Fragment() {
         binding.btnRelatorioGeral.setOnClickListener {
             isGeral = true
             updateButtonSelection(binding.btnRelatorioGeral, binding.btnRelatorioPorPilar)
-
             animateLayoutChange(binding.baseLayout)
-
             binding.textSelecionarPilar.visibility = View.GONE
             binding.layoutSpinnerPilares.visibility = View.GONE
         }
@@ -91,14 +79,11 @@ class RelatorioFragment : Fragment() {
         binding.btnRelatorioPorPilar.setOnClickListener {
             isGeral = false
             updateButtonSelection(binding.btnRelatorioPorPilar, binding.btnRelatorioGeral)
-
             binding.textSelecionarPilar.alpha = 0f
             binding.layoutSpinnerPilares.alpha = 0f
             binding.textSelecionarPilar.visibility = View.VISIBLE
             binding.layoutSpinnerPilares.visibility = View.VISIBLE
-
             animateLayoutChange(binding.baseLayout)
-
             binding.textSelecionarPilar.animate().alpha(1f).setDuration(300).start()
             binding.layoutSpinnerPilares.animate().alpha(1f).setDuration(300).setStartDelay(50).start()
         }
@@ -164,9 +149,7 @@ class RelatorioFragment : Fragment() {
                     .scaleX(1f)
                     .scaleY(1f)
                     .setDuration(80)
-                    .withEndAction {
-                        onEnd?.invoke()
-                    }
+                    .withEndAction { onEnd?.invoke() }
                     .start()
             }
             .start()
@@ -192,9 +175,8 @@ class RelatorioFragment : Fragment() {
 
     private fun gerarRelatorio(tipo: String) {
         lifecycleScope.launch {
+            binding.progressBar.visibility = View.VISIBLE
             try {
-                binding.progressBar.visibility = View.VISIBLE
-
                 val pilaresSelecionados = if (isGeral) {
                     withContext(Dispatchers.IO) { pilarViewModel.getTodosPilares() }
                 } else {
@@ -203,18 +185,54 @@ class RelatorioFragment : Fragment() {
                     if (pilarSelecionado != null) listOf(pilarSelecionado) else emptyList()
                 }
 
-                val listaDTO = pilaresSelecionados.map {
+                val db = AppDatabase.getDatabase(requireContext())
+
+                val listaDTO = pilaresSelecionados.map { pilar ->
+                    val acoesEntity = withContext(Dispatchers.IO) {
+                        db.acaoDao().getAcoesPorPilarDireto(pilar.id)
+                    }
+
+                    val acoes = acoesEntity.map { acao ->
+                        val atividadesEntity = withContext(Dispatchers.IO) {
+                            db.atividadeDao().getAtividadesPorAcaoDireto(acao.id!!)
+                        }
+
+                        val atividades = atividadesEntity.map { atividade ->
+                            AtividadeDTO(
+                                nome = atividade.nome,
+                                descricao = atividade.descricao,
+                                status = atividade.status.name,
+                                responsavel = "Funcionário ID: ${atividade.funcionarioId}"
+                            )
+                        }
+
+                        AcaoDTO(
+                            nome = acao.nome,
+                            descricao = acao.descricao,
+                            status = acao.status.name,
+                            atividades = atividades
+                        )
+                    }
+
                     PilarDTO(
-                        nome = it.nome,
-                        descricao = it.descricao,
-                        dataInicio = it.dataInicio.toString(),
-                        dataPrazo = it.dataPrazo.toString(),
-                        status = it.status.name,
-                        criadoPor = it.criadoPor.toString()
+                        nome = pilar.nome,
+                        descricao = pilar.descricao,
+                        dataInicio = pilar.dataInicio.toString(),
+                        dataPrazo = pilar.dataPrazo.toString(),
+                        status = pilar.status.name,
+                        criadoPor = "Usuário ID: ${pilar.criadoPor}",
+                        acoes = acoes
                     )
                 }
 
-                val request = RelatorioRequest(pilares = listaDTO)
+                val tipoRelatorio = if (isGeral) "geral" else "pilar"
+                val pilarId = if (!isGeral && pilaresSelecionados.isNotEmpty()) pilaresSelecionados.first().id else null
+
+                val request = RelatorioRequest(
+                    tipoRelatorio = tipoRelatorio,
+                    pilarId = pilarId,
+                    pilares = listaDTO
+                )
 
                 val response: Response<ResponseBody>? = when (tipo) {
                     "pdf" -> apiService.gerarPdf(request)
@@ -300,4 +318,4 @@ class RelatorioFragment : Fragment() {
         _binding = null
         super.onDestroyView()
     }
-}
+} 
