@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import java.util.Calendar
 import kotlin.collections.*
 
 class PilarViewModel(application: Application) : AndroidViewModel(application) {
@@ -75,6 +76,29 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         if (somaTotalAtividades > 0) somaPesos / somaTotalAtividades else 0f
       }
     }
+
+  suspend fun atualizarStatusAutomaticamente(pilarId: Int) {
+    val pilar = pilarDao.getById(pilarId) ?: return
+    val progresso = calcularProgressoInterno(pilarId)
+
+    val hoje = Calendar.getInstance().time
+
+    val novoStatus = when {
+      progresso >= 1f -> StatusPilar.CONCLUIDO
+      hoje.after(pilar.dataPrazo) -> StatusPilar.VENCIDO
+      progresso == 0f -> StatusPilar.PLANEJADO
+      else -> StatusPilar.EM_ANDAMENTO
+    }
+
+    if (novoStatus != pilar.status) {
+      pilarDao.atualizarPilar(pilar.copy(status = novoStatus))
+    }
+  }
+
+
+
+
+
 
 
   suspend fun getTodosPilares(): List<PilarEntity> = withContext(Dispatchers.IO) {
