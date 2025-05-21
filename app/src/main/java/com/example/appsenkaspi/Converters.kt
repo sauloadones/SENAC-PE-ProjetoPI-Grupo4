@@ -32,7 +32,7 @@ class Converters {
     fun toStatusPilar(value: String): StatusPilar = try {
         StatusPilar.valueOf(value.uppercase())
     } catch (e: IllegalArgumentException) {
-        StatusPilar.PLANEJADA
+        StatusPilar.PLANEJADO
     }
 
   @TypeConverter

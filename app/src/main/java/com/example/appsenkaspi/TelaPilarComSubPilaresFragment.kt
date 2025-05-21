@@ -11,9 +11,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentTelaPilarComSubpilaresBinding
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,15 +45,25 @@ class TelaPilarComSubpilaresFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    subpilarViewModel.calcularProgressoDoPilarComSubpilares(pilarId) { progresso ->
-      animarProgresso((progresso * 100).toInt())
-    }
+
+
 
     pilarId = arguments?.getInt("pilarId") ?: -1
     if (pilarId == -1) {
       Toast.makeText(requireContext(), "Pilar inválido!", Toast.LENGTH_SHORT).show()
       parentFragmentManager.popBackStack()
       return
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      // Calcula o progresso real, considerando se tem ou não subpilares
+      val progresso = pilarViewModel.calcularProgressoInterno(pilarId)
+
+      // Atualiza o status no banco com base no progresso e na data
+      pilarViewModel.atualizarStatusAutomaticamente(pilarId)
+
+      // Anima a barra
+      animarProgresso((progresso * 100).toInt())
     }
 
     configurarBotaoVoltar(view)
@@ -96,19 +110,31 @@ class TelaPilarComSubpilaresFragment : Fragment() {
     }
 
     subpilarViewModel.listarSubpilaresPorPilar(pilarId).observe(viewLifecycleOwner) { subpilares ->
-      subpilarAdapter.submitList(subpilares.toList())
+      viewLifecycleOwner.lifecycleScope.launch {
+        // Limpa mapa antigo
+        progressoMap.clear()
 
-      subpilares.forEach { subpilar ->
-        subpilarViewModel.calcularProgressoDoSubpilar(subpilar.id) { progresso ->
-          progressoMap[subpilar.id] = progresso
-          subpilarAdapter.submitList(subpilares.toList())
-        }
+        // Calcula todos os progressos paralelamente
+        val progressoList = subpilares.map { subpilar ->
+          async {
+            val progresso = subpilarViewModel.calcularProgressoInterno(subpilar.id)
+            subpilar.id to progresso
+          }
+        }.awaitAll()
+
+        // Atualiza o mapa completo de uma vez
+        progressoMap.putAll(progressoList.toMap())
+
+        // Atualiza lista do adapter com os dados já prontos
+        subpilarAdapter.submitList(subpilares.toList())
       }
 
+      // Atualiza a barra de progresso do Pilar
       pilarViewModel.calcularProgressoDoPilar(pilarId) { progresso ->
         animarProgresso((progresso * 100).toInt())
       }
     }
+
 
     binding.iconeMenu.setOnClickListener { toggleSobre() }
   }

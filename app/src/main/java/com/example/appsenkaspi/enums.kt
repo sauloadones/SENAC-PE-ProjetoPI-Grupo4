@@ -9,11 +9,11 @@ enum class Cargo {
 }
 
 enum class StatusPilar {
-  PLANEJADA,
+  PLANEJADO,
   EM_ANDAMENTO,
-  CONCLUIDA,
-  EXCLUIDA,
-  VENCIDA
+  CONCLUIDO,
+  EXCLUIDO,
+  VENCIDO
 }
 
 enum class StatusAcao {
