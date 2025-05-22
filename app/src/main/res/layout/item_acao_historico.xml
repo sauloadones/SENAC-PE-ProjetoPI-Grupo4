@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@android:color/transparent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:background="@drawable/box"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/textTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Título do Pilar"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/statusOverlay" />
+
+        <ImageView
+            android:id="@+id/statusOverlay"
+            android:layout_width="84dp"
+            android:layout_height="31dp"
+            android:src="@drawable/bverde"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="84dp"
+            android:layout_height="31dp"
+            android:gravity="center"
+            android:text="Concluído"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/statusOverlay"
+            app:layout_constraintTop_toTopOf="@id/statusOverlay" />
+
+        <TextView
+            android:id="@+id/textData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Excluído em: 10/05/2024"
+            android:textColor="#CCCCCC"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/textTitulo"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/botaoVerMais"
+            android:layout_width="136dp"
+            android:layout_height="29dp"
+            android:layout_marginTop="66dp"
+            app:srcCompat="@drawable/rounded_buttonc"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ver mais"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="@id/botaoVerMais"
+            app:layout_constraintBottom_toBottomOf="@id/botaoVerMais"
+            app:layout_constraintStart_toStartOf="@id/botaoVerMais"
+            app:layout_constraintEnd_toEndOf="@id/botaoVerMais" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
