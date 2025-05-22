@@ -1,3 +1,4 @@
+
 package com.example.appsenkaspi
 
 import android.app.Application
@@ -13,13 +14,15 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
 
+    val pilaresConcluidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresConcluidos()
+    val pilaresExcluidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresExcluidos()
+    val pilaresVencidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresVencidos()
+
     fun getPilarById(id: Int): LiveData<PilarEntity?> =
         pilarDao.getPilarById(id)
 
-
-
     fun listarTodosPilares(): LiveData<List<PilarEntity>> {
-        return pilarDao.listarTodosPilares()  // ✅ Corrigido o nome aqui
+        return pilarDao.listarTodosPilares()
     }
 
     fun inserir(pilar: PilarEntity) = viewModelScope.launch {
@@ -53,11 +56,4 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-
-
-
-
-
-
 }
