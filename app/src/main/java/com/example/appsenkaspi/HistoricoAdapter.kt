@@ -54,7 +54,7 @@ class HistoricoAdapter(
           statusIcon = R.drawable.ic_delete
         }
         else -> {
-          statusText = "Desconhecido"
+          statusText = "Desc"
           statusColor = ContextCompat.getColor(context, R.color.cinza_claro)
           statusIcon = R.drawable.ic_unknown
         }
