@@ -1,5 +1,6 @@
 package com.example.appsenkaspi
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ class PilarHistoricoAdapter(
         return ViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val pilar = lista[position]
         holder.titulo.text = pilar.nome
@@ -53,6 +55,7 @@ class PilarHistoricoAdapter(
 
     override fun getItemCount(): Int = lista.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun atualizarLista(novaLista: List<PilarEntity>) {
         lista = novaLista
         notifyDataSetChanged()

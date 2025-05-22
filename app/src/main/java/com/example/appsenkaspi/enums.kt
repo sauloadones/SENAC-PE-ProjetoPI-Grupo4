@@ -11,7 +11,10 @@ enum class Cargo {
 enum class StatusPilar {
     ATIVO,
     EXCLUIDO,
-    VENCIDO
+    VENCIDO,
+    VENCIDA,
+    EXCLUIDA,
+    CONCLUIDA
 }
 
 enum class StatusAcao {

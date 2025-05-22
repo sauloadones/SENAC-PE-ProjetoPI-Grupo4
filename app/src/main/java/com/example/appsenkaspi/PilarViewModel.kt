@@ -14,7 +14,7 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
 
-    val pilaresConcluidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresConcluidos()
+    val pilaresConcluidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresConcluidas()
     val pilaresExcluidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresExcluidos()
     val pilaresVencidos: LiveData<List<PilarEntity>> = pilarDao.getPilaresVencidos()
 

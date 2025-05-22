@@ -40,9 +40,9 @@ interface PilarDao {
 
     @Query("SELECT nome FROM pilares WHERE id = :id")
     suspend fun getNomePilarPorId(id: Int): String?
-
-
-
+    abstract fun getPilaresVencidos(): LiveData<List<PilarEntity>>
+    abstract fun getPilaresExcluidos(): LiveData<List<PilarEntity>>
+    abstract fun getPilaresConcluidas(): LiveData<List<PilarEntity>>
 
 
 }
