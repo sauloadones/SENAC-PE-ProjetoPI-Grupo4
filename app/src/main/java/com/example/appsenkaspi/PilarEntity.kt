@@ -27,6 +27,8 @@ data class PilarEntity(
     val dataInicio: Date,
     val dataPrazo: Date,
     val dataCriacao: Date,
+    val dataConclusao: Date? = null, // ✅ DEVE existir
+    val dataExcluido: Date? = null,
     @ColumnInfo(name = "criado_por")
     val criadoPor: Int,
 

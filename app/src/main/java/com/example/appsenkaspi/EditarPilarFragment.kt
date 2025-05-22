@@ -138,28 +138,30 @@ class EditarPilarFragment : Fragment() {
         }
     }
 
-    private fun deletarPilar() {
-        lifecycleScope.launch {
-            val dao = AppDatabase.getDatabase(requireContext()).pilarDao()
-            val pilar = dao.buscarPilarPorId(pilarId)
-            if (pilar != null) {
-                dao.deletarPilar(pilar)
-                Toast.makeText(requireContext(), "Pilar deletado com sucesso!", Toast.LENGTH_SHORT).show()
-                parentFragmentManager.popBackStack()
-            } else {
-                Toast.makeText(requireContext(), "Erro ao localizar Pilar!", Toast.LENGTH_SHORT).show()
-            }
-        }
+  private fun excluirPilar() {
+    lifecycleScope.launch {
+      val dao = AppDatabase.getDatabase(requireContext()).pilarDao()
+      val pilar = dao.buscarPilarPorId(pilarId)
+      if (pilar != null) {
+        pilarViewModel.excluirPilar(pilar) // ← usa a função do ViewModel
+        Toast.makeText(requireContext(), "Pilar excluído com sucesso!", Toast.LENGTH_SHORT).show()
+        parentFragmentManager.popBackStack()
+      } else {
+        Toast.makeText(requireContext(), "Erro ao localizar Pilar!", Toast.LENGTH_SHORT).show()
+      }
     }
+  }
 
-    private fun exibirDialogoConfirmacao() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Confirmar exclusão")
-            .setMessage("Deseja deletar este Pilar?")
-            .setPositiveButton("Deletar") { _, _ -> deletarPilar() }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
+
+  private fun exibirDialogoConfirmacao() {
+    AlertDialog.Builder(requireContext())
+      .setTitle("Confirmar exclusão")
+      .setMessage("Deseja excluir este Pilar?")
+      .setPositiveButton("Excluir") { _, _ -> excluirPilar() }
+      .setNegativeButton("Cancelar", null)
+      .show()
+  }
+
 
     private fun exibirPopupMenu(anchor: View) {
         val popup = PopupMenu(requireContext(), anchor)

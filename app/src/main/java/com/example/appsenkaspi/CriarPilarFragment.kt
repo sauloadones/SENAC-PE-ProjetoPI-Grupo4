@@ -140,7 +140,11 @@ class CriarPilarFragment : Fragment() {
           dataPrazo = prazo,
           status = StatusPilar.PLANEJADO,
           dataCriacao = Date(),
-          criadoPor = funcionarioId
+          criadoPor = funcionarioId,
+          dataConclusao =  null,
+          dataExcluido = null,
+
+
         )
       )
       val novoId = idLong.toInt()

@@ -16,9 +16,16 @@
         <color name="azulSelecionado">#164773</color>
         <color name="cardNormal">#1E1E1E</color>
         <color name="rippleLight">#33FFFFFF</color>
+        <color name="preto_escuro">#1E1E1E</color>
+        <color name="branco">#FFFFFF</color>
+        <color name="verde_concluido">#4CAF50</color>
+        <color name="vermelho_expirado">#F44336</color>
+        <color name="cinza_deletado">#9E9E9E</color>
 
 
-        <color name="cinza_escuro">#2A2A2A</color>
+
+
+  <color name="cinza_escuro">#2A2A2A</color>
 
         <color name="gray">#808080</color>
         <color name="light_gray">#CCCCCC</color>

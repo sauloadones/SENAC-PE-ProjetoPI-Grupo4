@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/cardPilarHistorico"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginBottom="12dp"
+  android:layout_marginHorizontal="4dp"
+  app:cardCornerRadius="12dp"
+  app:cardElevation="2dp"
+  android:foreground="?android:attr/selectableItemBackground"
+  android:clickable="true"
+  android:focusable="true"
+  app:cardBackgroundColor="@color/preto_escuro">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical">
+
+    <!-- Ícone dinâmico -->
+    <ImageView
+      android:id="@+id/iconeStatus"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_marginEnd="16dp"
+      android:contentDescription="Ícone do status" />
+
+    <!-- Informações do Pilar -->
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <TextView
+        android:id="@+id/nomePilar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome do Pilar"
+        android:textColor="@color/branco"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/statusPilar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Concluído"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Data final -->
+    <TextView
+      android:id="@+id/dataPilar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="22/04/2024"
+      android:textColor="@color/cinza_claro"
+      android:textSize="14sp"
+      android:layout_gravity="bottom" />
+
+  </LinearLayout>
+</androidx.cardview.widget.CardView>
+
