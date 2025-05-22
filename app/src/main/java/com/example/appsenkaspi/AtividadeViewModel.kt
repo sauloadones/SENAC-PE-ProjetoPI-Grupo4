@@ -118,6 +118,11 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
     }
   }
 
+  fun listarAtividadesComFuncionariosPorFuncionario(idFuncionario: Int): LiveData<List<AtividadeComFuncionarios>> {
+    return atividadeDao.listarAtividadesComResponsaveis(idFuncionario)
+  }
+
+
 
 
 }

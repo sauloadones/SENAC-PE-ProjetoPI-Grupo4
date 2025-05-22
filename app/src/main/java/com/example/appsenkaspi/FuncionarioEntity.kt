@@ -38,5 +38,9 @@ data class FuncionarioEntity(
     @ColumnInfo(name = "id_acesso")
     val idAcesso: Int = 0,
 
+    val numeroTel: String,
+
+    val fotoBanner: String? = null
+
 
 ) : Parcelable

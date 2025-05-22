@@ -68,7 +68,10 @@ abstract class AppDatabase : RoomDatabase() {
                                         fotoPerfil = "https://i.pravatar.cc/150?img=1",
                                         nomeUsuario = "ana.souza",
                                         senha = "senha123",
-                                        idAcesso = 1
+                                        idAcesso = 1,
+                                        numeroTel = "(84)91191-9291",
+                                        fotoBanner = ""
+
                                     ),
                                     FuncionarioEntity(
                                         nomeCompleto = "Fernanda Oliveira",
@@ -77,7 +80,9 @@ abstract class AppDatabase : RoomDatabase() {
                                         fotoPerfil = "https://i.pravatar.cc/150?img=3",
                                         nomeUsuario = "fernanda.oliveira",
                                         senha = "senha123",
-                                        idAcesso = 3
+                                        idAcesso = 3,
+                                        numeroTel = "(84)91191-9291",
+                                        fotoBanner = ""
                                     ),
                                     FuncionarioEntity(
                                         nomeCompleto = "Carlos Eduardo Silva",
@@ -86,7 +91,9 @@ abstract class AppDatabase : RoomDatabase() {
                                         fotoPerfil = "https://i.pravatar.cc/150?img=2",
                                         nomeUsuario = "carlos.silva",
                                         senha = "senha123",
-                                        idAcesso = 2
+                                        idAcesso = 2,
+                                        numeroTel = "(84)91191-9291",
+                                        fotoBanner = ""
                                     ),
                                     FuncionarioEntity(
                                         nomeCompleto = "Eu mesmo",
@@ -95,7 +102,9 @@ abstract class AppDatabase : RoomDatabase() {
                                         fotoPerfil = "https://i.pravatar.cc/150?img=3",
                                         nomeUsuario = "fernanda.oliveira",
                                         senha = "senha123",
-                                        idAcesso = 4
+                                        idAcesso = 4,
+                                        numeroTel = "(84)91191-9291",
+                                        fotoBanner = ""
                                     ),
                                     // adicione quantos quiser…
                                 )
