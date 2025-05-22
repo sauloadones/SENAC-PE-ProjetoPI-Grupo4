@@ -51,12 +51,13 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation("com.google.android.material:material:1.11.0")
-    implementation ("androidx.work:work-runtime-ktx:2.9.0") // ou versão mais recente
+    implementation("androidx.work:work-runtime-ktx:2.9.0") // ou versão mais recente
 
   // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
+    implementation("com.google.code.gson:gson:2.10.1")
 
 // ViewModel e Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)

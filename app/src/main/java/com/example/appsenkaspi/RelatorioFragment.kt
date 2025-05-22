@@ -5,6 +5,10 @@ import android.animation.ValueAnimator
 import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.recyclerview.widget.DividerItemDecoration
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.example.appsenkaspi.databinding.FragmentRelatorioBinding
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +35,8 @@ class RelatorioFragment : Fragment() {
     private val binding get() = _binding!!
     private val pilarViewModel: PilarViewModel by viewModels()
     private val apiService = RetrofitClient.apiService
+    private val historicoRelatorios = mutableListOf<HistoricoRelatorio>()
+    private lateinit var historicoAdapter: HistoricoAdapter
 
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
@@ -48,6 +55,27 @@ class RelatorioFragment : Fragment() {
         configurarSpinners()
         configurarBotoes()
         carregarPilares()
+
+        binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
+        historicoAdapter = HistoricoAdapter(historicoRelatorios)
+        binding.recyclerHistorico.adapter = historicoAdapter
+
+        val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+        ContextCompat.getDrawable(requireContext(), R.drawable.my_divider)?.let { drawable ->
+            divider.setDrawable(drawable)
+            binding.recyclerHistorico.addItemDecoration(divider)
+        }
+
+        carregarHistoricoSalvo()
+
+        binding.textSelecionarPilar.measure(
+            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        binding.layoutSpinnerPilares.measure(
+            View.MeasureSpec.makeMeasureSpec(binding.baseLayout.width, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
 
         binding.textSelecionarPilar.alpha = 0f
         binding.layoutSpinnerPilares.alpha = 0f
@@ -244,6 +272,17 @@ class RelatorioFragment : Fragment() {
                 response?.let {
                     if (it.isSuccessful) {
                         salvarArquivo(it.body(), "relatorio.$tipo")
+
+                        // >>> Adiciona ao histórico <<<
+                        val titulo = if (isGeral) "Relatório Geral" else "Relatório por Pilar"
+                        val dataAtual = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()).format(Date())
+
+                        historicoRelatorios.add(0, HistoricoRelatorio(titulo, dataAtual))
+                        historicoAdapter.notifyItemInserted(0)
+                        HistoricoStorage.salvar(requireContext(), historicoRelatorios)
+                        binding.recyclerHistorico.visibility = View.VISIBLE
+                        // >>> Fim <<<
+
                     } else {
                         Toast.makeText(requireContext(), "Erro ao gerar relatório", Toast.LENGTH_SHORT).show()
                     }
@@ -257,6 +296,7 @@ class RelatorioFragment : Fragment() {
             }
         }
     }
+
 
     private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String) {
         if (body == null) return
@@ -311,6 +351,15 @@ class RelatorioFragment : Fragment() {
             }
         } ?: run {
             Toast.makeText(requireContext(), "Erro ao acessar a pasta Downloads", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun carregarHistoricoSalvo() {
+        historicoRelatorios.clear()
+        historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext()))
+        historicoAdapter.notifyDataSetChanged()
+        if (historicoRelatorios.isNotEmpty()) {
+            binding.recyclerHistorico.visibility = View.VISIBLE
         }
     }
 
