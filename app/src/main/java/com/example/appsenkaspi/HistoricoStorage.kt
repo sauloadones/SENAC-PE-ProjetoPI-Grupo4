@@ -6,19 +6,26 @@ import com.google.gson.reflect.TypeToken
 
 object HistoricoStorage {
 
-    private const val PREF_NAME = "historico_prefs"
-    private const val KEY_HISTORICO = "historico_relatorios"
+    private const val PREFS_NAME = "historico_prefs"
 
-    fun salvar(context: Context, lista: List<HistoricoRelatorio>) {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val json = Gson().toJson(lista)
-        prefs.edit().putString(KEY_HISTORICO, json).apply()
+    fun salvar(context: Context, historico: List<HistoricoRelatorio>, usuario: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        val gson = Gson()
+        val json = gson.toJson(historico)
+        editor.putString("historico_$usuario", json)
+        editor.apply()
     }
 
-    fun carregar(context: Context): MutableList<HistoricoRelatorio> {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(KEY_HISTORICO, null) ?: return mutableListOf()
-        val type = object : TypeToken<MutableList<HistoricoRelatorio>>() {}.type
-        return Gson().fromJson(json, type)
+    fun carregar(context: Context, usuario: String): List<HistoricoRelatorio> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = prefs.getString("historico_$usuario", null)
+        return if (json != null) {
+            val type = object : TypeToken<List<HistoricoRelatorio>>() {}.type
+            gson.fromJson(json, type)
+        } else {
+            emptyList()
+        }
     }
 }

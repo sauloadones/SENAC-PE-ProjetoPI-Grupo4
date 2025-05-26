@@ -41,6 +41,7 @@ class RelatorioFragment : Fragment() {
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
     private var isGeral: Boolean = true
+    private var nomeUsuarioLogado: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +53,10 @@ class RelatorioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // >>>>> PEGAR NOME DO USUÁRIO LOGADO <<<<<
+        nomeUsuarioLogado = getFuncionarioNomeUsuario(requireContext())
+
         configurarSpinners()
         configurarBotoes()
         carregarPilares()
@@ -66,6 +71,7 @@ class RelatorioFragment : Fragment() {
             binding.recyclerHistorico.addItemDecoration(divider)
         }
 
+        // >>>>> CARREGAR HISTÓRICO COM BASE NO USUÁRIO LOGADO <<<<<
         carregarHistoricoSalvo()
 
         binding.textSelecionarPilar.measure(
@@ -80,6 +86,8 @@ class RelatorioFragment : Fragment() {
         binding.textSelecionarPilar.alpha = 0f
         binding.layoutSpinnerPilares.alpha = 0f
     }
+
+
 
     private fun configurarSpinners() {
         val tipoArquivoAdapter = ArrayAdapter.createFromResource(
@@ -279,9 +287,10 @@ class RelatorioFragment : Fragment() {
 
                         historicoRelatorios.add(0, HistoricoRelatorio(titulo, dataAtual))
                         historicoAdapter.notifyItemInserted(0)
-                        HistoricoStorage.salvar(requireContext(), historicoRelatorios)
+                        if (nomeUsuarioLogado != null) {
+                            HistoricoStorage.salvar(requireContext(), historicoRelatorios, nomeUsuarioLogado!!)
+                        }
                         binding.recyclerHistorico.visibility = View.VISIBLE
-                        // >>> Fim <<<
 
                     } else {
                         Toast.makeText(requireContext(), "Erro ao gerar relatório", Toast.LENGTH_SHORT).show()
@@ -296,7 +305,6 @@ class RelatorioFragment : Fragment() {
             }
         }
     }
-
 
     private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String) {
         if (body == null) return
@@ -355,8 +363,9 @@ class RelatorioFragment : Fragment() {
     }
 
     private fun carregarHistoricoSalvo() {
+        if (nomeUsuarioLogado == null) return
         historicoRelatorios.clear()
-        historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext()))
+        historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext(), nomeUsuarioLogado!!))
         historicoAdapter.notifyDataSetChanged()
         if (historicoRelatorios.isNotEmpty()) {
             binding.recyclerHistorico.visibility = View.VISIBLE
@@ -367,4 +376,4 @@ class RelatorioFragment : Fragment() {
         _binding = null
         super.onDestroyView()
     }
-} 
+}
