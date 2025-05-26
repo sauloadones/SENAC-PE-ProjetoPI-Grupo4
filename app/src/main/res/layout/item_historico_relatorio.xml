@@ -40,10 +40,11 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/btnDetalhes"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:src="@drawable/ic_baseline_chevron_right_24"
-        android:tint="#CCCCCC" />
+        android:tint="#FFFFFF" />
 
 </LinearLayout>
 

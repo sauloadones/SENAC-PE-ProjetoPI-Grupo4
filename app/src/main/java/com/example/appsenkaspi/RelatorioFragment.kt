@@ -211,6 +211,13 @@ class RelatorioFragment : Fragment() {
 
     private fun gerarRelatorio(tipo: String) {
         lifecycleScope.launch {
+            // Verifica se existem pilares cadastrados antes de continuar
+            if (listaPilares.isEmpty()) {
+                Toast.makeText(requireContext(), "Impossível fazer relatório sem pilares cadastrados", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+                return@launch
+            }
+
             binding.progressBar.visibility = View.VISIBLE
             try {
                 val pilaresSelecionados = if (isGeral) {
@@ -281,12 +288,43 @@ class RelatorioFragment : Fragment() {
                     if (it.isSuccessful) {
                         salvarArquivo(it.body(), "relatorio.$tipo")
 
-                        // >>> Adiciona ao histórico <<<
+                        // >>> Agora vamos calcular as informações para o histórico <<<
+                        val caminhoDoArquivoSalvo = salvarArquivo(it.body(), "relatorio.$tipo")
+                        val acoesCount = listaDTO.sumOf { pilar -> pilar.acoes.size }
+                        val atividadesCount = listaDTO.sumOf { pilar -> pilar.acoes.sumOf { acao -> acao.atividades.size } }
+
+                        val statusGeral = if (listaDTO.all { pilar -> pilar.acoes.all { acao -> acao.status == "CONCLUIDO" } }) {
+                            "Concluído"
+                        } else {
+                            "Em andamento"
+                        }
+
+                        val responsaveisSet = listaDTO.flatMap { pilar ->
+                            pilar.acoes.flatMap { acao ->
+                                acao.atividades.map { it.responsavel }
+                            }
+                        }.toSet()
+
+                        val responsaveis = responsaveisSet.joinToString(", ")
+
+                        val nomePilar = if (!isGeral) listaDTO.firstOrNull()?.nome else null
+
                         val titulo = if (isGeral) "Relatório Geral" else "Relatório por Pilar"
                         val dataAtual = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()).format(Date())
 
-                        historicoRelatorios.add(0, HistoricoRelatorio(titulo, dataAtual))
+                        // Se tiver como pegar o caminho do arquivo, pode salvar aqui. Por enquanto vazio.
+                        val arquivoPath = ""
+
+                        val novoHistorico = HistoricoRelatorio(
+                            titulo = titulo,
+                            data = dataAtual,
+                            pilarNome = nomePilar,
+                            caminhoArquivo = caminhoDoArquivoSalvo
+                        )
+
+                        historicoRelatorios.add(0, novoHistorico)
                         historicoAdapter.notifyItemInserted(0)
+
                         if (nomeUsuarioLogado != null) {
                             HistoricoStorage.salvar(requireContext(), historicoRelatorios, nomeUsuarioLogado!!)
                         }
@@ -306,8 +344,8 @@ class RelatorioFragment : Fragment() {
         }
     }
 
-    private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String) {
-        if (body == null) return
+    private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String): String? {
+        if (body == null) return null
 
         val resolver = requireContext().contentResolver
         val mimeType = when {
@@ -333,9 +371,9 @@ class RelatorioFragment : Fragment() {
 
         val itemUri = resolver.insert(collection, contentValues)
 
-        itemUri?.let { uri ->
+        return if (itemUri != null) {
             try {
-                resolver.openOutputStream(uri).use { outputStream ->
+                resolver.openOutputStream(itemUri).use { outputStream ->
                     body.byteStream().use { inputStream ->
                         val buffer = ByteArray(4096)
                         var bytesRead: Int
@@ -349,16 +387,20 @@ class RelatorioFragment : Fragment() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     contentValues.clear()
                     contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
+                    resolver.update(itemUri, contentValues, null, null)
                 }
 
                 Toast.makeText(requireContext(), "Arquivo salvo em Downloads", Toast.LENGTH_LONG).show()
+                itemUri.toString()  // Retorna o URI como string
+
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(requireContext(), "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+                null
             }
-        } ?: run {
+        } else {
             Toast.makeText(requireContext(), "Erro ao acessar a pasta Downloads", Toast.LENGTH_SHORT).show()
+            null
         }
     }
 
