@@ -51,6 +51,11 @@ interface PilarDao {
   @Query("UPDATE pilares SET status = :status, dataExcluido = :data WHERE id = :id")
   suspend fun excluirPilarPorId(id: Int, status: StatusPilar, data: Date): Int
 
+  @Query("SELECT id, nome FROM pilares WHERE status IN (:status)")
+  fun listarIdsENomesPorStatus(status: List<StatusPilar>): LiveData<List<PilarNomeDTO>>
+
+  @Query("SELECT * FROM pilares WHERE status IN (:statusList)")
+  suspend fun getPilaresPorStatus(statusList: List<StatusPilar>): List<PilarEntity>
 
 
 

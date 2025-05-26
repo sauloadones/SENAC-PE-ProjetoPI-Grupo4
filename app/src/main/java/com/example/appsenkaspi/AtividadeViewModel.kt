@@ -72,6 +72,7 @@ class AtividadeViewModel(application: Application) : AndroidViewModel(applicatio
   ) = viewModelScope.launch {
     atividadeDao.update(atividadeEditada)
     repository.tratarAlteracaoPrazo(atividadeEditada, atividadeAntiga)
+    repository.verificarAtividadesVencidas()
   }
 
 

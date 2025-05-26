@@ -155,6 +155,11 @@ class AtividadeRepository(
 
     if (atividadeNova.status == StatusAtividade.CONCLUIDA) return
 
+    if (novaTruncada.before(hoje)) {
+      atividadeDao.update(atividadeNova.copy(status = StatusAtividade.VENCIDA))
+      return
+    }
+
     if (atividadeNova.status == StatusAtividade.VENCIDA && novaTruncada.after(hoje)) {
       atividadeDao.update(atividadeNova.copy(status = StatusAtividade.PENDENTE))
     }

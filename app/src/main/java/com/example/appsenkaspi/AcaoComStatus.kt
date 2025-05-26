@@ -1,4 +1,4 @@
-package com.example.appsenkaspi.data  // ou com.example.appsenkaspi
+package com.example.appsenkaspi // ou com.example.appsenkaspi
 
 import androidx.room.Embedded
 import com.example.appsenkaspi.AcaoEntity

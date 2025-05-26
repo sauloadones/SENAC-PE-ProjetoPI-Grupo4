@@ -2,7 +2,7 @@
 
   import androidx.lifecycle.LiveData
   import androidx.room.*
-  import com.example.appsenkaspi.data.AcaoComStatus
+
 
   @Dao
   interface AtividadeDao {
@@ -127,6 +127,18 @@
 
     @Query("SELECT * FROM atividades WHERE acaoId = :acaoId")
     suspend fun getAtividadesPorAcaoDireto(acaoId: Int): List<AtividadeEntity>
+
+    @Query("SELECT COUNT(*) FROM atividades WHERE status = 'vencida'")
+    suspend fun contarVencidasGeral(): Int
+
+    @Query("""
+    SELECT COUNT(*)
+    FROM atividades AS at
+    INNER JOIN acoes AS ac ON ac.id = at.acaoId
+    WHERE at.status = 'vencida' AND ac.pilarId = :pilarId
+""")
+    suspend fun contarVencidasPorPilar(pilarId: Int): Int
+
 
   }
 

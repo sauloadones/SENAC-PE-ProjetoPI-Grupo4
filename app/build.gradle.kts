@@ -52,6 +52,10 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation("com.google.android.material:material:1.11.0")
     implementation ("androidx.work:work-runtime-ktx:2.9.0") // ou versão mais recente
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
+
+
 
   // Room
     implementation(libs.room.runtime)

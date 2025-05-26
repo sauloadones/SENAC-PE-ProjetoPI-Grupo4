@@ -21,7 +21,11 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     private val subpilarDao = AppDatabase.getDatabase(application).subpilarDao()
     val statusAtivos = listOf(StatusPilar.EM_ANDAMENTO, StatusPilar.PLANEJADO)
   val statusHistorico = listOf(StatusPilar.CONCLUIDO, StatusPilar.VENCIDO, StatusPilar.EXCLUIDO)
-
+  val statusParaDashboard = listOf(
+    StatusPilar.PLANEJADO,
+    StatusPilar.EM_ANDAMENTO,
+    StatusPilar.CONCLUIDO
+  )
 
 
   fun getPilarById(id: Int): LiveData<PilarEntity?> = pilarDao.getPilarById(id)
@@ -127,13 +131,17 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
   }
 
 
+
   fun listarPilaresAtivos() = pilarDao.listarPilaresPorStatus(statusAtivos)
   fun listarPilaresHistorico() = pilarDao.listarPilaresPorStatus(statusHistorico)
 
+  fun listarIdsENomes(): LiveData<List<PilarNomeDTO>> {
+    return AppDatabase.getDatabase(getApplication()).pilarDao().listarIdsENomesPorStatus(statusParaDashboard)
+  }
 
-
-
-
+  suspend fun getPilaresParaDashboard(): List<PilarEntity> {
+    return pilarDao.getPilaresPorStatus(statusParaDashboard)
+  }
 
   suspend fun getTodosPilares(): List<PilarEntity> = withContext(Dispatchers.IO) {
         pilarDao.getTodosPilares()
