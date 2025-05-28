@@ -47,4 +47,7 @@ interface FuncionarioDao {
     suspend fun getFuncionarioById(id: Int): FuncionarioEntity?
 
 
+
+
+
 }

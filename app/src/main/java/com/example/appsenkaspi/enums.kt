@@ -9,14 +9,11 @@ enum class Cargo {
 }
 
 enum class StatusPilar {
-    ATIVO,
-    EXCLUIDO,
-    PENDENTE,
-    EM_ANDAMENTO,
-    VENCIDO,
-    VENCIDA,
-    EXCLUIDA,
-    CONCLUIDA
+  PLANEJADO,
+  EM_ANDAMENTO,
+  CONCLUIDO,
+  EXCLUIDO,
+  VENCIDO
 }
 
 enum class StatusAcao {
@@ -53,7 +50,20 @@ enum class TipoRequisicao {
     COMPLETAR_ATIVIDADE,
     CRIAR_ACAO,
     EDITAR_ACAO,
-    ATIVIDADE_PARA_VENCER
+    ATIVIDADE_PARA_VENCER,
+    ATIVIDADE_VENCIDA,
+    ATIVIDADE_CONCLUIDA,
+    PRAZO_ALTERADO,
+    RESPONSAVEL_ADICIONADO,
+    RESPONSAVEL_REMOVIDO
+}
+
+enum class StatusSubPilar {
+  PLANJEADA,
+  EM_ANDAMENTO,
+  CONCLUIDA,
+  EXCLUIDA,
+  VENCIDA
 }
 
 enum class StatusNotificacao {
@@ -78,3 +88,4 @@ enum class TipoDeNotificacao {
     EDICAO_ATIVIDADE_ACEITA,
     CONFIRMACAO_ATIVIDADE_ACEITA
 }
+

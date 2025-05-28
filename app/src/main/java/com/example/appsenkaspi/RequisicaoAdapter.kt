@@ -9,10 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.appsenkaspi.R
-import com.example.appsenkaspi.RequisicaoEntity
-import com.example.appsenkaspi.StatusRequisicao
-import com.example.appsenkaspi.TipoRequisicao
+
+data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 
 class RequisicaoAdapter(
   private val funcionarioIdLogado: Int,
@@ -35,23 +33,67 @@ class RequisicaoAdapter(
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val requisicao = getItem(position)
 
-    // 🔔 Mostrar ATIVIDADE_PARA_VENCER apenas para o responsável
-    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER) {
-      // Mostrar a notificação se o requisitante for o logado, independentemente do modo
+    // 🔔 Notificações automáticas de prazo
+    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA || requisicao.tipo == TipoRequisicao.PRAZO_ALTERADO || requisicao.tipo == TipoRequisicao.ATIVIDADE_CONCLUIDA || requisicao.tipo == TipoRequisicao.RESPONSAVEL_ADICIONADO || requisicao.tipo == TipoRequisicao.RESPONSAVEL_REMOVIDO) {
       if (requisicao.solicitanteId != funcionarioIdLogado) {
         holder.itemView.visibility = View.GONE
         holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
         return
       }
 
-      holder.textoTitulo.text = "Prazo Próximo"
-      holder.textoMensagem.text = requisicao.mensagemResposta ?: "Atividade próxima do vencimento"
-      holder.iconStatus.setImageResource(R.drawable.ic_info)
-      holder.iconStatus.setColorFilter(Color.parseColor("#2196F3"))
+      if (requisicao.resolvida) {
+        val tituloResolvido = when (requisicao.tipo) {
+          TipoRequisicao.ATIVIDADE_PARA_VENCER -> "Prazo Resolvido"
+          TipoRequisicao.ATIVIDADE_VENCIDA -> "Vencimento Resolvido"
+          else -> "Atividade Resolvida"
+        }
+
+        holder.textoTitulo.text = "✔ $tituloResolvido"
+        holder.textoMensagem.text = requisicao.mensagemResposta ?: "Esta notificação foi resolvida."
+        holder.iconStatus.setImageResource(R.drawable.ic_check_circle)
+        holder.iconStatus.setColorFilter(Color.parseColor("#9E9E9E")) // cinza claro
+        holder.itemView.alpha = 0.6f
+        holder.itemView.setOnClickListener(null)
+        return
+      }
+
+      val tipoInfo = when (requisicao.tipo) {
+        TipoRequisicao.ATIVIDADE_PARA_VENCER -> Quadruple(
+          "Prazo Próximo", R.drawable.ic_info, "#2196F3", "A atividade está próxima do prazo final."
+        )
+        TipoRequisicao.ATIVIDADE_VENCIDA -> Quadruple(
+          "Atividade Vencida", R.drawable.ic_warning, "#F44336", "A atividade ultrapassou o prazo."
+        )
+        TipoRequisicao.PRAZO_ALTERADO -> Quadruple(
+          "Prazo Alterado", R.drawable.ic_update, "#FF9800", "A data de prazo da atividade foi modificada."
+        )
+        TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
+          "Atividade Concluida", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluida"
+        )
+        TipoRequisicao.RESPONSAVEL_ADICIONADO -> Quadruple(
+          "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Adicionado"
+        )
+        TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
+          "Responsavel Removido", R.drawable.ic_warning, "#FF9800", "Responsavel Removido"
+        )
+        else -> Quadruple(
+          "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
+        )
+      }
+
+
+      val (titulo, icone, corHex, mensagemPadrao) = tipoInfo
+
+      holder.textoTitulo.text = titulo
+      holder.textoMensagem.text = requisicao.mensagemResposta ?: mensagemPadrao
+      holder.iconStatus.setImageResource(icone)
+      holder.iconStatus.setColorFilter(Color.parseColor(corHex))
+      holder.itemView.alpha = 1f
       holder.itemView.setOnClickListener(null)
       return
     }
 
+    // 🔧 Requisições formais: criar, editar, completar ações/atividades
     val titulo = when (requisicao.tipo) {
       TipoRequisicao.CRIAR_ATIVIDADE -> "Criação de Atividade"
       TipoRequisicao.EDITAR_ATIVIDADE -> "Edição de Atividade"

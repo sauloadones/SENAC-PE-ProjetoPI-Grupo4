@@ -1,83 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:padding="16dp"
+  android:background="@android:color/transparent">
+
+  <!-- Cargo -->
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/transparent">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingBottom="8dp">
 
-    <!-- Coordenador na empresa -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="8dp">
+    <ImageView
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:src="@drawable/ic_work"
+      android:contentDescription="Ícone de trabalho" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_work"
-            android:contentDescription="Ícone de trabalho"/>
+    <TextView
+      android:id="@+id/textCargo"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Coordenador na empresa SENAC"
+      android:textColor="#FFFFFF"
+      android:textSize="16sp"
+      android:layout_marginStart="12dp"
+      android:gravity="start" />
+  </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Coordenador na empresa SENAC"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:layout_marginStart="12dp"
-            android:gravity="start"/>
+  <!-- Email -->
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingBottom="8dp">
 
-    </LinearLayout>
+    <ImageView
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:src="@drawable/ic_email"
+      android:contentDescription="Ícone de email" />
 
-    <!-- Email -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="8dp">
+    <TextView
+      android:id="@+id/textEmail"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="exampleemail@gmail.com"
+      android:textColor="#FFFFFF"
+      android:textSize="16sp"
+      android:layout_marginStart="12dp"
+      android:gravity="start" />
+  </LinearLayout>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_email"
-            android:contentDescription="Ícone de email"/>
+  <!-- Telefone -->
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="exampleemail@gmail.com"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:layout_marginStart="12dp"
-            android:gravity="start"/>
+    <ImageView
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:src="@drawable/ic_phone"
+      android:contentDescription="Ícone de telefone" />
 
-    </LinearLayout>
-
-    <!-- Telefone -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_phone"
-            android:contentDescription="Ícone de telefone"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+55 (81) 9 4002-8922"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:layout_marginStart="12dp"
-            android:gravity="start"/>
-
-    </LinearLayout>
+    <TextView
+      android:id="@+id/textTelefone"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="+55 (81) 9 4002-8922"
+      android:textColor="#FFFFFF"
+      android:textSize="16sp"
+      android:layout_marginStart="12dp"
+      android:gravity="start" />
+  </LinearLayout>
 
 </LinearLayout>

@@ -106,7 +106,7 @@ interface RequisicaoDao {
         WHERE atividadeId = :atividadeId
         AND solicitanteId = :solicitanteId
         AND tipo = :tipo
-        AND date(dataSolicitacao / 1000, 'unixepoch') = date('now')
+        AND date(datetime(dataSolicitacao / 1000, 'unixepoch')) = date('now')
     )
 """)
   suspend fun existeRequisicaoHojeParaAtividade(
@@ -126,7 +126,7 @@ interface RequisicaoDao {
     SELECT COUNT(*) FROM requisicoes
     WHERE solicitanteId = :userId
     AND foiVista = 0
-    AND tipo = 'atividade_para_vencer'
+    AND tipo IN ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida', 'responsavel_adicionado', 'responsavel_removido')
 """)
   fun getQuantidadeNotificacoesPrazoNaoVistas(userId: Int): LiveData<Int>
 
@@ -135,9 +135,93 @@ interface RequisicaoDao {
     SET foiVista = 1
     WHERE solicitanteId = :usuarioId
     AND foiVista = 0
-    AND tipo = 'atividade_para_vencer'
+    AND tipo in ('atividade_para_vencer', 'atividade_vencida', 'prazo_alterado', 'atividade_concluida', 'responsavel_adicionado', 'responsavel_removido')
 """)
   suspend fun marcarNotificacoesDePrazoComoVistas(usuarioId: Int)
+
+  @Query("""
+  SELECT EXISTS (
+    SELECT 1 FROM requisicoes
+    WHERE atividadeId = :atividadeId
+    AND solicitanteId = :solicitanteId
+    AND tipo = 'atividade_vencida'
+  )
+""")
+  suspend fun existeRequisicaoDeVencida(
+    atividadeId: Int,
+    solicitanteId: Int
+  ): Boolean
+
+  @Query("SELECT * FROM requisicoes WHERE atividadeId = :atividadeId AND (tipo = 'atividade_para_vencer' OR tipo = 'atividade_vencidade')")
+  suspend fun getRequisicoesDePrazoPorAtividade(atividadeId: Int): List<RequisicaoEntity>
+  @Query("""
+      UPDATE requisicoes
+      SET foiVista = 1
+      WHERE id = :requisicaoId
+    """)
+  suspend fun marcarComoOculta(requisicaoId: Int)
+
+  @Query("UPDATE requisicoes SET resolvida = 1 WHERE id = :requisicaoId")
+  suspend fun marcarComoResolvida(requisicaoId: Int)
+
+  @Query("DELETE FROM requisicoes WHERE atividadeId = :atividadeId AND tipo = :tipo")
+  suspend fun deletarRequisicoesDePrazoPorAtividade(
+    atividadeId: Int,
+    tipo: TipoRequisicao = TipoRequisicao.ATIVIDADE_PARA_VENCER
+  )
+  @Query("DELETE FROM requisicoes WHERE atividadeId = :atividadeId AND tipo = :tipo")
+  suspend fun deletarRequisicoesDeTipoPorAtividade(
+    atividadeId: Int,
+    tipo: TipoRequisicao
+  )
+  @Query("SELECT * FROM requisicoes WHERE solicitanteId = :id ORDER BY dataSolicitacao DESC")
+  fun getNotificacoesDoFuncionario(id: Int): LiveData<List<RequisicaoEntity>>
+
+  @Query("""
+  SELECT COUNT(*) > 0 FROM requisicoes
+  WHERE atividadeId = :atividadeId
+    AND solicitanteId = :responsavelId
+    AND tipo = :tipo
+    AND mensagemResposta LIKE '%' || :diasRestantes || '%'
+""")
+  suspend fun existeNotificacaoComDiasRestantes(
+    atividadeId: Int,
+    responsavelId: Int,
+    tipo: TipoRequisicao,
+    diasRestantes: Int
+  ): Boolean
+
+  @Query("""
+  SELECT EXISTS(
+    SELECT 1 FROM requisicoes
+    WHERE atividadeId = :atividadeId
+    AND solicitanteId = :responsavelId
+    AND tipo = :tipo
+    AND mensagemResposta = :mensagem
+  )
+""")
+  suspend fun existeMensagemExata(
+    atividadeId: Int,
+    responsavelId: Int,
+    tipo: TipoRequisicao,
+    mensagem: String
+  ): Boolean
+
+
+
+  @Query("SELECT * FROM requisicoes ORDER BY dataSolicitacao DESC")
+  fun getTodasNotificacoes(): LiveData<List<RequisicaoEntity>>
+
+  @Query("""
+  DELETE FROM requisicoes
+  WHERE atividadeId = :atividadeId AND tipo = :tipo AND solicitanteId = :responsavelId
+""")
+  suspend fun deletarRequisicoesDeTipoPorAtividadeEFuncionario(
+    atividadeId: Int,
+    tipo: TipoRequisicao,
+    responsavelId: Int
+  )
+
 
 
 }

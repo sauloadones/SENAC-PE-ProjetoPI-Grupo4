@@ -22,6 +22,6 @@ import androidx.room.ForeignKey
     ]
 )
 data class AcaoFuncionarioEntity(
-    val acaoId: Int,
+    val acaoId: Long,
     val funcionarioId: Int
 )

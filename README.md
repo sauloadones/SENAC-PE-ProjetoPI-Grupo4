@@ -1,46 +1,83 @@
-# Projeto Compliance Senac
+## 🏢 AppSenKaspi - Projeto Compliance Senac
+Este projeto é um sistema Android desenvolvido para o gerenciamento de pilares e atividades no contexto do Compliance do Senac. Ele facilita a criação, acompanhamento e automação de processos com funcionalidades como geração de relatórios, controle de progresso e perfis com permissões distintas.
 
-## Descrição do Sistema
+## 📝 Visão Geral
+O sistema foi criado para organizar e automatizar tarefas relacionadas à conformidade (compliance), permitindo o gerenciamento de pilares, subpilares, ações e atividades por diferentes perfis de usuários. Também possibilita a análise de logs e geração de dashboards com base na produção de atividades realizadas.
 
-### Visão Geral
+## ✅ Funcionalidades Principais
+Cadastro e gerenciamento de pilares, subpilares, ações e atividades
 
-Este projeto é um sistema desenvolvido para um sistema de gerenciamento de pilares e atividades o sistema foi desenvolvido para facilitar a criação, gerenciamento, analise de logs e criação de dashboards facilitando a automação de atividades no Compliance Senac
+Atribuição de atividades a funcionários com progresso individual
 
-## Funcionalidade Principais
+Processamento de porcentagem de execução por atividade realizada
 
-* Funcionalidade 1: Cadastrar e gerenciar atividades
-* Funcionalidade 2: Processar uma porcetagem a cada atividade feita
-* Funcionalidade 3: Geração de relatorios de produção de atividades
-* Funcionalidade 4: Cada perfil com funcionalidades diferente
+Geração de relatórios de produção e desempenho
 
-## Tecnologia Utilizadas
+Perfis de acesso diferenciados com funcionalidades específicas
 
-* Backend: A definir
-* Banco de Dados: SQLite
-* Mobile: Kotlin
-* Python: API
+Banco de dados inicial pré-carregado com usuários fictícios para testes
 
-## Requisitos do Sistema
+Interface responsiva e moderna com animações
 
-* Dependencia 1 - A definir
-* Dependencia 2 - Banco de dados PostgresSQL
-* Dependencia 3 - Android Studio Markeet
+## 🛠 Tecnologias Utilizadas
+Mobile: Kotlin
 
-## Instalação de Requisitos
+Banco de Dados: SQLite (com Room – Android Jetpack)
 
-### Banco  de Dados PostgresSQL
+Persistência: Room + TypeConverters personalizados
 
-`` sudo apt install postgresql ``
+Concorrência: Kotlin Coroutines
 
+API: Python (a definir detalhes do backend)
 
-## Integrantes do Grupo
-* Andrey Rodrigo Barbosa da Silva
-* Carlos Eduardo Paulino Vilaça
-* Joao Marcos de Melo Carneiro da Cunha Silva
-* Lucas Gabriel Lima do Nascimento
-* Matheus de Souza Moura
-* Saulo Adones Gabriel Guimarães da Silveira
-* Vitor Luiz de Oliveira Correia
+## 🗃️ Banco de Dados
+O banco de dados local (appsenkaspi.db) é criado automaticamente ao iniciar o app, com dados pré-populados por meio de um RoomDatabase.Callback.
+
+Principais entidades:
+PilarEntity, SubpilarEntity, AcaoEntity, AtividadeEntity
+
+FuncionarioEntity (com perfis, login e permissões)
+
+Entidades relacionais: AcaoFuncionarioEntity, AtividadeFuncionarioEntity
+
+ChecklistItemEntity, RequisicaoEntity
+
+O acesso aos dados é realizado por meio de DAOs (Data Access Objects) para garantir separação de responsabilidades e acesso seguro às operações de CRUD.
+
+## 🚀 Como Executar o Projeto
+Clone o repositório:
+
+bash
+Copiar
+Editar
+git clone https://github.com/seu-usuario/appsenkaspi.git
+cd appsenkaspi
+Abra o projeto no Android Studio.
+
+Sincronize o Gradle e construa o projeto.
+
+Execute em um emulador Android ou dispositivo físico.
+
+## 📦 Requisitos do Sistema
+
+Dependência 1: A definir (API externa)
+
+Dependência 2: Banco de dados SQLite (Room)
+
+Dependência 3: Android Studio + ambiente Kotlin configurado
+
+## 👥 Contribuições dos Membros do Grupo
+Saulo – Responsável pela implementação de funcionalidades e atualização do banco de dados.
+
+Andrey – Responsável pelo design da interface, animações visuais e aprimoramento da experiência do usuário.
+
+Matheus – Responsável pela integração e implementações de API.
+
+João – Responsável pela gestão de erros e correção de bugs.
+
+Lucas – Responsável pela criação das telas iniciais do escopo do projeto.
+
+Vitor – Responsável pela criação das telas iniciais do escopo do projeto.
 
 ## Links
 [Notion](https://www.notion.so/Sistema-de-Ouvidoria-do-SENAC-1a6cf81c640d8080b6d3f4cd051740fa?pvs=4) - Documentação de Requisitos

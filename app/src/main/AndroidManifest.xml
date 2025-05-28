@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.appsenkaspi">
-
     <!-- Permissões (se precisar no futuro, já estão previstas) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
 
   <application
         android:name=".App"
@@ -15,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppSenkasPI">
+
 
         <!-- Activity principal que inicia o app -->
         <activity
@@ -27,11 +29,11 @@
         </activity>
 
         <!-- Tela principal após login -->
-        <activity
-            android:name=".TelaPrincipalActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-        android:exported="true" />
+      <activity
+          android:name=".TelaPrincipalActivity"
+          android:theme="@style/Theme.AppSenkasPI"
+          android:windowSoftInputMode="adjustPan"
+          android:exported="true" />
 
         <!-- (Opcional) Se você quiser depois ter atividades específicas, como editar pilares, adicionar telas novas -->
         <!-- <activity android:name=".OutraActivity" android:exported="true" /> -->

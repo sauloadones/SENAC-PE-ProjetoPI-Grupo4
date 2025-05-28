@@ -11,9 +11,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentTelaPilarBinding
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -120,10 +122,13 @@ class TelaPilarFragment : Fragment() {
         binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
         binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
 
-        // 🚀 Chamada para calcular progresso real
-        pilarViewModel.calcularProgressoDoPilar(pilar.id) { progresso ->
-            animarProgresso((progresso * 100).toInt())
-        }
+        // Chamada para calcular progresso real
+      viewLifecycleOwner.lifecycleScope.launch {
+        val progresso = pilarViewModel.calcularProgressoInterno(pilar.id)
+        pilarViewModel.atualizarStatusAutomaticamente(pilar.id)
+        animarProgresso((progresso * 100).toInt())
+      }
+
     }
 
 
@@ -193,7 +198,7 @@ class TelaPilarFragment : Fragment() {
 
     private fun abrirTelaAcao(acao: AcaoEntity) {
         val fragment = TelaAcaoFragment().apply {
-            arguments = Bundle().apply { putInt("acaoId", acao.id) }
+            arguments = Bundle().apply { putInt("acaoId", acao.id!!) }
         }
         parentFragmentManager.beginTransaction()
             .replace(R.id.main_container, fragment)

@@ -10,12 +10,12 @@
     <string name="relat_rio">Relatório</string>
     <string name="descricao_lista_pilares">Lista de pilares exibida na tela</string>
     <string name="historico_icon">Ícone de acesso ao histórico</string>
-    <string name="ver_mais">ver mais</string>
-    <string name="t_tulo_do_pilar">Título do Pilar</string>
-    <string name="todo">TODO</string>
-    <string name="conclu_do">Concluído</string>
-    <string name="exclu_do_em_10_05_2024">Excluído em: 10/05/2024</string>
-    <string name="todo_">TODO</string>
+    <string-array name="tipos_arquivo">
+        <item>PDF</item>
+        <item>Excel</item>
+        <item>Word</item>
+    </string-array>
+
 
 
 </resources>

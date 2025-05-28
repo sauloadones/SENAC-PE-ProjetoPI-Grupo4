@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -21,6 +20,7 @@ class DetalheNotificacaoFragment : Fragment() {
   private val viewModel: NotificacaoViewModel by activityViewModels()
   private lateinit var requisicao: RequisicaoEntity
   private val formatoData = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale.getDefault())
+  private val atividadeViewModel: AtividadeViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -44,10 +44,28 @@ class DetalheNotificacaoFragment : Fragment() {
       val tvResponsaveis = view.findViewById<TextView>(R.id.tvResponsaveis)
       val tvPrioridade = view.findViewById<TextView>(R.id.tvPrioridade)
       val tvPrioridadeBox = view.findViewById<TextView>(R.id.tvPrioridadeBox)
+
+      fun carregarNomesResponsaveis(ids: List<Int>) {
+        if (ids.isNotEmpty()) {
+          lifecycleScope.launch {
+            val nomes = AppDatabase.getDatabase(requireContext())
+              .funcionarioDao()
+              .getFuncionariosPorIds(ids)
+              .joinToString { it.nomeCompleto }
+            tvResponsaveis.text = "Responsáveis: $nomes"
+          }
+        } else {
+          tvResponsaveis.text = "Sem responsáveis definidos"
+        }
+      }
+
       when (requisicao.tipo) {
         TipoRequisicao.CRIAR_ACAO, TipoRequisicao.EDITAR_ACAO -> {
           val acao = Gson().fromJson(requisicao.acaoJson, AcaoJson::class.java)
-          tvTituloTopo.text = if (requisicao.tipo == TipoRequisicao.CRIAR_ACAO) "Solicitação de Nova Ação" else "Edição de Ação"
+          tvTituloTopo.text = if (requisicao.tipo == TipoRequisicao.CRIAR_ACAO)
+            "Solicitação de Nova Ação"
+          else
+            "Edição de Ação"
           tvPilar.text = "1º Pilar: ${acao.nomePilar}"
           tvNome.text = acao.nome
           tvDescricao.text = acao.descricao
@@ -55,38 +73,29 @@ class DetalheNotificacaoFragment : Fragment() {
           tvDataInicio.visibility = View.GONE
           tvDataFinal.visibility = View.GONE
           tvPrazo.visibility = View.VISIBLE
-
-          lifecycleScope.launch {
-            val nomes = AppDatabase.getDatabase(requireContext())
-              .funcionarioDao()
-              .getFuncionariosPorIds(acao.responsaveis)
-              .joinToString { it.nomeCompleto }
-            tvResponsaveis.text = "Responsáveis: $nomes"
-          }
+          tvPrioridade.visibility = View.GONE
+          tvPrioridadeBox.visibility = View.GONE
+          carregarNomesResponsaveis(acao.responsaveis)
         }
 
         TipoRequisicao.CRIAR_ATIVIDADE, TipoRequisicao.EDITAR_ATIVIDADE -> {
           val atividade = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-          tvTituloTopo.text = if (requisicao.tipo == TipoRequisicao.CRIAR_ATIVIDADE) "Solicitação de Nova Atividade" else "Edição de Atividade"
+          tvTituloTopo.text = if (requisicao.tipo == TipoRequisicao.CRIAR_ATIVIDADE)
+            "Solicitação de Nova Atividade"
+          else
+            "Edição de Atividade"
           tvPilar.text = "1º Pilar: ${atividade.nomePilar}"
           tvNome.text = atividade.nome
           tvDescricao.text = atividade.descricao
           tvDataInicio.text = "Data de início: ${formatoData.format(atividade.dataInicio)}"
           tvDataFinal.text = "Data de Término: ${formatoData.format(atividade.dataPrazo)}"
+          tvPrazo.visibility = View.GONE
           tvDataInicio.visibility = View.VISIBLE
           tvDataFinal.visibility = View.VISIBLE
-          tvPrazo.visibility = View.GONE
           tvPrioridade.text = atividade.prioridade.name.uppercase()
-          tvPrioridade.visibility = View.VISIBLE
           tvPrioridadeBox.visibility = View.VISIBLE
-
-          lifecycleScope.launch {
-            val nomes = AppDatabase.getDatabase(requireContext())
-              .funcionarioDao()
-              .getFuncionariosPorIds(atividade.responsaveis)
-              .joinToString { it.nomeCompleto }
-            tvResponsaveis.text = "Responsáveis: $nomes"
-          }
+          tvPrioridade.visibility = View.VISIBLE
+          carregarNomesResponsaveis(atividade.responsaveis)
         }
 
         TipoRequisicao.COMPLETAR_ATIVIDADE -> {
@@ -97,102 +106,21 @@ class DetalheNotificacaoFragment : Fragment() {
           tvDescricao.text = atividade.descricao
           tvDataInicio.text = "Data de início: ${formatoData.format(atividade.dataInicio)}"
           tvDataFinal.text = "Finalizada em: ${formatoData.format(atividade.dataPrazo)}"
+          tvPrazo.visibility = View.GONE
+          tvDataInicio.visibility = View.VISIBLE
+          tvDataFinal.visibility = View.VISIBLE
           tvPrioridade.text = atividade.prioridade.name.uppercase()
           tvPrioridadeBox.visibility = View.VISIBLE
           tvPrioridade.visibility = View.VISIBLE
-          tvDataInicio.visibility = View.VISIBLE
-          tvDataFinal.visibility = View.VISIBLE
-          tvPrazo.visibility = View.GONE
-
-          lifecycleScope.launch {
-            val nomes = AppDatabase.getDatabase(requireContext())
-              .funcionarioDao()
-              .getFuncionariosPorIds(atividade.responsaveis)
-              .joinToString { it.nomeCompleto }
-            tvResponsaveis.text = "Responsáveis: $nomes"
-          }
+          carregarNomesResponsaveis(atividade.responsaveis)
         }
 
         else -> {}
       }
 
       view.findViewById<Button>(R.id.btnAceitar).setOnClickListener {
-        val atividadeViewModel: AtividadeViewModel by activityViewModels()
-
-        when (requisicao.tipo) {
-          TipoRequisicao.CRIAR_ATIVIDADE -> {
-            val atividade = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-
-            lifecycleScope.launch {
-              val novaAtividade = AtividadeEntity(
-                nome = atividade.nome,
-                descricao = atividade.descricao,
-                dataInicio = atividade.dataInicio,
-                dataPrazo = atividade.dataPrazo,
-                status = StatusAtividade.PENDENTE,
-                prioridade = atividade.prioridade,
-                criadoPor = atividade.criadoPor,
-                dataCriacao = atividade.dataCriacao,
-                acaoId = atividade.acaoId,
-                funcionarioId = atividade.responsaveis.firstOrNull() ?: 0
-              )
-
-              val id = atividadeViewModel.inserirComRetorno(novaAtividade)
-
-              atividade.responsaveis.forEach { funcId ->
-                val relacao = AtividadeFuncionarioEntity(
-                  atividadeId = id,
-                  funcionarioId = funcId
-                )
-                atividadeViewModel.inserirRelacaoFuncionario(relacao)
-              }
-
-              atividadeViewModel.verificarAtividadesComPrazoProximo()
-              viewModel.responderRequisicao(requireContext(), requisicao, true)
-              requireActivity().supportFragmentManager.popBackStack()
-            }
-          }
-
-          TipoRequisicao.EDITAR_ATIVIDADE -> {
-            val atividade = Gson().fromJson(requisicao.atividadeJson, AtividadeJson::class.java)
-
-            lifecycleScope.launch {
-              val atividadeAtualizada = AtividadeEntity(
-                id = atividade.id!!,
-                nome = atividade.nome,
-                descricao = atividade.descricao,
-                dataInicio = atividade.dataInicio,
-                dataPrazo = atividade.dataPrazo,
-                status = atividade.status,
-                prioridade = atividade.prioridade,
-                criadoPor = atividade.criadoPor,
-                dataCriacao = atividade.dataCriacao,
-                acaoId = atividade.acaoId,
-                funcionarioId = atividade.responsaveis.firstOrNull() ?: 0
-              )
-
-              atividadeViewModel.atualizar(atividadeAtualizada)
-              atividadeViewModel.deletarRelacoesPorAtividade(atividade.id)
-
-              atividade.responsaveis.forEach { funcId ->
-                val relacao = AtividadeFuncionarioEntity(
-                  atividadeId = atividade.id!!,
-                  funcionarioId = funcId
-                )
-                atividadeViewModel.inserirRelacaoFuncionario(relacao)
-              }
-
-              atividadeViewModel.verificarAtividadesComPrazoProximo()
-              viewModel.responderRequisicao(requireContext(), requisicao, true)
-              requireActivity().supportFragmentManager.popBackStack()
-            }
-          }
-
-          else -> {
-            viewModel.responderRequisicao(requireContext(), requisicao, true)
-            requireActivity().supportFragmentManager.popBackStack()
-          }
-        }
+        viewModel.responderRequisicao(requireContext(), requisicao, true)
+        requireActivity().supportFragmentManager.popBackStack()
       }
 
       view.findViewById<Button>(R.id.btnRecusar).setOnClickListener {

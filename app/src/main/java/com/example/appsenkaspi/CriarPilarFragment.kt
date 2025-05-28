@@ -17,169 +17,175 @@ import java.util.*
 
 class CriarPilarFragment : Fragment() {
 
-    private var _binding: FragmentCriarPilarBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: FragmentCriarPilarBinding? = null
+  private val binding get() = _binding!!
 
-    private val pilarViewModel: PilarViewModel        by activityViewModels()
-    private val subpilarViewModel: SubpilarViewModel  by activityViewModels()
-    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val pilarViewModel: PilarViewModel by activityViewModels()
+  private val subpilarViewModel: SubpilarViewModel by activityViewModels()
+  private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
 
-    private var dataPrazoSelecionada: Date? = null
-    private val calendario = Calendar.getInstance()
+  private var dataPrazoSelecionada: Date? = null
+  private val calendario = Calendar.getInstance()
 
-    private val listaSubpilares = mutableListOf<String>()
-    private lateinit var subpilarAdapter: SubpilarAdapter
+  private val listaSubpilares = mutableListOf<SubpilarTemp>()
+  private lateinit var subpilarAdapter: SubpilarAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentCriarPilarBinding.inflate(inflater, container, false)
-        return binding.root
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentCriarPilarBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      when (funcionario?.cargo) {
+        Cargo.APOIO -> {
+          binding.confirmarButtonWrapper.visibility = View.GONE
+          binding.pedirConfirmarButtonWrapper.visibility = View.VISIBLE
+        }
+        Cargo.COORDENADOR -> {
+          binding.confirmarButtonWrapper.visibility = View.VISIBLE
+          binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+        }
+        else -> {
+          binding.confirmarButtonWrapper.visibility = View.GONE
+          binding.pedirConfirmarButtonWrapper.visibility = View.GONE
+        }
+      }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        configurarBotaoVoltar(view)
-        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
-            when (funcionario?.cargo) {
-                Cargo.APOIO -> {
-                    binding.confirmarButtonWrapper.visibility = View.GONE
-                    binding.pedirConfirmarButtonWrapper.visibility = View.VISIBLE
-                }
-
-                Cargo.COORDENADOR -> {
-                    binding.confirmarButtonWrapper.visibility = View.VISIBLE
-                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
-
-                }
-                Cargo.GESTOR -> {
-                    binding.confirmarButtonWrapper.visibility = View.GONE
-                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
-
-                }
-
-                else -> {
-                    binding.confirmarButtonWrapper.visibility = View.GONE
-                    binding.pedirConfirmarButtonWrapper.visibility = View.GONE
-
-                }
-            }
-        }
-
-
-        // configura RecyclerView de subpilares
-        subpilarAdapter = SubpilarAdapter(listaSubpilares)
-        binding.recyclerViewSubpilares.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            adapter = subpilarAdapter
-        }
-
-        // listeners
-        binding.buttonPickDate.setOnClickListener { abrirDatePicker() }
-        binding.buttonAddSubpilar.setOnClickListener { abrirDialogAdicionarSubpilar() }
-        binding.confirmarButtonWrapper.setOnClickListener { confirmarCriacaoPilar() }
-
-        // recebe subpilar criado no diálogo
-        childFragmentManager.setFragmentResultListener("novoSubpilar", viewLifecycleOwner) { _, bundle ->
-            bundle.getString("nomeSubpilar")?.let { nome ->
-                listaSubpilares.add(nome)
-                subpilarAdapter.notifyItemInserted(listaSubpilares.size - 1)
-            }
-        }
+    subpilarAdapter = SubpilarAdapter(listaSubpilares)
+    binding.recyclerViewSubpilares.apply {
+      layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+      adapter = subpilarAdapter
     }
 
-    private fun abrirDatePicker() {
-        DatePickerDialog(
-            requireContext(),
-            { _, year, month, day ->
-                calendario.set(year, month, day)
-                dataPrazoSelecionada = calendario.time
-                val fmt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                binding.buttonPickDate.text = fmt.format(dataPrazoSelecionada!!)
-            },
-            calendario.get(Calendar.YEAR),
-            calendario.get(Calendar.MONTH),
-            calendario.get(Calendar.DAY_OF_MONTH)
-        ).show()
+    binding.buttonPickDate.setOnClickListener { abrirDatePicker() }
+    binding.buttonAddSubpilar.setOnClickListener { abrirDialogAdicionarSubpilar() }
+    binding.confirmarButtonWrapper.setOnClickListener { confirmarCriacaoPilar() }
+
+    childFragmentManager.setFragmentResultListener("novoSubpilar", viewLifecycleOwner) { _, bundle ->
+      val nome = bundle.getString("nomeSubpilar")
+      val descricao = bundle.getString("descricaoSubpilar")
+      val prazo = bundle.getSerializable("prazoSubpilar") as? Date
+
+      if (nome != null && prazo != null) {
+        listaSubpilares.add(SubpilarTemp(nome, descricao, prazo))
+        subpilarAdapter.notifyItemInserted(listaSubpilares.size - 1)
+      }
+    }
+  }
+
+  private fun abrirDatePicker() {
+    DatePickerDialog(
+      requireContext(),
+      { _, year, month, day ->
+        calendario.set(year, month, day)
+        dataPrazoSelecionada = calendario.time
+        val fmt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        binding.buttonPickDate.text = fmt.format(dataPrazoSelecionada!!)
+      },
+      calendario.get(Calendar.YEAR),
+      calendario.get(Calendar.MONTH),
+      calendario.get(Calendar.DAY_OF_MONTH)
+    ).show()
+  }
+
+  private fun abrirDialogAdicionarSubpilar() {
+    dataPrazoSelecionada?.let { prazo ->
+      AdicionarSubpilarDialogFragment.newInstance(-1, prazo)
+        .show(childFragmentManager, "AdicionarSubpilarDialog")
+    } ?: run {
+      binding.buttonPickDate.error = "Escolha primeiro um prazo"
+    }
+  }
+
+  private fun confirmarCriacaoPilar() {
+    val nome = binding.inputNomePilar.text.toString().trim()
+    val descricao = binding.inputDescricao.text.toString().trim()
+    val prazo = dataPrazoSelecionada
+
+    if (nome.isEmpty()) {
+      binding.inputNomePilar.error = "Digite o nome do Pilar"
+      return
+    }
+    if (prazo == null) {
+      binding.buttonPickDate.error = "Escolha um prazo"
+      return
     }
 
-    private fun abrirDialogAdicionarSubpilar() {
-        dataPrazoSelecionada?.let { prazo ->
-            AdicionarSubpilarDialogFragment.newInstance(-1, prazo)
-                .show(childFragmentManager, "AdicionarSubpilarDialog")
-        } ?: run {
-            binding.buttonPickDate.error = "Escolha primeiro um prazo"
-        }
+    val prefs = requireContext().getSharedPreferences(
+      "funcionario_prefs",
+      android.content.Context.MODE_PRIVATE
+    )
+    val funcionarioId = prefs.getInt("funcionario_id", -1)
+    if (funcionarioId == -1) {
+      Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
+      return
     }
 
+    viewLifecycleOwner.lifecycleScope.launch {
+      val idLong = pilarViewModel.inserirRetornandoId(
+        PilarEntity(
+          nome = nome,
+          descricao = descricao,
+          dataInicio = Date(),
+          dataPrazo = prazo,
+          status = StatusPilar.PLANEJADO,
+          dataCriacao = Date(),
+          criadoPor = funcionarioId
+        )
+      )
+      val novoId = idLong.toInt()
 
+      listaSubpilares.forEach { sub ->
+        subpilarViewModel.inserir(
+          SubpilarEntity(
+            nome = sub.nome,
+            descricao = sub.descricao,
+            dataInicio = Date(),
+            dataPrazo = sub.prazo,
+            pilarId = novoId,
+            criadoPor = funcionarioId,
+            dataCriacao = Date(),
+            status = StatusSubPilar.PLANJEADA
+          )
+        )
+      }
 
-    private fun confirmarCriacaoPilar() {
-        val nome      = binding.inputNomePilar.text.toString().trim()
-        val descricao = binding.inputDescricao.text.toString().trim()
-        val prazo     = dataPrazoSelecionada
+      val possuiSubpilares = listaSubpilares.isNotEmpty()
 
-        if (nome.isEmpty()) {
-            binding.inputNomePilar.error = "Digite o nome do Pilar"
-            return
+      val destino = if (possuiSubpilares) {
+        TelaPilarComSubpilaresFragment.newInstance(novoId)
+      } else {
+        TelaPilarFragment().apply {
+          arguments = Bundle().apply { putInt("pilarId", novoId) }
         }
-        if (prazo == null) {
-            binding.buttonPickDate.error = "Escolha um prazo"
-            return
-        }
-        val prefs = requireContext().getSharedPreferences("funcionario_prefs", android.content.Context.MODE_PRIVATE)
-        val funcionarioId = prefs.getInt("funcionario_id", -1)
-        if (funcionarioId == -1) {
-            Toast.makeText(context, "Erro: usuário não autenticado", Toast.LENGTH_LONG).show()
-            return
-        }
+      }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            // insere pilar e obtém ID
-            val idLong = pilarViewModel.inserirRetornandoId(
-                PilarEntity(
-                    nome = nome,
-                    descricao = descricao,
-                    dataInicio = Date(),
-                    dataPrazo = prazo,
-                    status = StatusPilar.VENCIDO,
-                    dataCriacao = Date(),
-                    criadoPor = funcionarioId
-                )
-            )
-            val novoId = idLong.toInt()
+      parentFragmentManager.beginTransaction()
+        .replace(R.id.main_container, destino)
+        .addToBackStack(null)
+        .commit()
 
-            // insere subpilares
-            listaSubpilares.forEach { subNome ->
-                subpilarViewModel.inserir(
-                    SubpilarEntity(
-                        nome       = subNome,
-                        descricao  = null,
-                        dataInicio = Date(),
-                        dataPrazo  = prazo,
-                        pilarId    = novoId
-                    )
-                )
-            }
-
-            // navega para TelaPilarFragment
-            parentFragmentManager.beginTransaction()
-                .replace(
-                    R.id.main_container,
-                    TelaPilarFragment().apply {
-                        arguments = Bundle().apply { putInt("pilarId", novoId) }
-                    }
-                )
-                .addToBackStack(null)
-                .commit()
-        }
     }
+  }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
+  data class SubpilarTemp(
+    val nome: String,
+    val descricao: String?,
+    val prazo: Date
+  )
 }

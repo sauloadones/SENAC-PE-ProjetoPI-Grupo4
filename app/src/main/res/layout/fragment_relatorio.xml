@@ -1,113 +1,331 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/baseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient"
-    tools:context=".RelatorioFragment">
+    android:fillViewport="true"
+    android:background="@drawable/background_gradient">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/baseLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <include
-        android:id="@+id/topBarRelatorio"
-        layout="@layout/view_top_bar"
+        android:id="@+id/header"
+        layout="@layout/view_top_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/container_historico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_historico_box"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:elevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/texto_historico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Relatórios"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/tituloTipoRelatorio"
+        android:id="@+id/textTipoRelatorio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
         android:layout_marginStart="20dp"
-        android:text="Tipo de Relatório"
+        android:text="Tipo de Relatório:"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/topBarRelatorio"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/container_historico"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/inputRelatorio"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnRelatorioGeral"
         android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:background="@drawable/bg_card"
-        android:drawableEnd="@drawable/abrir_arqs"
-        android:drawablePadding="12dp"
-        android:inputType="text"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        app:layout_constraintTop_toBottomOf="@id/tituloTipoRelatorio"
+        android:layout_marginHorizontal="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/cardNormal"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toBottomOf="@id/textTipoRelatorio"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_baseline_list_24"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Relatório Geral"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnRelatorioPorPilar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/cardNormal"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toBottomOf="@id/btnRelatorioGeral"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_baseline_filter_list_24"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Relatório por Pilar"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
-        android:id="@+id/labelArquivo"
+        android:id="@+id/textSelecionarPilar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tipo de Arquivo"
-        android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/inputRelatorio"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"/>
-
-    <EditText
-        android:id="@+id/inputArquivo"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_card"
-        android:drawableEnd="@drawable/abrir_arqs"
-        android:drawablePadding="12dp"
-        android:inputType="text"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        app:layout_constraintTop_toBottomOf="@id/labelArquivo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/dataIntervalo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Data Inicial - Data Final"
-        android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/inputArquivo"
-        app:layout_constraintStart_toEndOf="@id/imageView24"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="12dp" />
-
-    <ImageView
-        android:id="@+id/imageView24"
-        android:layout_width="29dp"
-        android:layout_height="24dp"
-        app:srcCompat="@drawable/calendarioblack"
-        app:layout_constraintTop_toTopOf="@id/dataIntervalo"
+        android:text="Selecione o Pilar:"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/btnRelatorioPorPilar"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="20dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutSpinnerPilares"
+        style="@style/CustomFilledBoxStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
+        android:minHeight="56dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        android:elevation="4dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:layout_constraintTop_toBottomOf="@id/textSelecionarPilar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/spinnerPilares"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:background="@drawable/spinner_background"
+            android:textColor="@color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="12dp"
+            android:dropDownVerticalOffset="-5dp"
+            android:popupBackground="@drawable/bg_dropdown_popup"
+            android:focusable="false"
+            android:clickable="true" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/textTipoArquivo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp"
+        android:text="Tipo de Arquivo:"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/layoutSpinnerPilares"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutTipoArquivo"
+        style="@style/CustomFilledBoxStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:hint="Escolha o tipo de arquivo"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:layout_constraintTop_toBottomOf="@id/textTipoArquivo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/spinnerTipoArquivo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:background="@drawable/spinner_background"
+            android:textColor="@color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="12dp"
+            android:elevation="4dp"
+            android:dropDownVerticalOffset="-5dp"
+            android:popupBackground="@drawable/bg_dropdown_popup"
+            android:focusable="true"
+            android:clickable="true"
+            android:drawableStart="@drawable/tiparquivo"
+            android:drawablePadding="8dp"
+            android:textColorHint="#CCCCCC" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
         android:id="@+id/btnGerarRelatorio"
         android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_confirmar"
+        android:padding="12dp"
+        android:layout_marginTop="18dp"
         android:layout_marginHorizontal="16dp"
-        android:backgroundTint="#1353A4"
-        android:text="Gerar Relatório"
-        android:textColor="#FFFFFF"
-        app:cornerRadius="12dp"
-        app:layout_constraintTop_toBottomOf="@id/dataIntervalo"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutTipoArquivo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_baseline_download_24"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gerar Relatório"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:progressDrawable="@drawable/progress_bar"
+            app:layout_constraintTop_toBottomOf="@id/btnGerarRelatorio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvHistoricoTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Histórico de Relatórios"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="6dp"
+            app:layout_constraintTop_toBottomOf="@id/progressBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="2dp"
+            android:background="#FFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/tvHistoricoTitulo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerHistorico"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvHistoricoTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,19 +1,21 @@
 package com.example.appsenkaspi
 
-import android.content.Context
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
+
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -49,15 +51,10 @@ class HomeFragment : Fragment() {
         funcionarioLogadoId = funcionarioId
 
         // 🔁 Geração de notificação de prazo: apenas 1x por dia por funcionário
-        val prefs = requireContext().getSharedPreferences("notificacoes_prazo", Context.MODE_PRIVATE)
-        val ultimaExecucaoKey = "ultima_execucao_funcionario_$funcionarioId"
-        val hoje = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val ultimaExecucao = prefs.getString(ultimaExecucaoKey, null)
 
-        if (ultimaExecucao != hoje) {
-          atividadeViewModel.verificarAtividadesComPrazoProximo()
-          prefs.edit().putString(ultimaExecucaoKey, hoje).apply()
-        }
+
+
+
 
         // ✅ Badge de notificação (bolinha com contador)
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
@@ -86,7 +83,11 @@ class HomeFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
 
-        adapter = PilarAdapter { pilar -> abrirTelaPilar(pilar) }
+        adapter = PilarAdapter(
+          onClickPilar = { pilar -> abrirTelaPilar(pilar) },
+          verificarSubpilares = { pilarId -> pilarViewModel.temSubpilaresDireto(pilarId) }
+        )
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
@@ -113,20 +114,31 @@ class HomeFragment : Fragment() {
       }
     }
   }
-
   private fun abrirTelaPilar(pilar: PilarEntity) {
-    val fragment = TelaPilarFragment().apply {
-      arguments = Bundle().apply {
-        putInt("pilarId", pilar.id)
-        putInt("funcionarioId", funcionarioLogadoId)
-      }
-    }
+    viewLifecycleOwner.lifecycleScope.launch {
+      val temSubpilares = pilarViewModel.temSubpilares(pilar.id)
 
-    parentFragmentManager.beginTransaction()
-      .replace(R.id.main_container, fragment)
-      .addToBackStack(null)
-      .commit()
+      val fragment = if (temSubpilares) {
+        TelaPilarComSubpilaresFragment().apply {
+          arguments = Bundle().apply { putInt("pilarId", pilar.id) }
+        }
+      } else {
+        TelaPilarFragment().apply {
+          arguments = Bundle().apply {
+            putInt("pilarId", pilar.id)
+            putInt("funcionarioId", funcionarioLogadoId)
+          }
+        }
+      }
+
+      parentFragmentManager.beginTransaction()
+        .replace(R.id.main_container, fragment)
+        .addToBackStack(null)
+        .commit()
+    }
   }
+
+
 
   override fun onDestroyView() {
     super.onDestroyView()
