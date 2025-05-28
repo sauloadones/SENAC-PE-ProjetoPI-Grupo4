@@ -1,49 +1,50 @@
 <resources>
 
+    <!-- Estilo para o tema principal -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">#164773</item>
-        <item name="colorPrimaryVariant">#0F355A</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="colorPrimary">#164773</item> <!-- Cor principal -->
+        <item name="colorPrimaryVariant">#0F355A</item> <!-- Cor secundária -->
+        <item name="colorOnPrimary">#FFFFFF</item> <!-- Cor do texto quando o fundo for colorPrimary -->
+        <item name="android:textColor">#FFFFFF</item> <!-- Cor padrão do texto -->
     </style>
 
+    <!-- Estilo para o tema do diálogo de login -->
     <style name="LoginDialogTheme" parent="Theme.MaterialComponents.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item> <!-- Fundo transparente -->
+        <item name="android:backgroundDimEnabled">true</item> <!-- Ativa o fundo dim -->
     </style>
 
+    <!-- Estilo para o indicador ativo da navegação inferior -->
     <style name="BottomNavActiveIndicator">
-        <item name="android:color">#3CA6A6</item>
-        <item name="android:shape">rectangle</item>
-        <item name="android:height">4dp</item>
+        <item name="android:color">#3CA6A6</item> <!-- Cor do indicador -->
+        <item name="android:shape">rectangle</item> <!-- Forma do indicador -->
+        <item name="android:height">4dp</item> <!-- Altura do indicador -->
     </style>
 
+    <!-- Estilo para botões primários -->
     <style name="BotaoPrimario" parent="Widget.MaterialComponents.Button">
-        <item name="android:backgroundTint">@color/purple500</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="android:backgroundTint">@color/purple500</item> <!-- Cor do fundo do botão -->
+        <item name="android:textColor">@android:color/white</item> <!-- Cor do texto do botão -->
+        <item name="cornerRadius">12dp</item> <!-- Bordas arredondadas -->
     </style>
 
+    <!-- Estilo para caixas de texto personalizadas -->
     <style name="CustomFilledBoxStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
-        <item name="boxBackgroundColor">@color/cardNormal</item>
-        <item name="boxStrokeColor">@android:color/transparent</item>
-        <item name="boxStrokeWidth">0dp</item>
-        <item name="boxStrokeWidthFocused">0dp</item>
-        <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxCornerRadiusTopEnd">12dp</item>
-        <item name="boxCornerRadiusBottomStart">12dp</item>
-        <item name="boxCornerRadiusBottomEnd">12dp</item>
-        <item name="hintTextColor">@android:color/transparent</item>
+        <item name="boxBackgroundColor">@color/cardNormal</item> <!-- Cor de fundo da caixa -->
+        <item name="boxStrokeColor">@android:color/transparent</item> <!-- Sem borda -->
+        <item name="boxStrokeWidth">0dp</item> <!-- Sem espessura na borda -->
+        <item name="boxStrokeWidthFocused">0dp</item> <!-- Sem espessura na borda quando em foco -->
+        <item name="boxCornerRadiusTopStart">12dp</item> <!-- Bordas arredondadas no topo -->
+        <item name="boxCornerRadiusTopEnd">12dp</item> <!-- Bordas arredondadas no topo -->
+        <item name="boxCornerRadiusBottomStart">12dp</item> <!-- Bordas arredondadas na parte inferior -->
+        <item name="boxCornerRadiusBottomEnd">12dp</item> <!-- Bordas arredondadas na parte inferior -->
+        <item name="hintTextColor">@android:color/transparent</item> <!-- Cor do texto do hint -->
     </style>
 
-  <style name="ProfileImageShape" parent="">
-    <item name="cornerFamily">rounded</item>
-    <item name="cornerSize">50%</item>
-  </style>
-
+    <!-- Estilo para imagem de perfil com bordas arredondadas -->
+    <style name="ProfileImageShape" parent="">
+        <item name="cornerFamily">rounded</item> <!-- Definindo bordas arredondadas -->
+        <item name="cornerSize">50%</item> <!-- Bordas arredondadas de 50% (imagem circular) -->
+    </style>
 
 </resources>
-
-
-
-

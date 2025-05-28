@@ -20,39 +20,55 @@
 
         <!-- Histórico de Pilares -->
         <LinearLayout
-            android:id="@+id/containerHistorico"
+            android:id="@+id/container_historico"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:background="@drawable/bg_historico_box"
+            android:padding="16dp"
+            android:gravity="center_horizontal"
+            android:elevation="4dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="16dp">
 
-            <!-- Título -->
+            <!-- Título do Histórico -->
             <TextView
-                android:id="@+id/textViewTitulo"
+                android:id="@+id/texto_historico"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Histórico de Pilares"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp"
+                android:text="Históricos de Pilares"
                 android:textStyle="bold"
-                android:layout_gravity="center_horizontal"
-                android:paddingBottom="16dp" />
+                android:textColor="@android:color/white"
+                android:textSize="25sp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="16dp" />
 
+            <!-- Spinner com a cor de fundo e texto personalizado -->
             <Spinner
                 android:id="@+id/spinnerStatusFiltro"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_gravity="center_horizontal"
-                android:entries="@array/status_pilar_array" />
+                android:entries="@array/status_pilar_array"
+                android:background="@drawable/spinner_background_historico"
+                android:popupBackground="@drawable/spinner_dropdown_background"
+                android:layout_marginBottom="7dp"
+                android:gravity="center" />
 
-            <!-- RecyclerView Adicional -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerFiltroExclusao"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_pilar" />
         </LinearLayout>
+
+        <!-- RecyclerView fora do container_historico -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerFiltroExclusao"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:elevation="4dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_pilar" />
+
+
     </LinearLayout>
 </ScrollView>
