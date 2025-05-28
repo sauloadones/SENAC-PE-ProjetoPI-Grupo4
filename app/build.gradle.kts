@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
+    implementation("com.google.code.gson:gson:2.10.1")
 
 // ViewModel e Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
