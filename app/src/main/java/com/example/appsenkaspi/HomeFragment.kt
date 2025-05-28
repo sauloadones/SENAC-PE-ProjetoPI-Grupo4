@@ -1,6 +1,5 @@
 package com.example.appsenkaspi
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +14,6 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
-
-import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -50,36 +47,29 @@ class HomeFragment : Fragment() {
         val funcionarioId = it.id
         funcionarioLogadoId = funcionarioId
 
-        // 🔁 Geração de notificação de prazo: apenas 1x por dia por funcionário
+        // Notificação e badge (se tiver)
 
-
-
-
-
-        // ✅ Badge de notificação (bolinha com contador)
-        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
-          funcionario?.let {
+        // Configura badge de notificação
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { f ->
+          f?.let { func ->
             configurarNotificacaoBadge(
               rootView = view,
               lifecycleOwner = viewLifecycleOwner,
               fragmentManager = parentFragmentManager,
-              funcionarioId = it.id,
-              cargo = it.cargo,
+              funcionarioId = func.id,
+              cargo = func.cargo,
               viewModel = notificacaoViewModel
             )
           }
         }
 
-        // ✅ Botão do sino
-
-
-        // ✅ Controle de visibilidade do botão "Adicionar Pilar"
+        // Controle de visibilidade do botão "Adicionar Pilar"
         binding.cardAdicionarPilar.visibility = when (it.cargo) {
           Cargo.COORDENADOR -> View.VISIBLE
           else -> View.GONE
         }
 
-        // ✅ RecyclerView de pilares
+        // RecyclerView de pilares
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
 
@@ -91,11 +81,15 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
+        // Filtrar só planejados e em andamento
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-          adapter.submitList(lista)
+          val listaFiltrada = lista.filter { pilar ->
+            pilar.status == StatusPilar.PLANEJADO || pilar.status == StatusPilar.EM_ANDAMENTO
+          }
+          adapter.submitList(listaFiltrada)
         }
 
-        // ✅ Botão para criar novo pilar
+        // Botão para criar novo pilar
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -108,12 +102,23 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
-        // ✅ Cor da barra de status do Android
+        // Botão histórico (box_historico)
+        val boxHistorico = view.findViewById<View>(R.id.box_historico)
+        boxHistorico.setOnClickListener {
+          val historicoFragment = HistoricoFragment()
+          parentFragmentManager.beginTransaction()
+            .replace(R.id.main_container, historicoFragment)
+            .addToBackStack(null)
+            .commit()
+        }
+
+        // Cor da barra de status do Android
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }
     }
   }
+
   private fun abrirTelaPilar(pilar: PilarEntity) {
     viewLifecycleOwner.lifecycleScope.launch {
       val temSubpilares = pilarViewModel.temSubpilares(pilar.id)
@@ -137,8 +142,6 @@ class HomeFragment : Fragment() {
         .commit()
     }
   }
-
-
 
   override fun onDestroyView() {
     super.onDestroyView()

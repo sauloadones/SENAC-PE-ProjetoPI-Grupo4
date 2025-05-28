@@ -56,25 +56,6 @@
             app:layout_constraintTop_toBottomOf="@id/textTitulo"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <ImageView
-            android:id="@+id/botaoVerMais"
-            android:layout_width="136dp"
-            android:layout_height="29dp"
-            android:layout_marginTop="66dp"
-            app:srcCompat="@drawable/rounded_buttonc"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ver mais"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="@id/botaoVerMais"
-            app:layout_constraintBottom_toBottomOf="@id/botaoVerMais"
-            app:layout_constraintStart_toStartOf="@id/botaoVerMais"
-            app:layout_constraintEnd_toEndOf="@id/botaoVerMais" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
