@@ -286,7 +286,7 @@ class RelatorioFragment : Fragment() {
 
                 response?.let {
                     if (it.isSuccessful) {
-                        salvarArquivo(it.body(), "relatorio.$tipo")
+
 
                         // >>> Agora vamos calcular as informações para o histórico <<<
                         val caminhoDoArquivoSalvo = salvarArquivo(it.body(), "relatorio.$tipo")

@@ -2,32 +2,56 @@ package com.example.appsenkaspi.utils
 
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
-import android.widget.Toast
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import java.io.File
-import android.webkit.MimeTypeMap
 
-fun abrirArquivo(context: Context, caminhoArquivo: String) {
-    try {
-        val file = File(caminhoArquivo)
-        val uri: Uri = FileProvider.getUriForFile(
-            context,
-            context.packageName + ".fileprovider",
-            file
-        )
-
-        val mime = MimeTypeMap.getSingleton()
-            .getMimeTypeFromExtension(file.extension.lowercase()) ?: "*/*"
-
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, mime)
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+fun getRealPathFromURI(context: Context, contentUri: Uri): String? {
+    val proj = arrayOf(MediaStore.Images.Media.DATA)
+    val cursor: Cursor? = context.contentResolver.query(contentUri, proj, null, null, null)
+    cursor?.use {
+        val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        if (it.moveToFirst()) {
+            return it.getString(columnIndex)
         }
+    }
+    return null
+}
 
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        Toast.makeText(context, "Não foi possível abrir o arquivo.", Toast.LENGTH_SHORT).show()
-        e.printStackTrace()
+fun openFile(context: Context, contentUri: Uri) {
+    val realPath = getRealPathFromURI(context, contentUri)
+    if (realPath != null) {
+        val file = File(realPath)
+        if (file.exists()) {
+            val fileUri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                file
+            )
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(fileUri, "application/pdf") // Ajuste o MIME type conforme necessário
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, "Abrir com"))
+        }
     }
 }
+
+fun getMimeType(path: String): String {
+        return when {
+            path.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+            path.endsWith(
+                ".xlsx",
+                ignoreCase = true
+            ) -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+            path.endsWith(
+                ".docx",
+                ignoreCase = true
+            ) -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+            else -> "*/*"
+        }
+    }

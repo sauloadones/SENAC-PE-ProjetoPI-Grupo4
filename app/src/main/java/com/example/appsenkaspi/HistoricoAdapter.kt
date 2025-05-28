@@ -1,14 +1,20 @@
 package com.example.appsenkaspi
 
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appsenkaspi.databinding.DialogDetalhesRelatorioBinding
-import android.widget.Toast
-import com.example.appsenkaspi.utils.abrirArquivo
+import com.example.appsenkaspi.utils.getMimeType
+import java.io.File
+import android.net.Uri
 
 class HistoricoAdapter(
     private val lista: List<HistoricoRelatorio>
@@ -17,7 +23,7 @@ class HistoricoAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titulo: TextView = view.findViewById(R.id.txtTitulo)
         val data: TextView = view.findViewById(R.id.txtData)
-        val setinha: View = view.findViewById(R.id.btnDetalhes) // Supondo que a setinha seja um botão na view
+        val setinha: View = view.findViewById(R.id.btnDetalhes)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,14 +39,12 @@ class HistoricoAdapter(
         holder.titulo.text = item.titulo
         holder.data.text = item.data
 
-        // Listener para a setinha (ou para o item inteiro, se preferir)
         holder.setinha.setOnClickListener {
             mostrarDialogDetalhes(holder.itemView, item)
         }
     }
 
     private fun mostrarDialogDetalhes(view: View, item: HistoricoRelatorio) {
-        // Usando ViewBinding para o diálogo (crie o layout dialog_detalhes_relatorio.xml para isso)
         val dialogBinding = DialogDetalhesRelatorioBinding.inflate(LayoutInflater.from(view.context))
 
         dialogBinding.txtTitulo.text = item.titulo
@@ -52,27 +56,39 @@ class HistoricoAdapter(
             .setCancelable(true)
             .create()
 
-        dialogBinding.btnFechar.setOnClickListener {
-            dialog.dismiss()
-        }
+        dialogBinding.btnFechar.setOnClickListener { dialog.dismiss() }
 
         dialogBinding.btnBaixar.setOnClickListener {
-            // Aqui você pode adicionar a lógica para baixar o relatório novamente
-            // Se tiver a path salva, você pode abrir, ou disparar nova geração
-            // Por enquanto só um toast:
             Toast.makeText(view.context, "Baixando relatório novamente...", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-
         dialogBinding.btnAbrir.setOnClickListener {
-            if (item.caminhoArquivo != null) {
-                abrirArquivo(view.context, item.caminhoArquivo)
+            val caminho = item.caminhoArquivo
+
+            if (caminho != null) {
+                try {
+                    val uri = Uri.parse(caminho)
+
+                    val mimeType = view.context.contentResolver.getType(uri) ?: "*/*"
+
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, mimeType)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    view.context.startActivity(Intent.createChooser(intent, "Abrir com"))
+                } catch (e: Exception) {
+                    Toast.makeText(view.context, "Erro ao abrir o arquivo.", Toast.LENGTH_SHORT).show()
+                    e.printStackTrace()
+                }
             } else {
-                Toast.makeText(view.context, "Arquivo não disponível para abrir.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view.context, "Arquivo não disponível.", Toast.LENGTH_SHORT).show()
             }
+
             dialog.dismiss()
         }
 
         dialog.show()
     }
 }
+
