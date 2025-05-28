@@ -11,6 +11,8 @@ enum class Cargo {
 enum class StatusPilar {
     ATIVO,
     EXCLUIDO,
+    PENDENTE,
+    EM_ANDAMENTO,
     VENCIDO,
     VENCIDA,
     EXCLUIDA,
