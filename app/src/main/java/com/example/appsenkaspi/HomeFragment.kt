@@ -42,15 +42,6 @@ class HomeFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val iconHistorico = binding.containerHistorico.findViewById<ImageView>(R.id.icon_historico)
-    iconHistorico.setOnClickListener {
-
-
-      parentFragmentManager.beginTransaction()
-        .replace(R.id.main_container, HistoricoFragment())
-        .addToBackStack(null)
-        .commit()
-    }
 
 
 
