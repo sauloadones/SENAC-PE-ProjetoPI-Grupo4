@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.cardview.widget.CardView
-import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 
@@ -42,11 +43,28 @@ class HomeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+
+
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       funcionario?.let {
-        val funcionarioId = it.id
-        funcionarioLogadoId = funcionarioId
+        funcionarioLogadoId = it.id
 
+<<<<<<< HEAD
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+
+        binding.cardAdicionarPilar.visibility =
+          if (it.cargo == Cargo.COORDENADOR) View.VISIBLE else View.GONE
+
+        recyclerView = binding.recyclerViewPilares
+        cardAdicionarPilar = binding.cardAdicionarPilar
+=======
         // Notificação e badge (se tiver)
 
         // Configura badge de notificação
@@ -72,6 +90,7 @@ class HomeFragment : Fragment() {
         // RecyclerView de pilares
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
+>>>>>>> Historico
 
         adapter = PilarAdapter(
           onClickPilar = { pilar -> abrirTelaPilar(pilar) },
@@ -81,6 +100,18 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
+<<<<<<< HEAD
+        // Atualiza os status antes de observar os pilares
+        lifecycleScope.launch {
+          pilarViewModel.atualizarStatusDeTodosOsPilares()
+        }
+
+        // Observa apenas pilares ativos
+        pilarViewModel.listarPilaresAtivos().observe(viewLifecycleOwner) { lista ->
+          adapter.submitList(lista)
+        }
+
+=======
         // Filtrar só planejados e em andamento
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
           val listaFiltrada = lista.filter { pilar ->
@@ -90,6 +121,7 @@ class HomeFragment : Fragment() {
         }
 
         // Botão para criar novo pilar
+>>>>>>> Historico
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -102,6 +134,8 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
+<<<<<<< HEAD
+=======
         // Botão histórico (box_historico)
         val boxHistorico = view.findViewById<View>(R.id.box_historico)
         boxHistorico.setOnClickListener {
@@ -113,6 +147,7 @@ class HomeFragment : Fragment() {
         }
 
         // Cor da barra de status do Android
+>>>>>>> Historico
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }

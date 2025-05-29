@@ -1,6 +1,7 @@
 package com.example.appsenkaspi
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,14 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     private val pilarDao = AppDatabase.getDatabase(application).pilarDao()
     private val acaoDao = AppDatabase.getDatabase(application).acaoDao()
     private val subpilarDao = AppDatabase.getDatabase(application).subpilarDao()
+    val statusAtivos = listOf(StatusPilar.EM_ANDAMENTO, StatusPilar.PLANEJADO)
+  val statusHistorico = listOf(StatusPilar.CONCLUIDO, StatusPilar.VENCIDO, StatusPilar.EXCLUIDO)
+  val statusParaDashboard = listOf(
+    StatusPilar.PLANEJADO,
+    StatusPilar.EM_ANDAMENTO,
+    StatusPilar.CONCLUIDO
+  )
+
 
   fun getPilarById(id: Int): LiveData<PilarEntity?> = pilarDao.getPilarById(id)
 
@@ -35,7 +44,21 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         pilarDao.deletarPilar(pilar)
     }
 
-    suspend fun inserirRetornandoId(pilar: PilarEntity): Long = pilarDao.inserirPilar(pilar)
+  fun excluirPilar(pilar: PilarEntity) = viewModelScope.launch(Dispatchers.IO) {
+    val hoje = Calendar.getInstance().time
+    Log.d("ExcluirPilar", "Enviando para DAO → id=${pilar.id}, status=${StatusPilar.EXCLUIDO.name}, data=$hoje")
+
+
+    val linhasAfetadas = pilarDao.excluirPilarPorId(pilar.id, StatusPilar.EXCLUIDO, hoje)
+
+    Log.d("ExcluirPilar", "Linhas afetadas: $linhasAfetadas")
+
+  }
+
+
+
+
+  suspend fun inserirRetornandoId(pilar: PilarEntity): Long = pilarDao.inserirPilar(pilar)
 
     fun calcularProgressoDoPilar(pilarId: Int, callback: (Float) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -80,8 +103,8 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
   suspend fun atualizarStatusAutomaticamente(pilarId: Int) {
     val pilar = pilarDao.getById(pilarId) ?: return
     val progresso = calcularProgressoInterno(pilarId)
-
     val hoje = Calendar.getInstance().time
+    if (pilar.status == StatusPilar.EXCLUIDO) return
 
     val novoStatus = when {
       progresso >= 1f -> StatusPilar.CONCLUIDO
@@ -91,15 +114,34 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     if (novoStatus != pilar.status) {
-      pilarDao.atualizarPilar(pilar.copy(status = novoStatus))
+      val novoPilar = if (novoStatus == StatusPilar.CONCLUIDO) {
+        pilar.copy(status = novoStatus, dataConclusao = hoje)
+      } else {
+        pilar.copy(status = novoStatus)
+      }
+      pilarDao.atualizarPilar(novoPilar)
+    }
+  }
+
+  fun atualizarStatusDeTodosOsPilares() = viewModelScope.launch(Dispatchers.IO) {
+    val todosPilares = pilarDao.getTodosPilares()
+    todosPilares.forEach { pilar ->
+      atualizarStatusAutomaticamente(pilar.id)
     }
   }
 
 
 
+  fun listarPilaresAtivos() = pilarDao.listarPilaresPorStatus(statusAtivos)
+  fun listarPilaresHistorico() = pilarDao.listarPilaresPorStatus(statusHistorico)
 
+  fun listarIdsENomes(): LiveData<List<PilarNomeDTO>> {
+    return AppDatabase.getDatabase(getApplication()).pilarDao().listarIdsENomesPorStatus(statusParaDashboard)
+  }
 
-
+  suspend fun getPilaresParaDashboard(): List<PilarEntity> {
+    return pilarDao.getPilaresPorStatus(statusParaDashboard)
+  }
 
   suspend fun getTodosPilares(): List<PilarEntity> = withContext(Dispatchers.IO) {
         pilarDao.getTodosPilares()

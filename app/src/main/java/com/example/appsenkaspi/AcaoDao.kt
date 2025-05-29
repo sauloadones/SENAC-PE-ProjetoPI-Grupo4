@@ -2,7 +2,6 @@ package com.example.appsenkaspi
 
 
 import androidx.room.*
-import com.example.appsenkaspi.data.AcaoComStatus
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -187,6 +186,68 @@ interface AcaoDao {
 
     @Query("SELECT * FROM acoes WHERE pilarId = :pilarId")
     suspend fun getAcoesPorPilarDireto(pilarId: Int): List<AcaoEntity>
+
+  @Query("""
+  SELECT
+    a.*,
+    COUNT(at.id) AS totalAtividades,
+    SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS ativasConcluidas
+  FROM acoes a
+  LEFT JOIN atividades at ON at.acaoId = a.id
+  WHERE a.pilarId = :pilarId
+  GROUP BY a.id
+""")
+  fun listarAcoesComStatusPorPilar(pilarId: Int): LiveData<List<AcaoComStatus>>
+
+
+  @Query("""
+  SELECT
+    a.*,
+    COUNT(at.id) AS totalAtividades,
+    SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS ativasConcluidas
+  FROM acoes a
+  LEFT JOIN atividades at ON at.acaoId = a.id
+  GROUP BY a.id
+""")
+  fun listarTodasAcoesComStatus(): LiveData<List<AcaoComStatus>>
+
+  @Query("""
+  SELECT
+    a.*,
+    COUNT(at.id) AS totalAtividades,
+    SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS ativasConcluidas
+  FROM acoes a
+  LEFT JOIN atividades at ON at.acaoId = a.id
+  WHERE a.pilarId = :pilarId
+  GROUP BY a.id
+""")
+  suspend fun listarAcoesComStatusPorPilarNow(pilarId: Int): List<AcaoComStatus>
+
+  @Query("""
+  SELECT
+    a.*,
+    COUNT(at.id) AS totalAtividades,
+    SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS ativasConcluidas
+  FROM acoes a
+  LEFT JOIN atividades at ON at.acaoId = a.id
+  GROUP BY a.id
+""")
+  suspend fun listarTodasAcoesComStatusNow(): List<AcaoComStatus>
+
+  @Query("""
+    SELECT
+        a.*,
+        COUNT(at.id) AS totalAtividades,
+        SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS ativasConcluidas
+    FROM acoes a
+    LEFT JOIN atividades at ON at.acaoId = a.id
+    WHERE a.pilarId IN (:pilarIds)
+    GROUP BY a.id
+""")
+  suspend fun listarAcoesComStatusPorPilares(pilarIds: List<Int>): List<AcaoComStatus>
+
+
+
 
 }
 

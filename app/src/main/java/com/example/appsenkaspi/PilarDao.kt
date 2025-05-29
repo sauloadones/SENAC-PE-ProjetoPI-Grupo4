@@ -2,6 +2,7 @@ package com.example.appsenkaspi
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import java.util.Date
 
 @Dao
 interface PilarDao {
@@ -43,6 +44,19 @@ interface PilarDao {
 
     @Query("SELECT nome FROM pilares WHERE id = :id")
     suspend fun getNomePilarPorId(id: Int): String?
+
+  @Query("SELECT * FROM pilares WHERE status IN (:statusList)")
+  fun listarPilaresPorStatus(statusList: List<StatusPilar>): LiveData<List<PilarEntity>>
+
+  @Query("UPDATE pilares SET status = :status, dataExcluido = :data WHERE id = :id")
+  suspend fun excluirPilarPorId(id: Int, status: StatusPilar, data: Date): Int
+
+  @Query("SELECT id, nome FROM pilares WHERE status IN (:status)")
+  fun listarIdsENomesPorStatus(status: List<StatusPilar>): LiveData<List<PilarNomeDTO>>
+
+  @Query("SELECT * FROM pilares WHERE status IN (:statusList)")
+  suspend fun getPilaresPorStatus(statusList: List<StatusPilar>): List<PilarEntity>
+
 
 
     @Query("SELECT * FROM pilares WHERE status = :status")

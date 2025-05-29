@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 
-import com.example.appsenkaspi.data.AcaoComStatus
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -98,5 +98,44 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun buscarPilarPorId(id: Int): PilarEntity? {
         return pilarDao.getPilarPorId(id)
     }
+
+  fun gerarResumoDashboard(pilarId: Int?, callback: (ResumoDashboard) -> Unit) {
+    viewModelScope.launch(Dispatchers.IO) {
+      val acoes = if (pilarId == null) {
+        val statusValidos = listOf(StatusPilar.PLANEJADO, StatusPilar.EM_ANDAMENTO, StatusPilar.CONCLUIDO)
+        val pilaresValidos = pilarDao.getPilaresPorStatus(statusValidos)
+        val idsValidos = pilaresValidos.map { it.id }
+        acaoDao.listarAcoesComStatusPorPilares(idsValidos)
+      } else {
+        acaoDao.listarAcoesComStatusPorPilarNow(pilarId)
+      }
+
+      val totalAcoes = acoes.size
+      val totalAtividades = acoes.sumOf { it.totalAtividades }
+      val concluidas = acoes.sumOf { it.ativasConcluidas }
+
+      val vencidas = if (pilarId == null) {
+        AppDatabase.getDatabase(getApplication()).atividadeDao().contarVencidasGeral()
+      } else {
+        AppDatabase.getDatabase(getApplication()).atividadeDao().contarVencidasPorPilar(pilarId)
+      }
+
+      val andamento = totalAtividades - concluidas - vencidas
+
+      withContext(Dispatchers.Main) {
+        callback(
+          ResumoDashboard(
+            totalAcoes = totalAcoes,
+            totalAtividades = totalAtividades,
+            atividadesConcluidas = concluidas,
+            atividadesAndamento = andamento,
+            atividadesAtraso = vencidas
+          )
+        )
+      }
+    }
+  }
+
+
 
 }

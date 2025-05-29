@@ -9,3 +9,4 @@ data class ProgressoAcao(
     val progresso: Float,
     val totalAtividades: Int
 )
+
