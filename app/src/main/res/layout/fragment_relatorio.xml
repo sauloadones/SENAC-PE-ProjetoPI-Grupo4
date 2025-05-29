@@ -316,7 +316,7 @@
         android:id="@+id/recyclerHistorico"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:paddingHorizontal="16dp"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/tvHistoricoTitulo"
