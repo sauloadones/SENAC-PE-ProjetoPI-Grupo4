@@ -8,6 +8,7 @@
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical">
 
+    <!-- Ícone do Relatório -->
     <ImageView
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -39,12 +40,22 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+    <!-- Novo TextView para mostrar o tipo de arquivo -->
+    <TextView
+        android:id="@+id/txtTipoArquivo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PDF"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Ícone da seta para detalhes -->
     <ImageView
+        android:id="@+id/btnDetalhes"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:src="@drawable/ic_baseline_chevron_right_24"
-        android:tint="#CCCCCC" />
+        android:tint="#FFFFFF" />
 
 </LinearLayout>
-
-

@@ -103,9 +103,7 @@ class LoginDialogFragment : DialogFragment() {
                     }
                     editor.apply()
 
-                    // Salva ID do funcionário para uso geral (não precisa criptografar aqui)
-                    val prefs = requireContext().getSharedPreferences("funcionario_prefs", Context.MODE_PRIVATE)
-                    prefs.edit().putInt("funcionario_id", funcionario.id).apply()
+                    salvarFuncionarioLogado(requireContext(), funcionario.id, funcionario.nomeUsuario)
 
                     funcionarioViewModel.logarFuncionario(funcionario)
                     startActivity(Intent(requireContext(), TelaPrincipalActivity::class.java))

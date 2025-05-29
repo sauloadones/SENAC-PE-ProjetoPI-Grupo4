@@ -1,6 +1,6 @@
-// Atualizado: PerfilFragment.kt com redimensionamento, logs e imagem circular
 package com.example.appsenkaspi
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,11 +11,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -129,6 +131,12 @@ class PerfilFragment : Fragment() {
       bannerImageLauncher.launch(intent)
     }
 
+    // NOVO: Configurar botão logout com confirmação
+    val logoutButton = view.findViewById<Button>(R.id.logoutButton)
+    logoutButton.setOnClickListener {
+      mostrarConfirmacaoLogout()
+    }
+
     lifecycleScope.launch {
       val funcionario = funcionarioDao.getFuncionarioById(idFuncionarioLogado)
       Log.d("PerfilFragment", "Funcionario carregado: $funcionario")
@@ -160,6 +168,40 @@ class PerfilFragment : Fragment() {
     }
 
     return view
+  }
+
+  private fun mostrarConfirmacaoLogout() {
+    AlertDialog.Builder(requireContext())
+      .setTitle("Confirmação")
+      .setMessage("Deseja realmente sair?")
+      .setPositiveButton("Sim") { dialog, _ ->
+        dialog.dismiss()
+        realizarLogout()
+      }
+      .setNegativeButton("Não") { dialog, _ ->
+        dialog.dismiss()
+      }
+      .create()
+      .show()
+  }
+
+  private fun realizarLogout() {
+    // Limpar SharedPreferences do login
+    val prefs = requireContext().getSharedPreferences("funcionario_prefs", Context.MODE_PRIVATE)
+    prefs.edit().clear().apply()
+
+    // Abrir MainActivity com animação suave e limpar backstack
+    val intent = Intent(requireContext(), MainActivity::class.java)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+    val options = ActivityOptionsCompat.makeCustomAnimation(
+      requireContext(),
+      android.R.anim.fade_in,
+      android.R.anim.fade_out
+    )
+
+    startActivity(intent, options.toBundle())
+    requireActivity().finish()
   }
 
   private fun redimensionarESalvarImagem(uriOriginal: Uri, nomeArquivo: String, largura: Int, altura: Int): Uri? {

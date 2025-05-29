@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Título do Relatório -->
+    <TextView
+        android:id="@+id/txtTitulo"
+        android:layout_width="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content"
+        android:text="Relatório por Pilar"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textStyle="bold"
+        android:textColor="#DCDCDC"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Nome do Pilar -->
+    <TextView
+        android:id="@+id/labelPilar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome do Pilar:"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/txtTitulo"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtPilar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Segurança"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@id/labelPilar"
+        app:layout_constraintStart_toEndOf="@id/labelPilar"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Data -->
+    <TextView
+        android:id="@+id/labelData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data:"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/labelPilar"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Tipo de Arquivo -->
+    <TextView
+        android:id="@+id/labelTipoArquivo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Arquivo:"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/txtData"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtTipoArquivo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="PDF"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@id/labelTipoArquivo"
+        app:layout_constraintStart_toEndOf="@id/labelTipoArquivo"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/txtData"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="25/05/2025 às 14:30"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@id/labelData"
+        app:layout_constraintStart_toEndOf="@id/labelData"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Link: Instalar arquivo novamente -->
+    <LinearLayout
+        android:id="@+id/btnBaixar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/txtTipoArquivo"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/tiparquivo"
+            android:tint="@android:color/holo_blue_dark"
+            android:contentDescription="Ícone de download" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Instalar arquivo novamente"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="16sp"
+            android:layout_marginStart="6dp"
+            />
+
+    </LinearLayout>
+
+
+    <!-- Botão Abrir arquivo -->
+    <Button
+        android:id="@+id/btnAbrir"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:text="Abrir arquivo"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_button_confirmar"
+        app:layout_constraintTop_toBottomOf="@id/btnBaixar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Botão Fechar -->
+    <Button
+        android:id="@+id/btnFechar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:text="Fechar"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_button_confirmar"
+        app:layout_constraintTop_toBottomOf="@id/btnAbrir"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/txtApagar"/>
+
+    <TextView
+        android:id="@+id/txtApagar"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_height="wrap_content"
+        android:text="Apagar item do histórico"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/btnFechar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

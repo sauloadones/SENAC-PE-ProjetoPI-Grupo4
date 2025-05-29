@@ -36,11 +36,12 @@ class RelatorioFragment : Fragment() {
     private val pilarViewModel: PilarViewModel by viewModels()
     private val apiService = RetrofitClient.apiService
     private val historicoRelatorios = mutableListOf<HistoricoRelatorio>()
-    private lateinit var historicoAdapter: HistoricoAdapter
+    private lateinit var relatorioAdapter: RelatorioAdapter
 
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
     private var isGeral: Boolean = true
+    private var nomeUsuarioLogado: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,13 +53,17 @@ class RelatorioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // >>>>> PEGAR NOME DO USUÁRIO LOGADO <<<<<
+        nomeUsuarioLogado = getFuncionarioNomeUsuario(requireContext())
+
         configurarSpinners()
         configurarBotoes()
         carregarPilares()
 
         binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
-        historicoAdapter = HistoricoAdapter(historicoRelatorios)
-        binding.recyclerHistorico.adapter = historicoAdapter
+        relatorioAdapter = RelatorioAdapter(historicoRelatorios)
+        binding.recyclerHistorico.adapter = relatorioAdapter
 
         val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         ContextCompat.getDrawable(requireContext(), R.drawable.my_divider)?.let { drawable ->
@@ -66,6 +71,7 @@ class RelatorioFragment : Fragment() {
             binding.recyclerHistorico.addItemDecoration(divider)
         }
 
+        // >>>>> CARREGAR HISTÓRICO COM BASE NO USUÁRIO LOGADO <<<<<
         carregarHistoricoSalvo()
 
         binding.textSelecionarPilar.measure(
@@ -80,6 +86,8 @@ class RelatorioFragment : Fragment() {
         binding.textSelecionarPilar.alpha = 0f
         binding.layoutSpinnerPilares.alpha = 0f
     }
+
+
 
     private fun configurarSpinners() {
         val tipoArquivoAdapter = ArrayAdapter.createFromResource(
@@ -203,6 +211,12 @@ class RelatorioFragment : Fragment() {
 
     private fun gerarRelatorio(tipo: String) {
         lifecycleScope.launch {
+            if (listaPilares.isEmpty()) {
+                Toast.makeText(requireContext(), "Impossível fazer relatório sem pilares cadastrados", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+                return@launch
+            }
+
             binding.progressBar.visibility = View.VISIBLE
             try {
                 val pilaresSelecionados = if (isGeral) {
@@ -271,21 +285,56 @@ class RelatorioFragment : Fragment() {
 
                 response?.let {
                     if (it.isSuccessful) {
-                        salvarArquivo(it.body(), "relatorio.$tipo")
+                        val caminhoDoArquivoSalvo = salvarArquivo(it.body(), "relatorio.$tipo")
+                        if (caminhoDoArquivoSalvo == null) {
+                            Toast.makeText(requireContext(), "Falha ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+                            binding.progressBar.visibility = View.GONE
+                            return@launch
+                        }
 
-                        // >>> Adiciona ao histórico <<<
+                        val acoesCount = listaDTO.sumOf { pilar -> pilar.acoes.size }
+                        val atividadesCount = listaDTO.sumOf { pilar -> pilar.acoes.sumOf { acao -> acao.atividades.size } }
+
+                        val statusGeral = if (listaDTO.all { pilar -> pilar.acoes.all { acao -> acao.status == "CONCLUIDO" } }) {
+                            "Concluído"
+                        } else {
+                            "Em andamento"
+                        }
+
+                        val responsaveisSet = listaDTO.flatMap { pilar ->
+                            pilar.acoes.flatMap { acao ->
+                                acao.atividades.map { it.responsavel }
+                            }
+                        }.toSet()
+
+                        val responsaveis = responsaveisSet.joinToString(", ")
+
+                        val nomePilar = if (!isGeral) listaDTO.firstOrNull()?.nome else null
+
                         val titulo = if (isGeral) "Relatório Geral" else "Relatório por Pilar"
                         val dataAtual = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()).format(Date())
 
-                        historicoRelatorios.add(0, HistoricoRelatorio(titulo, dataAtual))
-                        historicoAdapter.notifyItemInserted(0)
-                        HistoricoStorage.salvar(requireContext(), historicoRelatorios)
+                        val novoHistorico = HistoricoRelatorio(
+                            titulo = titulo,
+                            data = dataAtual,
+                            tipoArquivo = tipo,
+                            pilarNome = nomePilar,
+                            caminhoArquivo = caminhoDoArquivoSalvo
+                        )
+
+                        historicoRelatorios.add(0, novoHistorico)
+                        relatorioAdapter.notifyItemInserted(0)
+
+                        if (nomeUsuarioLogado != null) {
+                            HistoricoStorage.salvar(requireContext(), historicoRelatorios, nomeUsuarioLogado!!)
+                        }
                         binding.recyclerHistorico.visibility = View.VISIBLE
-                        // >>> Fim <<<
 
                     } else {
                         Toast.makeText(requireContext(), "Erro ao gerar relatório", Toast.LENGTH_SHORT).show()
                     }
+                } ?: run {
+                    Toast.makeText(requireContext(), "Resposta inválida do servidor", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
@@ -297,9 +346,8 @@ class RelatorioFragment : Fragment() {
         }
     }
 
-
-    private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String) {
-        if (body == null) return
+    private fun salvarArquivo(body: ResponseBody?, nomeArquivo: String): String? {
+        if (body == null) return null
 
         val resolver = requireContext().contentResolver
         val mimeType = when {
@@ -325,9 +373,9 @@ class RelatorioFragment : Fragment() {
 
         val itemUri = resolver.insert(collection, contentValues)
 
-        itemUri?.let { uri ->
+        return if (itemUri != null) {
             try {
-                resolver.openOutputStream(uri).use { outputStream ->
+                resolver.openOutputStream(itemUri).use { outputStream ->
                     body.byteStream().use { inputStream ->
                         val buffer = ByteArray(4096)
                         var bytesRead: Int
@@ -341,23 +389,28 @@ class RelatorioFragment : Fragment() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     contentValues.clear()
                     contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
+                    resolver.update(itemUri, contentValues, null, null)
                 }
 
                 Toast.makeText(requireContext(), "Arquivo salvo em Downloads", Toast.LENGTH_LONG).show()
+                itemUri.toString()
+
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(requireContext(), "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+                null
             }
-        } ?: run {
+        } else {
             Toast.makeText(requireContext(), "Erro ao acessar a pasta Downloads", Toast.LENGTH_SHORT).show()
+            null
         }
     }
 
     private fun carregarHistoricoSalvo() {
+        if (nomeUsuarioLogado == null) return
         historicoRelatorios.clear()
-        historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext()))
-        historicoAdapter.notifyDataSetChanged()
+        historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext(), nomeUsuarioLogado!!))
+        relatorioAdapter.notifyDataSetChanged()
         if (historicoRelatorios.isNotEmpty()) {
             binding.recyclerHistorico.visibility = View.VISIBLE
         }
@@ -367,4 +420,4 @@ class RelatorioFragment : Fragment() {
         _binding = null
         super.onDestroyView()
     }
-} 
+}
