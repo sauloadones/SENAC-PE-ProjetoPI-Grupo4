@@ -15,6 +15,13 @@
         <item>Excel</item>
         <item>Word</item>
     </string-array>
+    <string-array name="status_pilar_array">
+        <item>Escolha os status de pilares</item>
+        <item>Concluído</item>
+        <item>Excluído</item>
+        <item>Vencido</item>
+    </string-array>
+
 
 
 
