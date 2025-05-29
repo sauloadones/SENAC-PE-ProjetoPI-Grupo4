@@ -21,7 +21,7 @@ class HistoricoFragment : Fragment() {
     private var funcionarioLogadoId: Int = -1
     private var listaOriginal: List<PilarEntity> = emptyList()
 
-    // Filtro pelo status selecionado (null = todos)
+    // Filtro pelo status selecionado (null = todos os 3 do histórico)
     private var filtroStatus: StatusPilar? = null
 
     override fun onCreateView(
@@ -68,8 +68,13 @@ class HistoricoFragment : Fragment() {
             }
         }
 
+        // Aqui aplicamos o filtro de histórico diretamente
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-            listaOriginal = lista
+            listaOriginal = lista.filter { pilar ->
+                pilar.status == StatusPilar.CONCLUIDO ||
+                        pilar.status == StatusPilar.EXCLUIDO ||
+                        pilar.status == StatusPilar.VENCIDO
+            }
             aplicarFiltroStatus()
         }
     }
@@ -107,4 +112,3 @@ class HistoricoFragment : Fragment() {
         }
     }
 }
-
