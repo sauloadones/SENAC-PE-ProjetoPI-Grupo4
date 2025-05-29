@@ -4,5 +4,7 @@ data class HistoricoRelatorio(
     val titulo: String,
     val data: String,
     val pilarNome: String? = null,
-    val caminhoArquivo: String? = null
+    val caminhoArquivo: String? = null,
+    val tipoArquivo: String,
+    val urlArquivo: String? = null
 )

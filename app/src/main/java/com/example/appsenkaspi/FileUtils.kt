@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.app.DownloadManager
+import android.os.Environment
+import android.widget.Toast
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import java.io.File
@@ -55,3 +58,24 @@ fun getMimeType(path: String): String {
             else -> "*/*"
         }
     }
+
+fun baixarArquivo(context: Context, url: String, nomeArquivo: String, mimeType: String) {
+    try {
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setTitle("Baixando relatório")
+            .setDescription("Relatório está sendo baixado novamente...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, nomeArquivo)
+            .setMimeType(mimeType)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+
+        Toast.makeText(context, "Download iniciado...", Toast.LENGTH_SHORT).show()
+    } catch (e: Exception) {
+        Toast.makeText(context, "Erro ao baixar o arquivo.", Toast.LENGTH_SHORT).show()
+        e.printStackTrace()
+    }
+}

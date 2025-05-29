@@ -211,7 +211,6 @@ class RelatorioFragment : Fragment() {
 
     private fun gerarRelatorio(tipo: String) {
         lifecycleScope.launch {
-            // Verifica se existem pilares cadastrados antes de continuar
             if (listaPilares.isEmpty()) {
                 Toast.makeText(requireContext(), "Impossível fazer relatório sem pilares cadastrados", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
@@ -286,10 +285,13 @@ class RelatorioFragment : Fragment() {
 
                 response?.let {
                     if (it.isSuccessful) {
-
-
-                        // >>> Agora vamos calcular as informações para o histórico <<<
                         val caminhoDoArquivoSalvo = salvarArquivo(it.body(), "relatorio.$tipo")
+                        if (caminhoDoArquivoSalvo == null) {
+                            Toast.makeText(requireContext(), "Falha ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+                            binding.progressBar.visibility = View.GONE
+                            return@launch
+                        }
+
                         val acoesCount = listaDTO.sumOf { pilar -> pilar.acoes.size }
                         val atividadesCount = listaDTO.sumOf { pilar -> pilar.acoes.sumOf { acao -> acao.atividades.size } }
 
@@ -312,12 +314,10 @@ class RelatorioFragment : Fragment() {
                         val titulo = if (isGeral) "Relatório Geral" else "Relatório por Pilar"
                         val dataAtual = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()).format(Date())
 
-                        // Se tiver como pegar o caminho do arquivo, pode salvar aqui. Por enquanto vazio.
-                        val arquivoPath = ""
-
                         val novoHistorico = HistoricoRelatorio(
                             titulo = titulo,
                             data = dataAtual,
+                            tipoArquivo = tipo,
                             pilarNome = nomePilar,
                             caminhoArquivo = caminhoDoArquivoSalvo
                         )
@@ -333,6 +333,8 @@ class RelatorioFragment : Fragment() {
                     } else {
                         Toast.makeText(requireContext(), "Erro ao gerar relatório", Toast.LENGTH_SHORT).show()
                     }
+                } ?: run {
+                    Toast.makeText(requireContext(), "Resposta inválida do servidor", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
@@ -391,7 +393,7 @@ class RelatorioFragment : Fragment() {
                 }
 
                 Toast.makeText(requireContext(), "Arquivo salvo em Downloads", Toast.LENGTH_LONG).show()
-                itemUri.toString()  // Retorna o URI como string
+                itemUri.toString()
 
             } catch (e: Exception) {
                 e.printStackTrace()
