@@ -1,4 +1,9 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#3F51B5" />  <!-- Cor de fundo azul -->
-    <corners android:radius="8dp" />  <!-- Bordas arredondadas -->
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#133A5E">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#164773" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</ripple>
