@@ -2,24 +2,20 @@ package com.example.appsenkaspi
 
 import com.example.appsenkaspi.utils.baixarArquivo
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appsenkaspi.databinding.DialogDetalhesRelatorioBinding
 import com.example.appsenkaspi.utils.getMimeType
-import java.io.File
 import android.net.Uri
 
-class HistoricoAdapter(
+class RelatorioAdapter(
     private val lista: List<HistoricoRelatorio>
-) : RecyclerView.Adapter<HistoricoAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RelatorioAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titulo: TextView = view.findViewById(R.id.txtTitulo)

@@ -36,7 +36,7 @@ class RelatorioFragment : Fragment() {
     private val pilarViewModel: PilarViewModel by viewModels()
     private val apiService = RetrofitClient.apiService
     private val historicoRelatorios = mutableListOf<HistoricoRelatorio>()
-    private lateinit var historicoAdapter: HistoricoAdapter
+    private lateinit var relatorioAdapter: RelatorioAdapter
 
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
@@ -62,8 +62,8 @@ class RelatorioFragment : Fragment() {
         carregarPilares()
 
         binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
-        historicoAdapter = HistoricoAdapter(historicoRelatorios)
-        binding.recyclerHistorico.adapter = historicoAdapter
+        relatorioAdapter = RelatorioAdapter(historicoRelatorios)
+        binding.recyclerHistorico.adapter = relatorioAdapter
 
         val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         ContextCompat.getDrawable(requireContext(), R.drawable.my_divider)?.let { drawable ->
@@ -323,7 +323,7 @@ class RelatorioFragment : Fragment() {
                         )
 
                         historicoRelatorios.add(0, novoHistorico)
-                        historicoAdapter.notifyItemInserted(0)
+                        relatorioAdapter.notifyItemInserted(0)
 
                         if (nomeUsuarioLogado != null) {
                             HistoricoStorage.salvar(requireContext(), historicoRelatorios, nomeUsuarioLogado!!)
@@ -410,7 +410,7 @@ class RelatorioFragment : Fragment() {
         if (nomeUsuarioLogado == null) return
         historicoRelatorios.clear()
         historicoRelatorios.addAll(HistoricoStorage.carregar(requireContext(), nomeUsuarioLogado!!))
-        historicoAdapter.notifyDataSetChanged()
+        relatorioAdapter.notifyDataSetChanged()
         if (historicoRelatorios.isNotEmpty()) {
             binding.recyclerHistorico.visibility = View.VISIBLE
         }
