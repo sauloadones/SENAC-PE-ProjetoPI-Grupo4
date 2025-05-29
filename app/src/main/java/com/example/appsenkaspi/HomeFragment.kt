@@ -49,6 +49,7 @@ class HomeFragment : Fragment() {
       funcionario?.let {
         funcionarioLogadoId = it.id
 
+<<<<<<< HEAD
         configurarNotificacaoBadge(
           rootView = view,
           lifecycleOwner = viewLifecycleOwner,
@@ -63,6 +64,33 @@ class HomeFragment : Fragment() {
 
         recyclerView = binding.recyclerViewPilares
         cardAdicionarPilar = binding.cardAdicionarPilar
+=======
+        // Notificação e badge (se tiver)
+
+        // Configura badge de notificação
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { f ->
+          f?.let { func ->
+            configurarNotificacaoBadge(
+              rootView = view,
+              lifecycleOwner = viewLifecycleOwner,
+              fragmentManager = parentFragmentManager,
+              funcionarioId = func.id,
+              cargo = func.cargo,
+              viewModel = notificacaoViewModel
+            )
+          }
+        }
+
+        // Controle de visibilidade do botão "Adicionar Pilar"
+        binding.cardAdicionarPilar.visibility = when (it.cargo) {
+          Cargo.COORDENADOR -> View.VISIBLE
+          else -> View.GONE
+        }
+
+        // RecyclerView de pilares
+        recyclerView = view.findViewById(R.id.recyclerViewPilares)
+        cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
+>>>>>>> Historico
 
         adapter = PilarAdapter(
           onClickPilar = { pilar -> abrirTelaPilar(pilar) },
@@ -72,6 +100,7 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
+<<<<<<< HEAD
         // Atualiza os status antes de observar os pilares
         lifecycleScope.launch {
           pilarViewModel.atualizarStatusDeTodosOsPilares()
@@ -82,6 +111,17 @@ class HomeFragment : Fragment() {
           adapter.submitList(lista)
         }
 
+=======
+        // Filtrar só planejados e em andamento
+        pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
+          val listaFiltrada = lista.filter { pilar ->
+            pilar.status == StatusPilar.PLANEJADO || pilar.status == StatusPilar.EM_ANDAMENTO
+          }
+          adapter.submitList(listaFiltrada)
+        }
+
+        // Botão para criar novo pilar
+>>>>>>> Historico
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -94,6 +134,20 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
+<<<<<<< HEAD
+=======
+        // Botão histórico (box_historico)
+        val boxHistorico = view.findViewById<View>(R.id.box_historico)
+        boxHistorico.setOnClickListener {
+          val historicoFragment = HistoricoFragment()
+          parentFragmentManager.beginTransaction()
+            .replace(R.id.main_container, historicoFragment)
+            .addToBackStack(null)
+            .commit()
+        }
+
+        // Cor da barra de status do Android
+>>>>>>> Historico
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }

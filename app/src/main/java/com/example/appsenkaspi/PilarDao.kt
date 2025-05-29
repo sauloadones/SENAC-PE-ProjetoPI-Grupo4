@@ -59,6 +59,11 @@ interface PilarDao {
 
 
 
+    @Query("SELECT * FROM pilares WHERE status = :status")
+    fun listarPilaresPorStatus(status: StatusPilar): LiveData<List<PilarEntity>>
+
+    @Query("SELECT * FROM pilares WHERE status = :status AND dataExclusao = :dataExclusao")
+    fun listarPilaresPorStatusEData(status: StatusPilar, dataExclusao: String): LiveData<List<PilarEntity>>
 
 
 }

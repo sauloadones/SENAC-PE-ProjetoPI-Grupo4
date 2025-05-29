@@ -34,5 +34,6 @@ data class PilarEntity(
 
     @ColumnInfo(name = "status") val status: StatusPilar,
 
+    val dataExclusao: Date? = null
 
     )

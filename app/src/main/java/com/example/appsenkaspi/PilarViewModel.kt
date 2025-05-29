@@ -147,4 +147,15 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         pilarDao.getTodosPilares()
     }
 
+    fun listarPilaresPorStatusEData(
+        status: StatusPilar,
+        dataExclusao: String? = null
+    ): LiveData<List<PilarEntity>> {
+        return if (dataExclusao.isNullOrEmpty()) {
+            pilarDao.listarPilaresPorStatus(status)
+        } else {
+            pilarDao.listarPilaresPorStatusEData(status, dataExclusao)
+        }
+    }
+
 }
