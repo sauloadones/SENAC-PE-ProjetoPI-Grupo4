@@ -13,9 +13,9 @@ import com.example.appsenkaspi.databinding.DialogDetalhesRelatorioBinding
 import com.example.appsenkaspi.utils.getMimeType
 import android.net.Uri
 
-class RelatorioAdapter(
+class HistoricoAdapter(
     private val lista: List<HistoricoRelatorio>
-) : RecyclerView.Adapter<RelatorioAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<HistoricoAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titulo: TextView = view.findViewById(R.id.txtTitulo)

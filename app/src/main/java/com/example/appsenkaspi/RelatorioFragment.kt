@@ -36,7 +36,7 @@ class RelatorioFragment : Fragment() {
     private val pilarViewModel: PilarViewModel by viewModels()
     private val apiService = RetrofitClient.apiService
     private val historicoRelatorios = mutableListOf<HistoricoRelatorio>()
-    private lateinit var relatorioAdapter: RelatorioAdapter
+    private lateinit var relatorioAdapter: HistoricoAdapter
 
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
@@ -62,7 +62,7 @@ class RelatorioFragment : Fragment() {
         carregarPilares()
 
         binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
-        relatorioAdapter = RelatorioAdapter(historicoRelatorios)
+        relatorioAdapter = HistoricoAdapter(historicoRelatorios)
         binding.recyclerHistorico.adapter = relatorioAdapter
 
         val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
