@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
       funcionario?.let {
         funcionarioLogadoId = it.id
 
-<<<<<<< HEAD
+
         configurarNotificacaoBadge(
           rootView = view,
           lifecycleOwner = viewLifecycleOwner,
@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
 
         recyclerView = binding.recyclerViewPilares
         cardAdicionarPilar = binding.cardAdicionarPilar
-=======
+
         // Notificação e badge (se tiver)
 
         // Configura badge de notificação
@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
         // RecyclerView de pilares
         recyclerView = view.findViewById(R.id.recyclerViewPilares)
         cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
->>>>>>> Historico
+
 
         adapter = PilarAdapter(
           onClickPilar = { pilar -> abrirTelaPilar(pilar) },
@@ -100,7 +100,7 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-<<<<<<< HEAD
+
         // Atualiza os status antes de observar os pilares
         lifecycleScope.launch {
           pilarViewModel.atualizarStatusDeTodosOsPilares()
@@ -111,7 +111,7 @@ class HomeFragment : Fragment() {
           adapter.submitList(lista)
         }
 
-=======
+
         // Filtrar só planejados e em andamento
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
           val listaFiltrada = lista.filter { pilar ->
@@ -121,7 +121,7 @@ class HomeFragment : Fragment() {
         }
 
         // Botão para criar novo pilar
->>>>>>> Historico
+
         cardAdicionarPilar.setOnClickListener {
           val fragment = CriarPilarFragment().apply {
             arguments = Bundle().apply {
@@ -134,8 +134,7 @@ class HomeFragment : Fragment() {
             .commit()
         }
 
-<<<<<<< HEAD
-=======
+
         // Botão histórico (box_historico)
         val boxHistorico = view.findViewById<View>(R.id.box_historico)
         boxHistorico.setOnClickListener {
@@ -147,7 +146,7 @@ class HomeFragment : Fragment() {
         }
 
         // Cor da barra de status do Android
->>>>>>> Historico
+
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
       }
