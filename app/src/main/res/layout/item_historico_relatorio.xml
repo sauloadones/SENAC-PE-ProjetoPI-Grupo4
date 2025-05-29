@@ -53,8 +53,8 @@
     <!-- Ícone da seta para detalhes -->
     <ImageView
         android:id="@+id/btnDetalhes"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:src="@drawable/ic_baseline_chevron_right_24"
         android:tint="#FFFFFF" />
 

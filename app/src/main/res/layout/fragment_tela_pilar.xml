@@ -226,11 +226,13 @@
     <!-- Lista de Ações -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAcoes"
-        android:layout_width="370dp"
-        android:layout_height="480dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingTop="12dp"
         android:paddingBottom="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintTop_toBottomOf="@id/cabecalhoCard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
