@@ -23,15 +23,13 @@
             android:id="@+id/container_historico"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:background="@drawable/bg_historico_box"
             android:padding="16dp"
-            android:gravity="center_horizontal"
-            android:elevation="4dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:elevation="4dp">
 
-            <!-- Título do Histórico -->
             <TextView
                 android:id="@+id/texto_historico"
                 android:layout_width="wrap_content"
@@ -40,35 +38,60 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:textSize="25sp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Spinner com a cor de fundo e texto personalizado -->
-            <Spinner
-                android:id="@+id/spinnerStatusFiltro"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_gravity="center_horizontal"
-                android:entries="@array/status_pilar_array"
-                android:background="@drawable/spinner_background_historico"
-                android:popupBackground="@drawable/spinner_dropdown_background"
-                android:layout_marginBottom="7dp"
-                android:gravity="center" />
-
+                android:layout_gravity="center" />
         </LinearLayout>
 
-        <!-- RecyclerView fora do container_historico -->
+        <!-- Spinners lado a lado -->
+        <LinearLayout
+            android:id="@+id/spinner_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:weightSum="2">
+
+            <Spinner
+                android:id="@+id/spinnerStatusFilter"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@android:color/white"
+                android:spinnerMode="dropdown" />
+
+            <Spinner
+                android:id="@+id/spinnerStatusFiltro"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@android:color/white"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <!-- Texto do filtro ativo -->
+        <TextView
+            android:id="@+id/textoFiltroAtivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Status: TODOS | Ano: TODOS"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerFiltroExclusao"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="0dp"
-            android:elevation="4dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_pilar" />
-
+            tools:listitem="@layout/item_pilar"
+            android:clipToPadding="false"
+            android:paddingBottom="24dp" />
 
     </LinearLayout>
 </ScrollView>

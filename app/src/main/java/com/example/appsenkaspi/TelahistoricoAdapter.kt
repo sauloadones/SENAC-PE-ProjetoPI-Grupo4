@@ -23,7 +23,7 @@ class TelaHistoricoAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoricoViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_pilar_historico, parent, false) // <- corrigido aqui
+            .inflate(R.layout.item_pilar_historico, parent, false)
         return HistoricoViewHolder(view)
     }
 
@@ -75,15 +75,6 @@ class TelaHistoricoAdapter(
 
     fun atualizarLista(novaLista: List<PilarEntity>) {
         listaPilares = novaLista
-        notifyDataSetChanged()
-    }
-
-    fun atualizarListaComFiltro(lista: List<PilarEntity>) {
-        listaPilares = lista.filter {
-            it.status == StatusPilar.CONCLUIDO ||
-                    it.status == StatusPilar.EXCLUIDO ||
-                    it.status == StatusPilar.VENCIDO
-        }
         notifyDataSetChanged()
     }
 

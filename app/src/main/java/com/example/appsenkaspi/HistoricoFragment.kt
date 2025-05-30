@@ -5,13 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import java.util.*
 
 class HistoricoFragment : Fragment() {
 
@@ -21,8 +25,10 @@ class HistoricoFragment : Fragment() {
     private var funcionarioLogadoId: Int = -1
     private var listaOriginal: List<PilarEntity> = emptyList()
 
-    // Filtro pelo status selecionado (null = todos os 3 do histórico)
-    private var filtroStatus: StatusPilar? = null
+    private var textoFiltroAtivo: TextView? = null
+
+    private var filtroStatusSelecionado: String? = null
+    private var filtroAnoSelecionado: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,23 +48,60 @@ class HistoricoFragment : Fragment() {
         }
         recyclerView.adapter = adapter
 
-        val spinnerStatus = view.findViewById<Spinner>(R.id.spinnerStatusFiltro)
-        spinnerStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        val spinnerStatusFilter = view.findViewById<Spinner>(R.id.spinnerStatusFilter)
+        val spinnerAnoFiltro = view.findViewById<Spinner>(R.id.spinnerStatusFiltro) // ano spinner
+
+        textoFiltroAtivo = view.findViewById(R.id.textoFiltroAtivo)
+
+        val itensStatus = resources.getStringArray(R.array.status_pilar_array)
+        val itensAno = resources.getStringArray(R.array.ano_pilar_array)
+
+        // Adapter para Status
+        val adapterStatus = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            itensStatus
+        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+        // Adapter para Ano
+        val adapterAno = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            itensAno
+        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+        spinnerStatusFilter.adapter = adapterStatus
+        spinnerAnoFiltro.adapter = adapterAno
+
+        spinnerStatusFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
-                filtroStatus = when (position) {
-                    1 -> StatusPilar.CONCLUIDO
-                    2 -> StatusPilar.EXCLUIDO
-                    3 -> StatusPilar.VENCIDO
-                    else -> null // "Todos"
-                }
-                aplicarFiltroStatus()
+                filtroStatusSelecionado = parent?.getItemAtPosition(position)?.toString()
+                aplicarFiltros()
+                atualizarTextoFiltro()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                filtroStatus = null
-                aplicarFiltroStatus()
+                filtroStatusSelecionado = null
+                aplicarFiltros()
+                atualizarTextoFiltro()
+            }
+        }
+
+        spinnerAnoFiltro.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+            ) {
+                filtroAnoSelecionado = parent?.getItemAtPosition(position)?.toString()
+                aplicarFiltros()
+                atualizarTextoFiltro()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                filtroAnoSelecionado = null
+                aplicarFiltros()
+                atualizarTextoFiltro()
             }
         }
 
@@ -68,24 +111,44 @@ class HistoricoFragment : Fragment() {
             }
         }
 
-        // Aqui aplicamos o filtro de histórico diretamente
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
+            // Mantém somente os status que você deseja mostrar no histórico
             listaOriginal = lista.filter { pilar ->
                 pilar.status == StatusPilar.CONCLUIDO ||
                         pilar.status == StatusPilar.EXCLUIDO ||
                         pilar.status == StatusPilar.VENCIDO
             }
-            aplicarFiltroStatus()
+            aplicarFiltros()
         }
     }
 
-    private fun aplicarFiltroStatus() {
-        val filtrados = if (filtroStatus == null) {
-            listaOriginal
-        } else {
-            listaOriginal.filter { it.status == filtroStatus }
+    private fun aplicarFiltros() {
+        val filtrados = listaOriginal.filter { pilar ->
+            val statusOk = filtroStatusSelecionado == null ||
+                    filtroStatusSelecionado.equals("TODOS", ignoreCase = true) ||
+                    pilar.status.name.equals(filtroStatusSelecionado, ignoreCase = true)
+
+            val ano = extrairAno(pilar.dataPrazo)?.toString()
+            val anoOk = filtroAnoSelecionado == null ||
+                    filtroAnoSelecionado.equals("TODOS", ignoreCase = true) ||
+                    ano == filtroAnoSelecionado
+
+            statusOk && anoOk
         }
         adapter.atualizarLista(filtrados)
+    }
+
+    private fun extrairAno(data: Date?): Int? {
+        if (data == null) return null
+        val cal = Calendar.getInstance()
+        cal.time = data
+        return cal.get(Calendar.YEAR)
+    }
+
+    private fun atualizarTextoFiltro() {
+        val status = filtroStatusSelecionado ?: "TODOS"
+        val ano = filtroAnoSelecionado ?: "TODOS"
+        textoFiltroAtivo?.text = "Status: $status | Ano: $ano"
     }
 
     private fun abrirTelaPilar(pilar: PilarEntity) {
