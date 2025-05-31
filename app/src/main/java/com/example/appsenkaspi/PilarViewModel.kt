@@ -101,16 +101,22 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         if (somaTotalAtividades > 0) somaPesos / somaTotalAtividades else 0f
       }
     }
-
   suspend fun atualizarStatusAutomaticamente(pilarId: Int) {
     val pilar = pilarDao.getById(pilarId) ?: return
     val progresso = calcularProgressoInterno(pilarId)
     val hoje = Calendar.getInstance().time
-    if (pilar.status == StatusPilar.CONCLUIDO || pilar.status == StatusPilar.EXCLUIDO) return
 
+    if (pilar.status == StatusPilar.EXCLUIDO) return
+
+    // Se for CONCLUIDO e progresso ainda >= 1 → mantém concluído
+    if (pilar.status == StatusPilar.CONCLUIDO && progresso >= 1f) {
+      Log.d("StatusAuto", "Mantendo CONCLUIDO pois foi definido manualmente.")
+      return
+    }
 
     val novoStatus = when {
-      progresso >= 1f && hoje.after(pilar.dataPrazo)-> StatusPilar.CONCLUIDO
+      progresso >= 1f && hoje.after(pilar.dataPrazo) -> StatusPilar.CONCLUIDO
+      progresso < 1f && pilar.status == StatusPilar.CONCLUIDO -> StatusPilar.EM_ANDAMENTO
       hoje.after(pilar.dataPrazo) -> StatusPilar.VENCIDO
       progresso == 0f -> StatusPilar.PLANEJADO
       else -> StatusPilar.EM_ANDAMENTO
@@ -125,6 +131,11 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
       pilarDao.atualizarPilar(novoPilar)
     }
   }
+
+
+
+
+
 
   fun atualizarStatusDeTodosOsPilares() = viewModelScope.launch(Dispatchers.IO) {
     val todosPilares = pilarDao.getTodosPilares()
