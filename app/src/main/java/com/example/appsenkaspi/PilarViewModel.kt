@@ -107,7 +107,7 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     if (pilar.status == StatusPilar.EXCLUIDO) return
 
     val novoStatus = when {
-      progresso >= 1f -> StatusPilar.CONCLUIDO
+      progresso >= 1f && hoje.after(pilar.dataPrazo)-> StatusPilar.CONCLUIDO
       hoje.after(pilar.dataPrazo) -> StatusPilar.VENCIDO
       progresso == 0f -> StatusPilar.PLANEJADO
       else -> StatusPilar.EM_ANDAMENTO
