@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appsenkaspi.databinding.FragmentTelaPilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class TelaPilarFragment : Fragment() {
@@ -44,7 +47,8 @@ class TelaPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
-        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+
+      funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
           funcionario?.let {
             configurarNotificacaoBadge(
               rootView = view,
@@ -104,35 +108,62 @@ class TelaPilarFragment : Fragment() {
                     parentFragmentManager.popBackStack()
                 }
             }
+      binding.cardConcluirPilar.setOnClickListener {
+        lifecycleScope.launch {
+          pilarViewModel.concluirPilar(pilarId)
 
-        configurarRecycler()
+          // Recarrega os dados do pilar após atualizar o status
+          pilarViewModel.getPilarById(pilarId).observe(viewLifecycleOwner) { pilar ->
+            if (pilar != null) {
+              preencherCamposComPilar(pilar)
+              Toast.makeText(requireContext(), "Pilar concluído com sucesso!", Toast.LENGTH_SHORT).show()
+            }
+          }
+        }
+      }
+
+
+
+
+
+      configurarRecycler()
         configurarBotoes()
         binding.iconeMenu.setOnClickListener { toggleSobre() }
         observarAcoes()
     }
 
-    private fun preencherCamposComPilar(pilar: PilarEntity) {
-        binding.tituloPilar.text = "${pilar.id}° Pilar"
-        binding.subtituloPilar.apply {
-            text = pilar.nome.ifBlank { "Sem nome" }
-            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        }
-
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
-        binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
-
-        // Chamada para calcular progresso real
-      viewLifecycleOwner.lifecycleScope.launch {
-        val progresso = pilarViewModel.calcularProgressoInterno(pilar.id)
-        pilarViewModel.atualizarStatusAutomaticamente(pilar.id)
-        animarProgresso((progresso * 100).toInt())
-      }
-
+  private fun preencherCamposComPilar(pilar: PilarEntity) {
+    binding.tituloPilar.text = "${pilar.id}° Pilar"
+    binding.subtituloPilar.apply {
+      text = pilar.nome.ifBlank { "Sem nome" }
+      paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
     }
 
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
+    binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
 
-    private fun configurarBotoes() {
+    // Lógica consolidada
+    viewLifecycleOwner.lifecycleScope.launch {
+      val progresso = pilarViewModel.calcularProgressoInterno(pilar.id)
+      pilarViewModel.atualizarStatusAutomaticamente(pilar.id)
+      animarProgresso((progresso * 100).toInt())
+
+      val pilarAtualizado = pilarViewModel.getPilarById(pilar.id).value ?: pilar // fallback se LiveData não emitiu
+
+      if (pilarAtualizado.status == StatusPilar.CONCLUIDO) {
+        binding.cardConcluirPilar.visibility = View.GONE
+      } else {
+        val dataVencimento = pilar.dataPrazo.toLocalDate()
+        val podeConcluir = pilarViewModel.podeConcluirPilar(pilarId, dataVencimento)
+        binding.cardConcluirPilar.visibility = if (podeConcluir) View.VISIBLE else View.GONE
+      }
+    }
+  }
+
+
+
+  private fun configurarBotoes() {
         binding.cardEditarPilar.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.main_container, EditarPilarFragment().apply {
@@ -164,6 +195,12 @@ class TelaPilarFragment : Fragment() {
             binding.headerLayout.elevation = 16f
         }
     }
+
+  private fun Date.toLocalDate(): LocalDate {
+    return this.toInstant()
+      .atZone(ZoneId.systemDefault())
+      .toLocalDate()
+  }
 
     private fun animarProgresso(target: Int) {
         ObjectAnimator.ofInt(binding.progressoPilar, "progress", target).apply {

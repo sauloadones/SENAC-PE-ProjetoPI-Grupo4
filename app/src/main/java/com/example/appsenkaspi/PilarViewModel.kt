@@ -11,7 +11,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
 import java.util.Calendar
+import java.util.Date
 import kotlin.collections.*
 
 class PilarViewModel(application: Application) : AndroidViewModel(application) {
@@ -104,7 +106,8 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     val pilar = pilarDao.getById(pilarId) ?: return
     val progresso = calcularProgressoInterno(pilarId)
     val hoje = Calendar.getInstance().time
-    if (pilar.status == StatusPilar.EXCLUIDO) return
+    if (pilar.status == StatusPilar.CONCLUIDO || pilar.status == StatusPilar.EXCLUIDO) return
+
 
     val novoStatus = when {
       progresso >= 1f && hoje.after(pilar.dataPrazo)-> StatusPilar.CONCLUIDO
@@ -129,6 +132,31 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
       atualizarStatusAutomaticamente(pilar.id)
     }
   }
+
+  suspend fun podeConcluirPilar(pilarId: Int, dataVencimento: LocalDate): Boolean {
+    val progresso = calcularProgressoInterno(pilarId)
+    val hoje = LocalDate.now()
+
+    return progresso >= 1f && (hoje.isBefore(dataVencimento) || hoje.isEqual(dataVencimento))
+  }
+
+  fun concluirPilar(pilarId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    val hoje = Calendar.getInstance().time
+
+    Log.d("ConcluirPilar", "Atualizando status para CONCLUIDO com dataConclusao = $hoje para pilarId=$pilarId")
+
+    val linhasAfetadas = pilarDao.atualizarStatusEDataConclusao(
+      pilarId,
+      StatusPilar.CONCLUIDO, // ✅ enum diretamente, sem .name nem .lowercase()
+      hoje
+    )
+
+    Log.d("ConcluirPilar", "Linhas afetadas na atualização: $linhasAfetadas")
+  }
+
+
+
+
 
 
 
