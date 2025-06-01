@@ -50,7 +50,8 @@ interface SubpilarDao {
   @Query("SELECT * FROM subpilares WHERE pilarId = :pilarId")
   suspend fun listarPorPilarDireto(pilarId: Int): List<SubpilarEntity>
 
-
+  @Query("SELECT * FROM subpilares WHERE id = :id LIMIT 1")
+  suspend fun getSubpilarPorId(id: Int): SubpilarEntity?
 
 
 

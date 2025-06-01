@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -108,6 +109,7 @@ class EditarAtividadeFragment : Fragment() {
       }
 
       viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+        if (!validarDatasComPilar()) return@launch
         val nomePilar = AppDatabase.getDatabase(requireContext())
           .pilarDao()
           .getNomePilarPorId(atividadeOriginal.acaoId) ?: "Indefinido"
@@ -169,17 +171,19 @@ class EditarAtividadeFragment : Fragment() {
       return
     }
 
-    val atividadeAtualizada = atividadeOriginal.copy(
-      nome = nome,
-      descricao = descricao,
-      dataInicio = dataInicio!!,
-      dataPrazo = dataFim!!,
-      prioridade = prioridadeSelecionada!!,
-      funcionarioId = funcionariosSelecionados.first().id,
-      status = atividadeOriginal.status
-    )
-
     viewLifecycleOwner.lifecycleScope.launch {
+      if (!validarDatasComPilar()) return@launch
+
+      val atividadeAtualizada = atividadeOriginal.copy(
+        nome = nome,
+        descricao = descricao,
+        dataInicio = dataInicio!!,
+        dataPrazo = dataFim!!,
+        prioridade = prioridadeSelecionada!!,
+        funcionarioId = funcionariosSelecionados.first().id,
+        status = atividadeOriginal.status
+      )
+
       val appDb = AppDatabase.getDatabase(requireContext())
       val atividadeDao = appDb.atividadeDao()
       val funcionarioDao = appDb.funcionarioDao()
@@ -224,6 +228,7 @@ class EditarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
     }
   }
+
 
 
 
@@ -321,6 +326,44 @@ class EditarAtividadeFragment : Fragment() {
       container.addView(imageView)
     }
   }
+  private suspend fun validarDatasComPilar(): Boolean {
+    val acao = acaoViewModel.buscarAcaoPorId(atividadeOriginal.acaoId)
+    val pilar = acao?.pilarId?.let {
+      AppDatabase.getDatabase(requireContext()).pilarDao().getById(it)
+    }
+
+    val dataPrazoPilar = pilar?.dataPrazo
+    if (dataInicio == null || dataFim == null || dataPrazoPilar == null) {
+      withContext(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "Erro ao validar datas com o pilar.", Toast.LENGTH_SHORT).show()
+      }
+      return false
+    }
+
+    if (!dataInicio!!.before(dataPrazoPilar)) {
+      withContext(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "A data de início deve ser antes do prazo do pilar.", Toast.LENGTH_SHORT).show()
+      }
+      return false
+    }
+
+    if (dataFim!!.before(dataInicio)) {
+      withContext(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
+      }
+      return false
+    }
+
+    if (dataFim!!.after(dataPrazoPilar)) {
+      withContext(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo do pilar.", Toast.LENGTH_SHORT).show()
+      }
+      return false
+    }
+
+    return true
+  }
+
 
   override fun onDestroyView() {
     super.onDestroyView()

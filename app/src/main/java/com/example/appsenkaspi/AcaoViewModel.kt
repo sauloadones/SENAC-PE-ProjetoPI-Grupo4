@@ -156,6 +156,10 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
   }
+  suspend fun buscarSubpilarPorId(id: Int): SubpilarEntity? {
+    return subpilarDao.getSubpilarPorId(id)
+  }
+
 
 
 

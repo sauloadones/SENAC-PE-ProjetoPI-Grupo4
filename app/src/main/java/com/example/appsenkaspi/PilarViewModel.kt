@@ -107,18 +107,28 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     val hoje = Calendar.getInstance().time
 
     if (pilar.status == StatusPilar.EXCLUIDO) return
-
-    // Se for CONCLUIDO e progresso ainda >= 1 → mantém concluído
     if (pilar.status == StatusPilar.CONCLUIDO && progresso >= 1f) {
       Log.d("StatusAuto", "Mantendo CONCLUIDO pois foi definido manualmente.")
       return
     }
 
+    val passouPrazo = hoje.after(pilar.dataPrazo)
+
     val novoStatus = when {
-      progresso >= 1f && hoje.after(pilar.dataPrazo) -> StatusPilar.CONCLUIDO
+      // 🔁 Se era VENCIDO e prazo foi prorrogado → vai para EM_ANDAMENTO
+      pilar.status == StatusPilar.VENCIDO && !passouPrazo -> StatusPilar.EM_ANDAMENTO
+
+      // ✅ Só conclui automaticamente se passou do prazo E progresso 100%
+      progresso >= 1f && passouPrazo -> StatusPilar.CONCLUIDO
+
+      // 🔄 Continua vencido se passou o prazo e não está concluído
+      progresso < 1f && passouPrazo -> StatusPilar.VENCIDO
+
+      // 🔁 Estava CONCLUIDO mas progresso caiu
       progresso < 1f && pilar.status == StatusPilar.CONCLUIDO -> StatusPilar.EM_ANDAMENTO
-      hoje.after(pilar.dataPrazo) -> StatusPilar.VENCIDO
+
       progresso == 0f -> StatusPilar.PLANEJADO
+
       else -> StatusPilar.EM_ANDAMENTO
     }
 
@@ -129,8 +139,11 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
         pilar.copy(status = novoStatus)
       }
       pilarDao.atualizarPilar(novoPilar)
+      Log.d("StatusAuto", "Status atualizado: ${pilar.status} → $novoStatus")
     }
   }
+
+
 
 
 

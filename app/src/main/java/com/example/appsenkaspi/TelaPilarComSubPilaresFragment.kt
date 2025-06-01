@@ -89,11 +89,13 @@ class TelaPilarComSubpilaresFragment : Fragment() {
           Cargo.APOIO, Cargo.GESTOR -> {
             binding.cardEditarPilar.visibility = View.GONE
             binding.cardAdicionarSubPilares.visibility = View.GONE
+            binding.cardConcluirPilar.visibility = View.GONE
           }
 
           Cargo.COORDENADOR -> {
             binding.cardEditarPilar.visibility = View.VISIBLE
             binding.cardAdicionarSubPilares.visibility = View.VISIBLE
+            binding.cardConcluirPilar.visibility = View.VISIBLE
           }
 
           else -> {

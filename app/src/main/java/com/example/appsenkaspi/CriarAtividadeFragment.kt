@@ -22,6 +22,7 @@ class CriarAtividadeFragment : Fragment() {
 
   private var _binding: FragmentCriarAtividadeBinding? = null
   private val binding get() = _binding!!
+  private var dataPrazoPilar: Date? = null
 
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
@@ -65,6 +66,15 @@ class CriarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
       return
     }
+    lifecycleScope.launch(Dispatchers.IO) {
+      val acao = acaoViewModel.buscarAcaoPorId(acaoId)
+      val pilar = acao?.pilarId?.let {
+        AppDatabase.getDatabase(requireContext()).pilarDao().getById(it)
+      }
+
+      dataPrazoPilar = pilar?.dataPrazo
+    }
+
 
     parentFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
       val selecionados = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: return@setFragmentResultListener
@@ -88,6 +98,8 @@ class CriarAtividadeFragment : Fragment() {
     binding.textDataFim.setOnClickListener { abrirDatePicker(false) }
 
     binding.botaoConfirmarAtividade.setOnClickListener {
+      if (!validarDatasComPilar()) return@setOnClickListener
+
       confirmarCriacaoAtividade()
     }
 
@@ -95,6 +107,7 @@ class CriarAtividadeFragment : Fragment() {
       val nome = binding.inputNomeAtividade.text.toString().trim()
       val descricao = binding.inputDescricao.text.toString().trim()
       val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
+      if (!validarDatasComPilar()) return@setOnClickListener
 
       when {
         nome.isEmpty() -> {
@@ -303,6 +316,31 @@ class CriarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
     }
   }
+  private fun validarDatasComPilar(): Boolean {
+    if (dataInicio == null || dataFim == null || dataPrazoPilar == null) {
+      Toast.makeText(requireContext(), "Erro ao validar datas: valores nulos.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (!dataInicio!!.before(dataPrazoPilar)) {
+      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo do pilar.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (dataFim!!.before(dataInicio)) {
+      Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (dataFim!!.after(dataPrazoPilar)) {
+      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo do pilar.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    return true
+  }
+
+
 
   override fun onDestroyView() {
     super.onDestroyView()

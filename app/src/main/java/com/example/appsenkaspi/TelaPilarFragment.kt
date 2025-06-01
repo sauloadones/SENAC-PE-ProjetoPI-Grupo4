@@ -68,6 +68,7 @@ class TelaPilarFragment : Fragment() {
                 Cargo.APOIO -> {
                     binding.cardEditarPilar.visibility = View.GONE
                     binding.cardAdicionarAcoes.visibility = View.VISIBLE
+                    binding.cardConcluirPilar.visibility = View.GONE
                 }
 
                 Cargo.COORDENADOR -> {
@@ -78,6 +79,7 @@ class TelaPilarFragment : Fragment() {
                 Cargo.GESTOR -> {
                     binding.cardEditarPilar.visibility = View.GONE
                     binding.cardAdicionarAcoes.visibility = View.GONE
+                    binding.cardConcluirPilar.visibility = View.GONE
 
                 }
 
