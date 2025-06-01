@@ -39,5 +39,21 @@ interface SubpilarDao {
   suspend fun getQuantidadePorPilar(pilarId: Int): Int
 
 
+    @Query("SELECT EXISTS (SELECT 1 FROM subpilares WHERE pilarId = :pilarId)")
+    suspend fun existeSubpilarParaPilar(pilarId: Int): Boolean
+
+    @Query("SELECT * FROM subpilares WHERE pilarId = :pilarId")
+    suspend fun listarPorPilar(pilarId: Int): List<SubpilarEntity>
+
+
+  // ✅ Adicione este agora, para uso direto em coroutines
+  @Query("SELECT * FROM subpilares WHERE pilarId = :pilarId")
+  suspend fun listarPorPilarDireto(pilarId: Int): List<SubpilarEntity>
+
+
+
+
+
+
 
 }

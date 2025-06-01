@@ -178,6 +178,10 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
     return AppDatabase.getDatabase(getApplication()).pilarDao().listarIdsENomesPorStatus(statusParaDashboard)
   }
 
+  fun listarAcaoIdsENomes(): LiveData<List<PilarNomeDTO>> {
+    return AppDatabase.getDatabase(getApplication()).pilarDao().listarIdsENomesPorStatus(statusParaDashboard)
+  }
+
   suspend fun getPilaresParaDashboard(): List<PilarEntity> {
     return pilarDao.getPilaresPorStatus(statusParaDashboard)
   }
@@ -196,5 +200,103 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
             pilarDao.listarPilaresPorStatusEData(status, dataExclusao)
         }
     }
+  suspend fun calcularProgressoDosSubpilares(pilarId: Int): List<Pair<String, Float>> {
+    val subpilares = AppDatabase.getDatabase(getApplication()).subpilarDao().listarPorPilar(pilarId)
+    val acaoDao = AppDatabase.getDatabase(getApplication()).acaoDao()
+    val atividadeDao = AppDatabase.getDatabase(getApplication()).atividadeDao()
+
+    val resultado = mutableListOf<Pair<String, Float>>()
+
+    for (subpilar in subpilares) {
+      val acoes = acaoDao.listarPorSubpilares(subpilar.id)
+      val atividades = acoes.flatMap { acao ->
+        acao.id?.let { atividadeDao.listarPorAcao(it) } ?: emptyList()
+      }
+
+
+      val total = atividades.size
+      val concluidas = atividades.count { it.status == StatusAtividade.CONCLUIDA }
+
+      val progresso = if (total > 0) concluidas.toFloat() / total else 0f
+      resultado.add(subpilar.nome to progresso)
+    }
+
+    return resultado
+  }
+  fun gerarResumoPorSubpilares(pilarId: Int, callback: (ResumoDashboard) -> Unit) {
+    viewModelScope.launch(Dispatchers.IO) {
+      val db = AppDatabase.getDatabase(getApplication())
+      val subpilares = db.subpilarDao().listarPorPilarDireto(pilarId)
+      val acaoDao = db.acaoDao()
+      val atividadeDao = db.atividadeDao()
+
+      var totalAcoes = 0
+      var totalAtividades = 0
+      var atividadesConcluidas = 0
+      var atividadesAndamento = 0
+      var atividadesAtraso = 0
+
+      for (sub in subpilares) {
+        val acoes = acaoDao.listarPorSubpilares(sub.id)
+          totalAcoes += acoes.size
+
+        for (acao in acoes) {
+          val atividades = acao.id?.let { atividadeDao.listarPorAcao(it) } ?: emptyList()
+          totalAtividades += atividades.size
+          atividadesConcluidas += atividades.count { it.status == StatusAtividade.CONCLUIDA }
+          atividadesAndamento += atividades.count { it.status == StatusAtividade.EM_ANDAMENTO }
+          atividadesAtraso += atividades.count { it.status == StatusAtividade.VENCIDA }
+        }
+      }
+
+      val resumo = ResumoDashboard(
+        totalAcoes = totalAcoes,
+        totalAtividades = totalAtividades,
+        atividadesConcluidas = atividadesConcluidas,
+        atividadesAndamento = atividadesAndamento,
+        atividadesAtraso = atividadesAtraso
+      )
+
+      withContext(Dispatchers.Main) {
+        callback(resumo)
+      }
+    }
+  }
+  suspend fun gerarResumoPorSubpilaresDireto(pilarId: Int): ResumoDashboard {
+    val db = AppDatabase.getDatabase(getApplication())
+    val subpilares = db.subpilarDao().listarPorPilarDireto(pilarId)
+    val acaoDao = db.acaoDao()
+    val atividadeDao = db.atividadeDao()
+
+    var totalAcoes = 0
+    var totalAtividades = 0
+    var atividadesConcluidas = 0
+    var atividadesAndamento = 0
+    var atividadesAtraso = 0
+
+    for (sub in subpilares) {
+      val acoes = acaoDao.listarPorSubpilares(sub.id)
+      totalAcoes += acoes.size
+
+      for (acao in acoes) {
+        val atividades = acao.id?.let { atividadeDao.listarPorAcao(it) } ?: emptyList()
+        totalAtividades += atividades.size
+        atividadesConcluidas += atividades.count { it.status == StatusAtividade.CONCLUIDA }
+        atividadesAndamento += atividades.count { it.status == StatusAtividade.PENDENTE }
+        atividadesAtraso += atividades.count { it.status == StatusAtividade.VENCIDA }
+      }
+    }
+
+    return ResumoDashboard(
+      totalAcoes,
+      totalAtividades,
+      atividadesConcluidas,
+      atividadesAndamento,
+      atividadesAtraso
+    )
+  }
+
+
+
 
 }

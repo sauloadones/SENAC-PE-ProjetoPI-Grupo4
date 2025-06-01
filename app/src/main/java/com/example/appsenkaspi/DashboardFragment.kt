@@ -64,68 +64,162 @@ class DashboardFragment : Fragment() {
   }
 
   private fun carregarResumo(pilarId: Int?) {
-    acaoViewModel.gerarResumoDashboard(pilarId) { resumo ->
-      binding.valorTotal.text = resumo.totalAcoes.toString()
-      binding.valorConcluidas.text = resumo.atividadesConcluidas.toString()
-      binding.valorAndamento.text = resumo.atividadesAndamento.toString()
-      binding.valorAtraso.text = resumo.atividadesAtraso.toString()
+    lifecycleScope.launch {
+      if (pilarId == null) {
+        // Visão geral (todos os pilares)
+        val pilares = withContext(Dispatchers.IO) {
+          pilarViewModel.getPilaresParaDashboard()
+        }
 
-      binding.labelDonut.text = if (pilarId == null)
-        "Progressão geral dos pilares"
-      else
-        "Progressão do pilar"
+        var totalAcoes = 0
+        var totalAtividades = 0
+        var atividadesConcluidas = 0
+        var atividadesAndamento = 0
+        var atividadesAtraso = 0
 
-      atualizarDonutChart(resumo.atividadesConcluidas, resumo.totalAtividades)
+        for (pilar in pilares) {
+          val possuiSubpilares = withContext(Dispatchers.IO) {
+            pilarViewModel.temSubpilaresDireto(pilar.id)
+          }
+
+          val resumo = if (possuiSubpilares) {
+            withContext(Dispatchers.IO) {
+              pilarViewModel.gerarResumoPorSubpilaresDireto(pilar.id)
+            }
+          } else {
+            withContext(Dispatchers.IO) {
+              acaoViewModel.gerarResumoDashboardDireto(pilar.id)
+            }
+          }
+
+          totalAcoes += resumo.totalAcoes
+          totalAtividades += resumo.totalAtividades
+          atividadesConcluidas += resumo.atividadesConcluidas
+          atividadesAndamento += resumo.atividadesAndamento
+          atividadesAtraso += resumo.atividadesAtraso
+        }
+
+        val resumoGeral = ResumoDashboard(
+          totalAcoes,
+          totalAtividades,
+          atividadesConcluidas,
+          atividadesAndamento,
+          atividadesAtraso
+        )
+
+        withContext(Dispatchers.Main) {
+          atualizarResumoEDonut(resumoGeral, "Progressão geral dos pilares")
+        }
+
+      } else {
+        // Pilar específico
+        val possuiSubpilares = withContext(Dispatchers.IO) {
+          pilarViewModel.temSubpilaresDireto(pilarId)
+        }
+
+        val resumo = if (possuiSubpilares) {
+          withContext(Dispatchers.IO) {
+            pilarViewModel.gerarResumoPorSubpilaresDireto(pilarId)
+          }
+        } else {
+          withContext(Dispatchers.IO) {
+            acaoViewModel.gerarResumoDashboardDireto(pilarId)
+          }
+        }
+
+        // Cálculo real do progresso para o gráfico de donut (progresso ponderado por atividades/subpilares)
+        val progressoReal = withContext(Dispatchers.IO) {
+          pilarViewModel.calcularProgressoInterno(pilarId)
+        }
+
+        withContext(Dispatchers.Main) {
+          atualizarResumoEDonut(resumo, "Progressão do Pilar", progressoReal)
+        }
+      }
     }
   }
 
-  private fun atualizarDonutChart(concluidas: Int, total: Int) {
-    if (total == 0) {
-      binding.labelDonut.text = "Sem atividades disponíveis"
-      binding.donutChart.clear()
-      return
+
+
+  private fun atualizarResumoEDonut(
+    resumo: ResumoDashboard,
+    titulo: String,
+    progressoReal: Float? = null // novo parâmetro opcional
+  ) {
+    binding.valorTotal.text = resumo.totalAcoes.toString()
+    binding.valorConcluidas.text = resumo.atividadesConcluidas.toString()
+    binding.valorAndamento.text = resumo.atividadesAndamento.toString()
+    binding.valorAtraso.text = resumo.atividadesAtraso.toString()
+    binding.labelDonut.text = titulo
+
+    val progressoUsado = progressoReal?.coerceIn(0f, 1f) ?: run {
+      if (resumo.totalAtividades > 0)
+        resumo.atividadesConcluidas.toFloat() / resumo.totalAtividades
+      else 0f
     }
 
-    val percentConcluido = (concluidas.toFloat() / total) * 100f
-    val percentPendente = 100f - percentConcluido
+    // Agora o donut usará o progressoReal se disponível
+    atualizarDonutChart(progressoUsado)
+  }
+
+  private fun atualizarDonutChart(progresso: Float) {
+    val progressoPercentual = (progresso * 100f).coerceIn(0f, 100f)
 
     val entries = listOf(
-      PieEntry(percentConcluido, "Concluído"),
-      PieEntry(percentPendente, "Pendente")
+      PieEntry(progressoPercentual, "") // Só uma entrada visível
     )
 
     val dataSet = PieDataSet(entries, "").apply {
-      colors = listOf(Color.parseColor("#164773"), Color.parseColor("#3A3A3A"))
-      setDrawValues(false)
+      setDrawValues(false) // remove os valores numéricos da borda
+      valueTextSize = 0f
+      colors = listOf(Color.parseColor("#164773")) // Azul original
     }
 
     val data = PieData(dataSet)
 
-    with(binding.donutChart) {
+    binding.donutChart.apply {
       this.data = data
       description.isEnabled = false
       legend.isEnabled = false
+      setUsePercentValues(false)
+      setDrawHoleEnabled(true)
       setHoleColor(Color.TRANSPARENT)
+      holeRadius = 70f
       setTransparentCircleAlpha(0)
-      setUsePercentValues(true)
       setDrawEntryLabels(false)
 
-      setDrawCenterText(true)
-      centerText = "${percentConcluido.toInt()}%"
+      centerText = "${progressoPercentual.toInt()}%"
       setCenterTextSize(18f)
       setCenterTextColor(Color.WHITE)
 
       invalidate()
+      animateY(800)
     }
   }
+
+
+
 
   private fun carregarGraficoDeBarras(pilarId: Int?) {
     if (pilarId == null) {
       carregarGraficoDeBarrasVisaoGeral()
     } else {
-      carregarGraficoDeBarrasPorAcoes(pilarId)
+      lifecycleScope.launch {
+        val possuiSubpilares = withContext(Dispatchers.IO) {
+          AppDatabase.getDatabase(requireContext())
+            .subpilarDao()
+            .existeSubpilarParaPilar(pilarId)
+        }
+
+        if (possuiSubpilares) {
+          carregarGraficoDeBarrasPorSubpilares(pilarId)
+        } else {
+          carregarGraficoDeBarrasPorAcoes(pilarId)
+        }
+      }
     }
   }
+
 
   private fun carregarGraficoDeBarrasVisaoGeral() {
     lifecycleScope.launch {
@@ -199,6 +293,7 @@ class DashboardFragment : Fragment() {
     }
   }
 
+
   private fun carregarGraficoDeBarrasPorAcoes(pilarId: Int) {
     lifecycleScope.launch {
       val progressoAcoes = withContext(Dispatchers.IO) {
@@ -217,9 +312,7 @@ class DashboardFragment : Fragment() {
         BarEntry(index.toFloat(), acao.progresso * 100f)
       }
 
-      val labels = progressoAcoes.mapIndexed { index, _ ->
-        "Ação ${index + 1}"
-      }
+      val labels = progressoAcoes.map { it.nome }
 
       val dataSet = BarDataSet(entries, "Progresso (%)").apply {
         valueTextColor = Color.WHITE
@@ -269,4 +362,72 @@ class DashboardFragment : Fragment() {
       }
     }
   }
+  private fun carregarGraficoDeBarrasPorSubpilares(pilarId: Int) {
+    lifecycleScope.launch {
+      val progressoSubpilares = withContext(Dispatchers.IO) {
+        pilarViewModel.calcularProgressoDosSubpilares(pilarId)
+      }
+
+      if (progressoSubpilares.isEmpty()) {
+        binding.barChart.clear()
+        binding.barChart.setNoDataText("Nenhum subpilar encontrado para este pilar.")
+        return@launch
+      }
+
+      val entries = progressoSubpilares.mapIndexed { index, (_, progresso) ->
+        BarEntry(index.toFloat(), progresso * 100f)
+      }
+
+      val labels = progressoSubpilares.map { it.first }
+
+      val dataSet = BarDataSet(entries, "Progresso por Subpilar (%)").apply {
+        valueTextColor = Color.WHITE
+        valueTextSize = 12f
+        color = Color.parseColor("#164773")
+      }
+
+      val barData = BarData(dataSet).apply {
+        barWidth = 0.5f
+      }
+
+      with(binding.barChart) {
+        data = barData
+        setFitBars(true)
+        description.isEnabled = false
+        legend.isEnabled = false
+        setDrawValueAboveBar(true)
+        setTouchEnabled(false)
+        animateY(800)
+        setScaleEnabled(false)
+
+        axisLeft.apply {
+          axisMinimum = 0f
+          axisMaximum = 100f
+          granularity = 10f
+          textColor = Color.WHITE
+          textSize = 12f
+        }
+
+        axisRight.isEnabled = false
+
+        xAxis.apply {
+          position = XAxis.XAxisPosition.BOTTOM
+          valueFormatter = IndexAxisValueFormatter(labels)
+          granularity = 1f
+          isGranularityEnabled = true
+          setDrawGridLines(false)
+          textColor = Color.WHITE
+          textSize = 10f
+          labelRotationAngle = 0f
+          setLabelCount(labels.size, false)
+          setAvoidFirstLastClipping(true)
+          yOffset = 2f
+        }
+
+        invalidate()
+      }
+    }
+  }
+
+
 }

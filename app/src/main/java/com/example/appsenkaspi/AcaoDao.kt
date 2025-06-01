@@ -106,22 +106,21 @@ interface AcaoDao {
     @Query("SELECT * FROM acoes WHERE id = :acaoId LIMIT 1")
     suspend fun getAcaoPorIdDireto(acaoId: Int): AcaoEntity?
 
-    @Query("""
+  @Query("""
     SELECT
         a.id AS acaoId,
-        COUNT(at.id) AS totalAtividades,
-        CASE
-            WHEN COUNT(at.id) = 0 THEN 0.0
-            ELSE CAST(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(at.id)
-        END AS progresso
+        a.nome AS nome,
+        COALESCE(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) * 1.0 / COUNT(at.id), 0) AS progresso,
+        COUNT(at.id) AS totalAtividades
     FROM acoes a
     LEFT JOIN atividades at ON at.acaoId = a.id
     WHERE a.pilarId = :pilarId
     GROUP BY a.id
 """)
-    suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
+  suspend fun listarProgressoPorPilar(pilarId: Int): List<ProgressoAcao>
 
-    @Query("SELECT * FROM acoes WHERE id = :id")
+
+  @Query("SELECT * FROM acoes WHERE id = :id")
     fun buscarPorId(id: Int): AcaoEntity?
 
     @Query("SELECT * FROM acoes WHERE id = :id")
@@ -144,20 +143,18 @@ interface AcaoDao {
 
 
   @Query("""
-
     SELECT
         a.id AS acaoId,
+        a.nome AS nome,  -- ✅ Essa linha é obrigatória!
         COUNT(at.id) AS totalAtividades,
-        CASE
-            WHEN COUNT(at.id) = 0 THEN 0.0
-            ELSE CAST(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(at.id)
-        END AS progresso
+        COALESCE(SUM(CASE WHEN at.status = 'concluida' THEN 1 ELSE 0 END) * 1.0 / COUNT(at.id), 0) AS progresso
     FROM acoes a
     LEFT JOIN atividades at ON at.acaoId = a.id
     WHERE a.subpilarId = :subpilarId
     GROUP BY a.id
 """)
   suspend fun listarProgressoPorSubpilar(subpilarId: Int): List<ProgressoAcao>
+
 
   @Query("""
   SELECT
@@ -245,6 +242,9 @@ interface AcaoDao {
     GROUP BY a.id
 """)
   suspend fun listarAcoesComStatusPorPilares(pilarIds: List<Int>): List<AcaoComStatus>
+
+  @Query("SELECT * FROM acoes WHERE subpilarId = :subpilarId")
+  suspend fun listarPorSubpilares(subpilarId: Int): List<AcaoEntity>
 
 
 

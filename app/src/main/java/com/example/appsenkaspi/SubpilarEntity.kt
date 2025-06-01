@@ -30,5 +30,5 @@ data class SubpilarEntity(
 
     @ColumnInfo(name = "status") val status: StatusSubPilar,
     @ColumnInfo(name = "criado_por")
-    val criadoPor: Int,
+    val criadoPor: Int
 )

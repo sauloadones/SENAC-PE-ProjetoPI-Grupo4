@@ -59,12 +59,13 @@ enum class TipoRequisicao {
 }
 
 enum class StatusSubPilar {
-  PLANJEADA,
+  PLANEJADO,
   EM_ANDAMENTO,
-  CONCLUIDA,
-  EXCLUIDA,
-  VENCIDA
+  CONCLUIDO,
+  VENCIDO,
+  EXCLUIDO
 }
+
 
 enum class StatusNotificacao {
     NAO_LIDA,
