@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -26,7 +25,6 @@ class HistoricoFragment : Fragment() {
     private var listaOriginal: List<PilarEntity> = emptyList()
 
     private var textoFiltroAtivo: TextView? = null
-
     private var filtroStatusSelecionado: String? = null
     private var filtroAnoSelecionado: String? = null
 
@@ -43,27 +41,27 @@ class HistoricoFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFiltroExclusao)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = TelaHistoricoAdapter(emptyList()) { pilar ->
-            abrirTelaPilar(pilar)
-        }
+        // ✅ Correção aqui: os 3 parâmetros do adapter
+        adapter = TelaHistoricoAdapter(
+            emptyList(),
+            { pilar -> abrirTelaPilar(pilar) },
+            pilarViewModel
+        )
         recyclerView.adapter = adapter
 
         val spinnerStatusFilter = view.findViewById<Spinner>(R.id.spinnerStatusFilter)
-        val spinnerAnoFiltro = view.findViewById<Spinner>(R.id.spinnerStatusFiltro) // ano spinner
-
+        val spinnerAnoFiltro = view.findViewById<Spinner>(R.id.spinnerStatusFiltro)
         textoFiltroAtivo = view.findViewById(R.id.textoFiltroAtivo)
 
         val itensStatus = resources.getStringArray(R.array.status_pilar_array)
         val itensAno = resources.getStringArray(R.array.ano_pilar_array)
 
-        // Adapter para Status
         val adapterStatus = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
             itensStatus
         ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
-        // Adapter para Ano
         val adapterAno = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -112,7 +110,6 @@ class HistoricoFragment : Fragment() {
         }
 
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-            // Mantém somente os status que você deseja mostrar no histórico
             listaOriginal = lista.filter { pilar ->
                 pilar.status == StatusPilar.CONCLUIDO ||
                         pilar.status == StatusPilar.EXCLUIDO ||

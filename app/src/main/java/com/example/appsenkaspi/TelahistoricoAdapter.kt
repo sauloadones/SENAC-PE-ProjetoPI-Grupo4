@@ -5,13 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TelaHistoricoAdapter(
     private var listaPilares: List<PilarEntity>,
-    private val onClickPilar: (PilarEntity) -> Unit
+    private val onClickPilar: (PilarEntity) -> Unit,
+    private val viewModel: PilarViewModel
 ) : RecyclerView.Adapter<TelaHistoricoAdapter.HistoricoViewHolder>() {
 
     inner class HistoricoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -19,6 +21,8 @@ class TelaHistoricoAdapter(
         val statusOverlay: ImageView = itemView.findViewById(R.id.statusOverlay)
         val textStatus: TextView = itemView.findViewById(R.id.textStatus)
         val textData: TextView = itemView.findViewById(R.id.textData)
+        val progressBar: ProgressBar = itemView.findViewById(R.id.progressoPilar)
+        val textPercentual: TextView = itemView.findViewById(R.id.percentual)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoricoViewHolder {
@@ -70,6 +74,16 @@ class TelaHistoricoAdapter(
 
         holder.itemView.setOnClickListener {
             onClickPilar(pilar)
+        }
+
+        // ✅ Lógica da barra de progresso
+        holder.progressBar.progress = 0
+        holder.textPercentual.text = "0%"
+
+        viewModel.calcularProgressoDoPilar(pilar.id) { progresso ->
+            val progressoPercentual = (progresso * 100).toInt()
+            holder.progressBar.progress = progressoPercentual
+            holder.textPercentual.text = "$progressoPercentual%"
         }
     }
 
