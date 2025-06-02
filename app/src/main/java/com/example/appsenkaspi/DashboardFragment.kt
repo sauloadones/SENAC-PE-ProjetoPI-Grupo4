@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.FragmentDashboardBinding
@@ -20,20 +21,50 @@ import kotlinx.coroutines.withContext
 
 class DashboardFragment : Fragment() {
 
-  private lateinit var binding: FragmentDashboardBinding
+  private var _binding: FragmentDashboardBinding? = null
+  private val binding get() = _binding!!
+
   private val acaoViewModel: AcaoViewModel by viewModels()
   private val pilarViewModel: PilarViewModel by viewModels()
+
+  // Usar activityViewModels para compartilhar com outros fragments
+  private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   private val mapaNomesParaIds = mutableMapOf<String, Int?>()
+  private var funcionarioLogadoId: Int = -1
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    binding = FragmentDashboardBinding.inflate(inflater, container, false)
+    _binding = FragmentDashboardBinding.inflate(inflater, container, false)
     return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    // Observar funcionário logado para configurar notificação e badges
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        funcionarioLogadoId = it.id
+
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+
+        // Se quiser controlar algum botão pela permissão do cargo:
+        // Exemplo (se tiver botão no layout):
+        // binding.algumBotao.visibility = if (it.cargo == Cargo.COORDENADOR) View.VISIBLE else View.GONE
+      }
+    }
+
     configurarSpinner()
   }
 
@@ -362,6 +393,7 @@ class DashboardFragment : Fragment() {
       }
     }
   }
+  
   private fun carregarGraficoDeBarrasPorSubpilares(pilarId: Int) {
     lifecycleScope.launch {
       val progressoSubpilares = withContext(Dispatchers.IO) {
@@ -428,6 +460,9 @@ class DashboardFragment : Fragment() {
       }
     }
   }
-
-
+  
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

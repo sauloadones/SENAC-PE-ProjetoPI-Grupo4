@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class CriarAtividadeFragment : Fragment() {
 
@@ -34,6 +35,9 @@ class CriarAtividadeFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private var acaoId: Int = -1
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentCriarAtividadeBinding.inflate(inflater, container, false)
     return binding.root
@@ -42,6 +46,19 @@ class CriarAtividadeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       when (funcionario?.cargo) {

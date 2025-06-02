@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import androidx.fragment.app.activityViewModels
 
 class HistoricoFragment : Fragment() {
 
@@ -20,6 +21,9 @@ class HistoricoFragment : Fragment() {
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
     private var funcionarioLogadoId: Int = -1
     private var listaOriginal: List<PilarEntity> = emptyList()
+
+
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
     // Filtro pelo status selecionado (null = todos os 3 do histórico)
     private var filtroStatus: StatusPilar? = null
@@ -33,6 +37,19 @@ class HistoricoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFiltroExclusao)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
