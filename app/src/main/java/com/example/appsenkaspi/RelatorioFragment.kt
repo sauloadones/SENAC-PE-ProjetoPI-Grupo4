@@ -54,7 +54,6 @@ class RelatorioFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // >>>>> PEGAR NOME DO USUÁRIO LOGADO <<<<<
         nomeUsuarioLogado = getFuncionarioNomeUsuario(requireContext())
 
         configurarSpinners()
@@ -62,7 +61,7 @@ class RelatorioFragment : Fragment() {
         carregarPilares()
 
         binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
-        relatorioAdapter = RelatorioAdapter(historicoRelatorios)
+        relatorioAdapter = RelatorioAdapter(requireContext(), nomeUsuarioLogado!!, historicoRelatorios)
         binding.recyclerHistorico.adapter = relatorioAdapter
 
         val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
@@ -71,7 +70,6 @@ class RelatorioFragment : Fragment() {
             binding.recyclerHistorico.addItemDecoration(divider)
         }
 
-        // >>>>> CARREGAR HISTÓRICO COM BASE NO USUÁRIO LOGADO <<<<<
         carregarHistoricoSalvo()
 
         binding.textSelecionarPilar.measure(
@@ -86,8 +84,6 @@ class RelatorioFragment : Fragment() {
         binding.textSelecionarPilar.alpha = 0f
         binding.layoutSpinnerPilares.alpha = 0f
     }
-
-
 
     private fun configurarSpinners() {
         val tipoArquivoAdapter = ArrayAdapter.createFromResource(
@@ -140,8 +136,14 @@ class RelatorioFragment : Fragment() {
                 }
             }
         }
-    }
 
+        binding.btnLimparHistorico.setOnClickListener {
+            animateButtonClick(binding.btnLimparHistorico) {
+                mostrarDialogConfirmacaoLimpeza()
+            }
+        }
+
+    }
     private fun animateLayoutChange(root: ViewGroup) {
         val transition = AutoTransition()
         transition.duration = 300
@@ -414,6 +416,27 @@ class RelatorioFragment : Fragment() {
         if (historicoRelatorios.isNotEmpty()) {
             binding.recyclerHistorico.visibility = View.VISIBLE
         }
+    }
+
+    private fun limparHistorico() {
+        historicoRelatorios.clear()
+        relatorioAdapter.notifyDataSetChanged()
+        binding.recyclerHistorico.visibility = View.GONE
+        if (nomeUsuarioLogado != null) {
+            HistoricoStorage.salvar(requireContext(), historicoRelatorios, nomeUsuarioLogado!!)
+        }
+        Toast.makeText(requireContext(), "Histórico limpo com sucesso", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun mostrarDialogConfirmacaoLimpeza() {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Confirmar ação")
+            .setMessage("Tem certeza que deseja limpar o histórico de relatórios?")
+            .setPositiveButton("Sim") { _, _ ->
+                limparHistorico()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     override fun onDestroyView() {
