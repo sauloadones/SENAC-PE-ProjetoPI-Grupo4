@@ -32,10 +32,10 @@
         <!-- Seta verde -->
         <ImageView
             android:id="@+id/iconArrowAcao"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_arrow_right"
-            app:tint="#00FF00"
+            app:tint="#9600FF00"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

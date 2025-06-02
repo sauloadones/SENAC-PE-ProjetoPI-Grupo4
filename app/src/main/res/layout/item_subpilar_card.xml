@@ -1,87 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:layout_marginVertical="6dp"
-  android:layout_marginHorizontal="12dp"
-  app:cardCornerRadius="12dp"
-  app:cardElevation="6dp"
-  app:cardBackgroundColor="#164773"
-  app:strokeColor="@android:color/black"
-  app:strokeWidth="2dp">
-
-  <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp">
+    android:layout_marginVertical="6dp"
+    android:layout_marginHorizontal="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#2F5271"
+    app:strokeColor="@android:color/black"
+    app:strokeWidth="1dp">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="14dp">
 
     <!-- Título "Subpilar:" -->
     <TextView
-      android:id="@+id/tvSubpilarTitulo"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Subpilar:"
-      android:textColor="#FFFFFF"
-      android:textStyle="bold"
-      android:textSize="16sp"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/tvSubpilarTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subpilar:"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Nome do subpilar -->
     <TextView
-      android:id="@+id/tvNomeSubpilar"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:text="Nome do Subpilar"
-      android:textColor="#FFFFFF"
-      android:textSize="14sp"
-      android:maxLines="2"
-      android:ellipsize="end"
-      app:layout_constraintTop_toBottomOf="@id/tvSubpilarTitulo"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/iconeSeta"
-      android:layout_marginTop="2dp"
-      android:layout_marginEnd="8dp" />
+        android:id="@+id/tvNomeSubpilar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Nome do Subpilar"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/tvSubpilarTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iconeSeta"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp" />
 
-    <!-- Ícone seta (parte superior direita do card) -->
+    <!-- Ícone seta reduzido e centralizado -->
     <ImageView
-      android:id="@+id/iconeSeta"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:src="@drawable/ic_arrow_right"
-      app:layout_constraintTop_toTopOf="@id/tvSubpilarTitulo"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:tint="#00FF00" />
+        android:id="@+id/iconeSeta"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_arrow_right"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="#9600FF00" />
 
-    <!-- Barra de progresso -->
+    <!-- Barra de progresso estilizada -->
     <ProgressBar
-      android:id="@+id/progressoSubpilar"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="0dp"
-      android:layout_height="10dp"
-      android:max="100"
-      android:progress="0"
-      android:progressTint="@color/green"
-      android:backgroundTint="@color/cinza_claro"
-      app:layout_constraintTop_toBottomOf="@id/tvNomeSubpilar"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/tvPercentual"
-      android:layout_marginTop="12dp" />
+        android:id="@+id/progressoSubpilar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="10dp"
+        android:max="100"
+        android:progress="20"
+        android:progressDrawable="@drawable/progresso_customizado"
+        app:layout_constraintTop_toBottomOf="@id/tvNomeSubpilar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvPercentual"
+        android:layout_marginTop="12dp" />
 
-    <!-- Porcentagem ao lado da barra -->
+    <!-- Porcentagem -->
     <TextView
-      android:id="@+id/tvPercentual"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="20%"
-      android:textColor="#FFFFFF"
-      android:textSize="12sp"
-      app:layout_constraintBottom_toBottomOf="@id/progressoSubpilar"
-      app:layout_constraintStart_toEndOf="@id/progressoSubpilar"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:layout_marginStart="8dp" />
+        android:id="@+id/tvPercentual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20%"
+        android:textColor="#DDDDDD"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="@id/progressoSubpilar"
+        app:layout_constraintBottom_toBottomOf="@id/progressoSubpilar"
+        app:layout_constraintStart_toEndOf="@id/progressoSubpilar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
