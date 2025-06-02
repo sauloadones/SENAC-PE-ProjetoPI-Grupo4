@@ -15,6 +15,7 @@ import com.example.appsenkaspi.databinding.FragmentEditarSubpilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class EditarSubpilarFragment : Fragment() {
 
@@ -24,6 +25,10 @@ class EditarSubpilarFragment : Fragment() {
   private val subpilarViewModel: SubpilarViewModel by activityViewModels()
   private var subpilarId: Int = -1
   private var novaDataSelecionada: Date? = null
+
+  private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +41,19 @@ class EditarSubpilarFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     subpilarId = arguments?.getInt("subpilarId") ?: -1
     if (subpilarId == -1) {

@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class CriarAcaoFragment : Fragment() {
 
@@ -32,6 +33,7 @@ class CriarAcaoFragment : Fragment() {
   private var pilarId: Int? = null
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private lateinit var adapterSelecionados: FuncionarioSelecionadoAdapter
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +46,19 @@ class CriarAcaoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     // Recuperar IDs passados por argumento
     pilarId = arguments?.getInt("pilarId")?.takeIf { it > 0 }

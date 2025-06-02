@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class EditarAcaoFragment : Fragment() {
 
@@ -40,6 +41,7 @@ class EditarAcaoFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private lateinit var adapterSelecionados: FuncionarioSelecionadoAdapter
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
@@ -51,6 +53,19 @@ class EditarAcaoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     adapterSelecionados = FuncionarioSelecionadoAdapter(funcionariosSelecionados)
     binding.recyclerViewFuncionariosSelecionados.layoutManager =

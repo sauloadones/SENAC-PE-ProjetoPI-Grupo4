@@ -14,6 +14,7 @@ import com.example.appsenkaspi.databinding.FragmentCriarPilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class CriarPilarFragment : Fragment() {
 
@@ -30,6 +31,8 @@ class CriarPilarFragment : Fragment() {
   private val listaSubpilares = mutableListOf<SubpilarTemp>()
   private lateinit var subpilarAdapter: SubpilarAdapter
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -42,6 +45,18 @@ class CriarPilarFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
     configurarBotaoVoltar(view)
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->

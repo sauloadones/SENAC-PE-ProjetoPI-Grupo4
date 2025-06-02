@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class EditarAtividadeFragment : Fragment() {
 
@@ -35,6 +36,8 @@ class EditarAtividadeFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private var funcionariosOriginais: List<FuncionarioEntity> = emptyList()
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentEditarAtividadeBinding.inflate(inflater, container, false)
     return binding.root
@@ -42,6 +45,19 @@ class EditarAtividadeFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     // 🔁 Observa notificações (ex.: após alteração de prazo)
 
