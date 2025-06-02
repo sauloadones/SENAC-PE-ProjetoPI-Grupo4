@@ -222,6 +222,12 @@ interface RequisicaoDao {
     responsavelId: Int
   )
 
+  @Query("UPDATE requisicoes SET excluida = 1 WHERE id IN (:ids)")
+  suspend fun marcarComoExcluidas(ids: List<Int>)
+
+
+  @Query("SELECT * FROM requisicoes WHERE excluida = 0")
+  fun getNaoExcluidas(): LiveData<List<RequisicaoEntity>>
 
 
 }

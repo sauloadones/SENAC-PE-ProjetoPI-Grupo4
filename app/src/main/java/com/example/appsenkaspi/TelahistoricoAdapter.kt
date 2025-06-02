@@ -36,8 +36,9 @@ class TelaHistoricoAdapter(
 
         val dataFormatada = formatarData(
             when (pilar.status) {
-                StatusPilar.EXCLUIDO -> pilar.dataExclusao
-                StatusPilar.CONCLUIDO, StatusPilar.VENCIDO -> pilar.dataPrazo
+                StatusPilar.EXCLUIDO -> pilar.dataExcluido
+                StatusPilar.CONCLUIDO -> pilar.dataConclusao
+                StatusPilar.VENCIDO -> pilar.dataPrazo
                 else -> null
             }
         )

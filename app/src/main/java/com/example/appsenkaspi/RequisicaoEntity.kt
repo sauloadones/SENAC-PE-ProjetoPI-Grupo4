@@ -29,5 +29,7 @@ data class RequisicaoEntity(
   val coordenadorId: Int? = null,
   val mensagemResposta: String? = null,
   val foiVista: Boolean = false,
-  val resolvida: Boolean = false
+  val resolvida: Boolean = false,
+  val excluida: Boolean = false
+
 )

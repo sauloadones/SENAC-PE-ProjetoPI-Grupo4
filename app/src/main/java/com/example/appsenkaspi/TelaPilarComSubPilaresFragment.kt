@@ -15,10 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.appsenkaspi.databinding.FragmentTelaPilarComSubpilaresBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 
 class TelaPilarComSubpilaresFragment : Fragment() {
@@ -85,11 +89,13 @@ class TelaPilarComSubpilaresFragment : Fragment() {
           Cargo.APOIO, Cargo.GESTOR -> {
             binding.cardEditarPilar.visibility = View.GONE
             binding.cardAdicionarSubPilares.visibility = View.GONE
+            binding.cardConcluirPilar.visibility = View.GONE
           }
 
           Cargo.COORDENADOR -> {
             binding.cardEditarPilar.visibility = View.VISIBLE
             binding.cardAdicionarSubPilares.visibility = View.VISIBLE
+            binding.cardConcluirPilar.visibility = View.VISIBLE
           }
 
           else -> {
@@ -106,6 +112,19 @@ class TelaPilarComSubpilaresFragment : Fragment() {
       } else {
         Toast.makeText(requireContext(), "Pilar não encontrado!", Toast.LENGTH_SHORT).show()
         parentFragmentManager.popBackStack()
+      }
+    }
+    binding.cardConcluirPilar.setOnClickListener {
+      lifecycleScope.launch {
+        pilarViewModel.concluirPilar(pilarId)
+
+        // Recarrega os dados do pilar após atualizar o status
+        pilarViewModel.getPilarById(pilarId).observe(viewLifecycleOwner) { pilar ->
+          if (pilar != null) {
+            preencherCamposComPilar(pilar)
+            Toast.makeText(requireContext(), "Pilar concluído com sucesso!", Toast.LENGTH_SHORT).show()
+          }
+        }
       }
     }
 
@@ -167,6 +186,34 @@ class TelaPilarComSubpilaresFragment : Fragment() {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     binding.dataPrazoPilar.text = "Prazo: ${sdf.format(pilar.dataPrazo)}"
     binding.textoSobre.text = pilar.descricao.ifBlank { "Nenhuma descrição adicionada." }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      val progresso = withContext(Dispatchers.IO) {
+        pilarViewModel.calcularProgressoInterno(pilar.id).also {
+          pilarViewModel.atualizarStatusAutomaticamente(pilar.id)
+        }
+      }
+
+      animarProgresso((progresso * 100).toInt()) // caso tenha animação de barra de progresso
+
+      val pilarAtualizado = pilarViewModel.getPilarById(pilar.id).value ?: pilar
+
+      if (pilarAtualizado.status == StatusPilar.CONCLUIDO) {
+        binding.cardConcluirPilar.visibility = View.GONE
+      } else {
+        val dataVencimento = pilar.dataPrazo.toLocalDate()
+        val podeConcluir = withContext(Dispatchers.IO) {
+          pilarViewModel.podeConcluirPilar(pilar.id, dataVencimento)
+        }
+
+        binding.cardConcluirPilar.visibility = if (podeConcluir) View.VISIBLE else View.GONE
+      }
+    }
+  }
+  private fun Date.toLocalDate(): LocalDate {
+    return this.toInstant()
+      .atZone(ZoneId.systemDefault())
+      .toLocalDate()
   }
 
   private fun configurarRecycler() {

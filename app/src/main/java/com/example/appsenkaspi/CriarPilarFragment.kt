@@ -174,7 +174,7 @@ class CriarPilarFragment : Fragment() {
             pilarId = novoId,
             criadoPor = funcionarioId,
             dataCriacao = Date(),
-            status = StatusSubPilar.PLANJEADA
+            status = StatusSubPilar.PLANEJADO
           )
         )
       }

@@ -139,6 +139,9 @@
 """)
     suspend fun contarVencidasPorPilar(pilarId: Int): Int
 
+    @Query("SELECT * FROM atividades WHERE acaoId = :acaoId")
+    suspend fun listarPorAcao(acaoId: Int): List<AtividadeEntity>
+
 
   }
 

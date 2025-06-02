@@ -138,6 +138,7 @@ class EditarAcaoFragment : Fragment() {
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
+      if (!validarPrazoEdicao()) return@launch
       val acao = AppDatabase.getDatabase(requireContext()).acaoDao().getAcaoPorIdDireto(acaoId) ?: return@launch
 
       val nomeAlvo = when {
@@ -192,6 +193,7 @@ class EditarAcaoFragment : Fragment() {
     }
 
     lifecycleScope.launch {
+      if (!validarPrazoEdicao()) return@launch
       val acaoExistente = acaoViewModel.getAcaoByIdNow(acaoId)
       if (acaoExistente != null) {
         if (acaoExistente.pilarId != null && acaoExistente.subpilarId != null) {
@@ -227,6 +229,46 @@ class EditarAcaoFragment : Fragment() {
       }
     }
   }
+  private suspend fun validarPrazoEdicao(): Boolean {
+    if (dataPrazoSelecionada == null) {
+      binding.buttonPickDateEdicao.error = "Selecione uma data de prazo"
+      return false
+    }
+
+    val dataLimite: Date? = when {
+      subpilarId != null -> acaoViewModel.buscarSubpilarPorId(subpilarId!!)?.dataPrazo
+      pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.dataPrazo
+      else -> null
+    }
+
+    dataLimite?.let {
+      val selecionada = truncarData(dataPrazoSelecionada!!)
+      val limite = truncarData(it)
+
+      if (selecionada.after(limite)) {
+        val nomeEstrutura = if (subpilarId != null) "subpilar" else "pilar"
+        val dataFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
+        Toast.makeText(
+          requireContext(),
+          "A nova data não pode ultrapassar o prazo do $nomeEstrutura ($dataFormatada).",
+          Toast.LENGTH_LONG
+        ).show()
+        return false
+      }
+    }
+
+    return true
+  }
+  private fun truncarData(data: Date): Date {
+    val cal = Calendar.getInstance()
+    cal.time = data
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    return cal.time
+  }
+
 
   private fun abrirDatePicker() {
     DatePickerDialog(

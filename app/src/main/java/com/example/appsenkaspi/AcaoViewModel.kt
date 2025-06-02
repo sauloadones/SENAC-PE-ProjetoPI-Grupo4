@@ -52,6 +52,27 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
         return acaoDao.inserirComRetorno(acao).toInt()
     }
 
+  suspend fun gerarResumoDashboardDireto(pilarId: Int): ResumoDashboard = withContext(Dispatchers.IO) {
+    val acoes = acaoDao.listarAcoesComStatusPorPilarNow(pilarId)
+
+    val totalAcoes = acoes.size
+    val totalAtividades = acoes.sumOf { it.totalAtividades }
+    val concluidas = acoes.sumOf { it.ativasConcluidas }
+
+    val vencidas = AppDatabase.getDatabase(getApplication())
+      .atividadeDao()
+      .contarVencidasPorPilar(pilarId)
+
+    val andamento = totalAtividades - concluidas - vencidas
+
+    return@withContext ResumoDashboard(
+      totalAcoes = totalAcoes,
+      totalAtividades = totalAtividades,
+      atividadesConcluidas = concluidas,
+      atividadesAndamento = andamento,
+      atividadesAtraso = vencidas
+    )
+  }
 
 
 
@@ -135,6 +156,10 @@ class AcaoViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
   }
+  suspend fun buscarSubpilarPorId(id: Int): SubpilarEntity? {
+    return subpilarDao.getSubpilarPorId(id)
+  }
+
 
 
 

@@ -108,6 +108,7 @@ class CriarAcaoFragment : Fragment() {
       }
 
       viewLifecycleOwner.lifecycleScope.launch {
+        if (!validarPrazoAcao()) return@launch
         val nomeEstrutura = when {
           subpilarId != null -> acaoViewModel.buscarNomeSubpilarPorId(subpilarId!!) ?: "Subpilar"
           pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.nome ?: "Pilar"
@@ -145,8 +146,13 @@ class CriarAcaoFragment : Fragment() {
       }
     }
 
+    binding.buttonConfirmacaoAcao.setOnClickListener {
+      viewLifecycleOwner.lifecycleScope.launch {
+        if (!validarPrazoAcao()) return@launch
+        confirmarCriacaoAcao()
+      }
+    }
 
-    binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
 
     childFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
       val lista = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: arrayListOf()
@@ -228,6 +234,48 @@ class CriarAcaoFragment : Fragment() {
       }
     }
   }
+  private suspend fun validarPrazoAcao(): Boolean {
+    if (dataPrazoSelecionada == null) {
+      binding.buttonPickDateAcao.error = "Selecione uma data de prazo"
+      return false
+    }
+
+    val dataLimite: Date? = when {
+      subpilarId != null -> acaoViewModel.buscarSubpilarPorId(subpilarId!!)?.dataPrazo
+      pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.dataPrazo
+      else -> null
+    }
+
+    dataLimite?.let {
+      val selecionadaTruncada = truncarData(dataPrazoSelecionada!!)
+      val limiteTruncado = truncarData(it)
+
+      if (selecionadaTruncada.after(limiteTruncado)) {
+        val nomeEstrutura = if (subpilarId != null) "subpilar" else "pilar"
+        val dataFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(limiteTruncado)
+        Toast.makeText(
+          requireContext(),
+          "A data da ação não pode ultrapassar o prazo do $nomeEstrutura ($dataFormatada).",
+          Toast.LENGTH_LONG
+        ).show()
+        return false
+      }
+    }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    val cal = Calendar.getInstance()
+    cal.time = data
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    return cal.time
+  }
+
+
 
   companion object {
     fun newInstance(pilarId: Int? = null, subpilarId: Int? = null): CriarAcaoFragment {
