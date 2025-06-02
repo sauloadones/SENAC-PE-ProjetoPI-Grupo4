@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class TelaAtividadeFragment : Fragment() {
 
@@ -33,6 +34,9 @@ class TelaAtividadeFragment : Fragment() {
   private val requisicaoViewModel: NotificacaoViewModel by activityViewModels()
   private var atividadeId: Int = -1
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentTelaAtividadeBinding.inflate(inflater, container, false)
     atividadeId = arguments?.getInt("atividadeId") ?: -1
@@ -42,6 +46,19 @@ class TelaAtividadeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       when (funcionario?.cargo) {

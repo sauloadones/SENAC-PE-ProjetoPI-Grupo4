@@ -17,6 +17,7 @@ import com.example.appsenkaspi.databinding.FragmentEditarPilarBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class EditarPilarFragment : Fragment() {
 
@@ -29,6 +30,9 @@ class EditarPilarFragment : Fragment() {
     private var novaDataSelecionada: Date? = null
     private var pilarId: Int = -1
 
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,6 +44,19 @@ class EditarPilarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
