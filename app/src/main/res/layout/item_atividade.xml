@@ -21,12 +21,12 @@
 
             <View
                 android:id="@+id/viewPrioridade"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
+                android:layout_marginEnd="14dp"
                 android:background="#FF0000" />
 
             <LinearLayout
