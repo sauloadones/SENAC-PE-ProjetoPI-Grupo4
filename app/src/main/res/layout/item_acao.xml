@@ -32,12 +32,12 @@
         <!-- Seta verde -->
         <ImageView
             android:id="@+id/iconArrowAcao"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:src="@drawable/ic_arrow_right"
-            app:tint="#9600FF00"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="#6600FF10" />
 
         <!-- Fração de atividades concluídas -->
         <TextView

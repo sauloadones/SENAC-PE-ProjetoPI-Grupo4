@@ -21,13 +21,13 @@
 
             <View
                 android:id="@+id/viewPrioridade"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="2dp"
-                android:background="#FF0000" />
+                android:background="@drawable/bg_prioridade_fundo" />
 
             <LinearLayout
                 android:id="@+id/topoStatusTitulo"

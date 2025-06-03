@@ -18,7 +18,7 @@
 
   <LinearLayout
       android:id="@+id/container_dashboard"
-      android:layout_width="match_parent"
+      android:layout_width="430dp"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
       android:background="@drawable/bg_historico_box"
@@ -45,44 +45,61 @@
   <!-- Título + Spinner -->
   <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/blocoTituloFiltro"
-      android:layout_width="0dp"
-      android:layout_height="42dp"
-      android:layout_marginTop="0dp"
-      android:background="@drawable/bg_historico_box"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
       android:layout_marginBottom="8dp"
-      android:layout_marginStart="10dp"
-      android:layout_marginEnd="10dp"
       app:layout_constraintTop_toBottomOf="@id/container_dashboard"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Ícone -->
-    <ImageView
-        android:id="@+id/iconFiltro"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_filter"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/spinnerFiltro"
+    <!-- Fundo com bg_historico_box -->
+    <View
+        android:id="@+id/fundoFiltro"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_historico_box"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_chainStyle="packed" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Ícone de Filtro à esquerda -->
+    <ImageView
+        android:id="@+id/iconeFiltro"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginEnd="0dp"
+        android:src="@drawable/ic_filter"
+        app:layout_constraintStart_toStartOf="@id/fundoFiltro"
+        app:layout_constraintTop_toTopOf="@id/fundoFiltro"
+        app:layout_constraintBottom_toBottomOf="@id/fundoFiltro" />
 
     <!-- Spinner -->
     <Spinner
         android:id="@+id/spinnerFiltro"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:background="@drawable/spinner_background"
-        android:popupBackground="@drawable/bg_dropdown_popup"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
         android:textAlignment="center"
-        app:layout_constraintStart_toEndOf="@id/iconFiltro"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/iconeFiltro"
+        app:layout_constraintEnd_toStartOf="@id/setaBaixo"
+        app:layout_constraintTop_toTopOf="@id/fundoFiltro"
+        app:layout_constraintBottom_toBottomOf="@id/fundoFiltro" />
+
+    <!-- Seta para baixo à direita -->
+    <ImageView
+        android:id="@+id/setaBaixo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="140dp"
+        android:src="@drawable/ic_arrow_drop_down"
+        app:layout_constraintEnd_toEndOf="@id/fundoFiltro"
+        app:layout_constraintTop_toTopOf="@id/fundoFiltro"
+        app:layout_constraintBottom_toBottomOf="@id/fundoFiltro" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 
 

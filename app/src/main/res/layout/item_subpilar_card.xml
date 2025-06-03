@@ -55,7 +55,7 @@
         android:layout_marginEnd="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="#9600FF00" />
+        app:tint="#6900FF10" />
 
     <!-- Barra de progresso estilizada -->
     <ProgressBar
