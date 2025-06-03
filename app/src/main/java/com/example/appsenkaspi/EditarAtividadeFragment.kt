@@ -24,7 +24,7 @@ class EditarAtividadeFragment : Fragment() {
 
   private var _binding: FragmentEditarAtividadeBinding? = null
   private val binding get() = _binding!!
-
+  private var dataPrazoAcao: Date? = null
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
   private val acaoViewModel: AcaoViewModel by activityViewModels()
@@ -125,7 +125,7 @@ class EditarAtividadeFragment : Fragment() {
       }
 
       viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-        if (!validarDatasComPilar()) return@launch
+        if (!validarDatasComAcao()) return@launch
         val nomePilar = AppDatabase.getDatabase(requireContext())
           .pilarDao()
           .getNomePilarPorId(atividadeOriginal.acaoId) ?: "Indefinido"
@@ -188,7 +188,7 @@ class EditarAtividadeFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      if (!validarDatasComPilar()) return@launch
+      if (!validarDatasComAcao()) return@launch
 
       val atividadeAtualizada = atividadeOriginal.copy(
         nome = nome,
@@ -342,42 +342,42 @@ class EditarAtividadeFragment : Fragment() {
       container.addView(imageView)
     }
   }
-  private suspend fun validarDatasComPilar(): Boolean {
-    val acao = acaoViewModel.buscarAcaoPorId(atividadeOriginal.acaoId)
-    val pilar = acao?.pilarId?.let {
-      AppDatabase.getDatabase(requireContext()).pilarDao().getById(it)
-    }
-
-    val dataPrazoPilar = pilar?.dataPrazo
-    if (dataInicio == null || dataFim == null || dataPrazoPilar == null) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "Erro ao validar datas com o pilar.", Toast.LENGTH_SHORT).show()
-      }
+  private fun validarDatasComAcao(): Boolean {
+    if (dataInicio == null || dataFim == null || dataPrazoAcao == null) {
+      Toast.makeText(requireContext(), "Erro ao validar datas: valores nulos.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (!dataInicio!!.before(dataPrazoPilar)) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "A data de início deve ser antes do prazo do pilar.", Toast.LENGTH_SHORT).show()
-      }
+    val inicio = truncarData(dataInicio!!)
+    val fim = truncarData(dataFim!!)
+    val prazoAcao = truncarData(dataPrazoAcao!!)
+
+    if (!inicio.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo da ação.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (dataFim!!.before(dataInicio)) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
-      }
+    if (fim.before(inicio)) {
+      Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (dataFim!!.after(dataPrazoPilar)) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo do pilar.", Toast.LENGTH_SHORT).show()
-      }
+    if (fim.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo da ação.", Toast.LENGTH_SHORT).show()
       return false
     }
 
     return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
   }
 
 
