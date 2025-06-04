@@ -24,7 +24,6 @@ class HistoricoFragment : Fragment() {
     private var listaOriginal: List<PilarEntity> = emptyList()
 
     private var textoFiltroAtivo: TextView? = null
-
     private var filtroStatusSelecionado: String = "STATUS"
     private var filtroAnoSelecionado: String = "ANOS"
 
@@ -41,7 +40,8 @@ class HistoricoFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFiltroExclusao)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = TelaHistoricoAdapter(emptyList()) { pilar ->
+        // Passando o ViewModel para o adapter atualizado
+        adapter = TelaHistoricoAdapter(pilarViewModel, emptyList()) { pilar ->
             abrirTelaPilar(pilar)
         }
         recyclerView.adapter = adapter
@@ -50,7 +50,6 @@ class HistoricoFragment : Fragment() {
         val spinnerAnoFiltro = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerAnoFiltro)
         textoFiltroAtivo = view.findViewById(R.id.textoFiltroAtivo)
 
-        // Lista de status com "STATUS" no início
         val itensStatus = resources.getStringArray(R.array.status_pilar_array).toMutableList()
         if (!itensStatus.contains("STATUS")) {
             itensStatus.add(0, "STATUS")
@@ -58,7 +57,7 @@ class HistoricoFragment : Fragment() {
 
         val adapterStatus = ArrayAdapter(
             requireContext(),
-            R.layout.dropdown_item_white,  // USAR layout customizado para texto branco
+            R.layout.dropdown_item_white,
             itensStatus
         )
         spinnerStatusFilter.setAdapter(adapterStatus)
@@ -88,7 +87,7 @@ class HistoricoFragment : Fragment() {
 
             val adapterAno = ArrayAdapter(
                 requireContext(),
-                R.layout.dropdown_item_white,  // USAR layout customizado para texto branco
+                R.layout.dropdown_item_white,
                 listaAnos
             )
             spinnerAnoFiltro.setAdapter(adapterAno)
@@ -101,7 +100,6 @@ class HistoricoFragment : Fragment() {
             atualizarTextoFiltro()
         }
 
-        // Abrir dropdown quando o campo receber foco ou for clicado
         spinnerStatusFilter.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) spinnerStatusFilter.showDropDown()
         }
@@ -115,7 +113,6 @@ class HistoricoFragment : Fragment() {
             spinnerAnoFiltro.showDropDown()
         }
 
-        // Atualizar filtro ao selecionar item
         spinnerStatusFilter.setOnItemClickListener { parent, _, position, _ ->
             filtroStatusSelecionado = parent.getItemAtPosition(position).toString()
             aplicarFiltros()

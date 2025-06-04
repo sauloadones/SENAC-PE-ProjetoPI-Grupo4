@@ -4,12 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TelaHistoricoAdapter(
+    private val viewModel: PilarViewModel,
     pilaresOriginais: List<PilarEntity>,
     private val onClickPilar: (PilarEntity) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -20,6 +23,7 @@ class TelaHistoricoAdapter(
     }
 
     private var listaItens: List<Any> = agruparPorAno(pilaresOriginais)
+    private val adapterScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     // ViewHolder para o cabeçalho do ano
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -32,6 +36,8 @@ class TelaHistoricoAdapter(
         val statusOverlay: ImageView = itemView.findViewById(R.id.statusOverlay)
         val textStatus: TextView = itemView.findViewById(R.id.textStatus)
         val textData: TextView = itemView.findViewById(R.id.textData)
+        val progressoPilar: ProgressBar = itemView.findViewById(R.id.progressoPilar)
+        val percentual: TextView = itemView.findViewById(R.id.percentual)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -53,6 +59,7 @@ class TelaHistoricoAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = listaItens[position]
+
         if (holder is HeaderViewHolder && item is String) {
             holder.txtAno.text = item
         } else if (holder is PilarViewHolder && item is PilarEntity) {
@@ -91,6 +98,18 @@ class TelaHistoricoAdapter(
                     holder.textStatus.text = ""
                     holder.textData.text = ""
                 }
+            }
+
+            // Inicializa barra de progresso zerada
+            holder.progressoPilar.progress = 0
+            holder.percentual.text = "0%"
+
+            // Atualiza progresso com coroutine
+            adapterScope.launch {
+                val progressoFloat = viewModel.calcularProgressoInterno(pilar.id)
+                val progresso = (progressoFloat * 100).toInt()
+                holder.progressoPilar.progress = progresso
+                holder.percentual.text = "$progresso%"
             }
 
             holder.itemView.setOnClickListener {

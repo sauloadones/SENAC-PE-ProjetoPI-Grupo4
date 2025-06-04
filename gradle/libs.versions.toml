@@ -1,6 +1,6 @@
 [versions]
 # Plugins e Ferramentas
-agp = "8.10.1"
+agp = "8.9.1"
 kotlin = "2.0.21"
 
 # AndroidX e Material
