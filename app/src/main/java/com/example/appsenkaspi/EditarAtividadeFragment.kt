@@ -94,6 +94,21 @@ class EditarAtividadeFragment : Fragment() {
         funcionariosSelecionados.addAll(atividadeComFuncionarios.funcionarios)
         funcionariosOriginais = atividadeComFuncionarios.funcionarios
         preencherCampos(atividadeComFuncionarios)
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+          val acao = AppDatabase.getDatabase(requireContext())
+            .acaoDao()
+            .getAcaoPorId(atividadeOriginal.acaoId)
+
+          if (acao != null) {
+            dataPrazoAcao = acao.dataPrazo
+          } else {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(requireContext(), "Erro ao carregar prazo da ação associada.", Toast.LENGTH_SHORT).show()
+            }
+          }
+        }
+
       } else {
         Toast.makeText(requireContext(), "Atividade não encontrada", Toast.LENGTH_SHORT).show()
       }
@@ -352,7 +367,7 @@ class EditarAtividadeFragment : Fragment() {
     val fim = truncarData(dataFim!!)
     val prazoAcao = truncarData(dataPrazoAcao!!)
 
-    if (!inicio.after(prazoAcao)) {
+    if (inicio.after(prazoAcao)) {
       Toast.makeText(requireContext(), "A data de início deve ser antes do prazo da ação.", Toast.LENGTH_SHORT).show()
       return false
     }

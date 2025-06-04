@@ -1,6 +1,5 @@
 package com.example.appsenkaspi
 
-
 import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -14,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
 import com.google.gson.Gson
@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.fragment.app.activityViewModels
 
 class TelaAtividadeFragment : Fragment() {
 
@@ -33,9 +32,6 @@ class TelaAtividadeFragment : Fragment() {
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
   private val requisicaoViewModel: NotificacaoViewModel by activityViewModels()
   private var atividadeId: Int = -1
-
-  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
-
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentTelaAtividadeBinding.inflate(inflater, container, false)
@@ -55,7 +51,7 @@ class TelaAtividadeFragment : Fragment() {
           fragmentManager = parentFragmentManager,
           funcionarioId = it.id,
           cargo = it.cargo,
-          viewModel = notificacaoViewModel
+          viewModel = requisicaoViewModel
         )
       }
     }
@@ -101,20 +97,11 @@ class TelaAtividadeFragment : Fragment() {
       }
     }
 
-    val checklistAdapter = ChecklistAdapter(
-      itens = emptyList(),
-      onItemCheckedChanged = { itemAtualizado, _ -> checklistViewModel.atualizar(itemAtualizado) },
-      onDeleteItem = { item -> checklistViewModel.deletar(item) }
-    )
 
-    binding.recyclerChecklist.apply {
-      adapter = checklistAdapter
-      layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-    }
 
-    checklistViewModel.getChecklist(atividadeId).observe(viewLifecycleOwner) { itens ->
-      checklistAdapter.atualizarLista(itens)
-    }
+
+
+
 
     binding.btnEditar.setOnClickListener {
       val args = Bundle().apply { putInt("atividadeId", atividadeId) }
@@ -122,6 +109,10 @@ class TelaAtividadeFragment : Fragment() {
         .replace(R.id.main_container, EditarAtividadeFragment::class.java, args)
         .addToBackStack(null)
         .commit()
+    }
+
+    binding.btnDeletar.setOnClickListener {
+      mostrarDialogoConfirmacao()
     }
 
     binding.cardConfirmarAtividade.setOnClickListener {
@@ -147,11 +138,6 @@ class TelaAtividadeFragment : Fragment() {
           parentFragmentManager.popBackStack()
         }
       }
-    }
-
-
-    binding.btnDeletar.setOnClickListener {
-      mostrarDialogoConfirmacao()
     }
 
     binding.cardPedirConfirmacao.setOnClickListener {
