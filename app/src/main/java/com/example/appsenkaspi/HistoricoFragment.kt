@@ -4,16 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.Spinner
 import android.widget.TextView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -27,8 +25,8 @@ class HistoricoFragment : Fragment() {
 
     private var textoFiltroAtivo: TextView? = null
 
-    private var filtroStatusSelecionado: String? = null
-    private var filtroAnoSelecionado: String? = null
+    private var filtroStatusSelecionado: String = "STATUS"
+    private var filtroAnoSelecionado: String = "ANOS"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,62 +46,23 @@ class HistoricoFragment : Fragment() {
         }
         recyclerView.adapter = adapter
 
-        val spinnerStatusFilter = view.findViewById<Spinner>(R.id.spinnerStatusFilter)
-        val spinnerAnoFiltro = view.findViewById<Spinner>(R.id.spinnerStatusFiltro) // ano spinner
-
+        val spinnerStatusFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerStatusFilter)
+        val spinnerAnoFiltro = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerAnoFiltro)
         textoFiltroAtivo = view.findViewById(R.id.textoFiltroAtivo)
 
-        val itensStatus = resources.getStringArray(R.array.status_pilar_array)
-        val itensAno = resources.getStringArray(R.array.ano_pilar_array)
+        // Lista de status com "STATUS" no início
+        val itensStatus = resources.getStringArray(R.array.status_pilar_array).toMutableList()
+        if (!itensStatus.contains("STATUS")) {
+            itensStatus.add(0, "STATUS")
+        }
 
-        // Adapter para Status
         val adapterStatus = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
+            R.layout.dropdown_item_white,  // USAR layout customizado para texto branco
             itensStatus
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-
-        // Adapter para Ano
-        val adapterAno = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            itensAno
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-
-        spinnerStatusFilter.adapter = adapterStatus
-        spinnerAnoFiltro.adapter = adapterAno
-
-        spinnerStatusFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
-                filtroStatusSelecionado = parent?.getItemAtPosition(position)?.toString()
-                aplicarFiltros()
-                atualizarTextoFiltro()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                filtroStatusSelecionado = null
-                aplicarFiltros()
-                atualizarTextoFiltro()
-            }
-        }
-
-        spinnerAnoFiltro.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
-                filtroAnoSelecionado = parent?.getItemAtPosition(position)?.toString()
-                aplicarFiltros()
-                atualizarTextoFiltro()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                filtroAnoSelecionado = null
-                aplicarFiltros()
-                atualizarTextoFiltro()
-            }
-        }
+        )
+        spinnerStatusFilter.setAdapter(adapterStatus)
+        spinnerStatusFilter.setText("STATUS", false)
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             funcionario?.let {
@@ -112,43 +71,86 @@ class HistoricoFragment : Fragment() {
         }
 
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-            // Mantém somente os status que você deseja mostrar no histórico
             listaOriginal = lista.filter { pilar ->
                 pilar.status == StatusPilar.CONCLUIDO ||
                         pilar.status == StatusPilar.EXCLUIDO ||
                         pilar.status == StatusPilar.VENCIDO
             }
+
+            val anosSet = listaOriginal.mapNotNull {
+                extrairAno(it.dataPrazo) ?: extrairAno(it.dataExclusao)
+            }.toSet()
+
+            val listaAnos = anosSet.sortedDescending().map { it.toString() }.toMutableList()
+            if (!listaAnos.contains("ANOS")) {
+                listaAnos.add(0, "ANOS")
+            }
+
+            val adapterAno = ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_item_white,  // USAR layout customizado para texto branco
+                listaAnos
+            )
+            spinnerAnoFiltro.setAdapter(adapterAno)
+            spinnerAnoFiltro.setText("ANOS", false)
+
+            filtroAnoSelecionado = "ANOS"
+            filtroStatusSelecionado = "STATUS"
+
             aplicarFiltros()
+            atualizarTextoFiltro()
+        }
+
+        // Abrir dropdown quando o campo receber foco ou for clicado
+        spinnerStatusFilter.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) spinnerStatusFilter.showDropDown()
+        }
+        spinnerStatusFilter.setOnClickListener {
+            spinnerStatusFilter.showDropDown()
+        }
+        spinnerAnoFiltro.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) spinnerAnoFiltro.showDropDown()
+        }
+        spinnerAnoFiltro.setOnClickListener {
+            spinnerAnoFiltro.showDropDown()
+        }
+
+        // Atualizar filtro ao selecionar item
+        spinnerStatusFilter.setOnItemClickListener { parent, _, position, _ ->
+            filtroStatusSelecionado = parent.getItemAtPosition(position).toString()
+            aplicarFiltros()
+            atualizarTextoFiltro()
+        }
+
+        spinnerAnoFiltro.setOnItemClickListener { parent, _, position, _ ->
+            filtroAnoSelecionado = parent.getItemAtPosition(position).toString()
+            aplicarFiltros()
+            atualizarTextoFiltro()
         }
     }
 
     private fun aplicarFiltros() {
-        val filtrados = listaOriginal.filter { pilar ->
-            val statusOk = filtroStatusSelecionado == null ||
-                    filtroStatusSelecionado.equals("TODOS", ignoreCase = true) ||
-                    pilar.status.name.equals(filtroStatusSelecionado, ignoreCase = true)
-
-            val ano = extrairAno(pilar.dataPrazo)?.toString()
-            val anoOk = filtroAnoSelecionado == null ||
-                    filtroAnoSelecionado.equals("TODOS", ignoreCase = true) ||
-                    ano == filtroAnoSelecionado
+        val filtrada = listaOriginal.filter { pilar ->
+            val statusOk = filtroStatusSelecionado == "STATUS" || pilar.status.name == filtroStatusSelecionado.uppercase()
+            val anoPilar = extrairAno(pilar.dataPrazo) ?: extrairAno(pilar.dataExclusao)
+            val anoOk = filtroAnoSelecionado == "ANOS" || anoPilar?.toString() == filtroAnoSelecionado
 
             statusOk && anoOk
         }
-        adapter.atualizarLista(filtrados)
-    }
-
-    private fun extrairAno(data: Date?): Int? {
-        if (data == null) return null
-        val cal = Calendar.getInstance()
-        cal.time = data
-        return cal.get(Calendar.YEAR)
+        adapter.atualizarLista(filtrada)
     }
 
     private fun atualizarTextoFiltro() {
-        val status = filtroStatusSelecionado ?: "TODOS"
-        val ano = filtroAnoSelecionado ?: "TODOS"
-        textoFiltroAtivo?.text = "Status: $status | Ano: $ano"
+        val statusTexto = if (filtroStatusSelecionado == "STATUS") "Todos" else filtroStatusSelecionado
+        val anoTexto = if (filtroAnoSelecionado == "ANOS") "Todos" else filtroAnoSelecionado
+        textoFiltroAtivo?.text = "Status: $statusTexto | Anos: $anoTexto"
+    }
+
+    private fun extrairAno(data: Date?): Int? {
+        data ?: return null
+        val cal = Calendar.getInstance()
+        cal.time = data
+        return cal.get(Calendar.YEAR)
     }
 
     private fun abrirTelaPilar(pilar: PilarEntity) {
@@ -157,7 +159,9 @@ class HistoricoFragment : Fragment() {
 
             val fragment = if (temSubpilares) {
                 TelaPilarComSubpilaresFragment().apply {
-                    arguments = Bundle().apply { putInt("pilarId", pilar.id) }
+                    arguments = Bundle().apply {
+                        putInt("pilarId", pilar.id)
+                    }
                 }
             } else {
                 TelaPilarFragment().apply {

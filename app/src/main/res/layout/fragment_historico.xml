@@ -37,11 +37,11 @@
                 android:text="Históricos de Pilares"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:textSize="25sp"
+                android:textSize="20dp"
                 android:layout_gravity="center" />
         </LinearLayout>
 
-        <!-- Spinners lado a lado -->
+        <!-- Spinners lado a lado com MaterialAutoCompleteTextView e drawableStart -->
         <LinearLayout
             android:id="@+id/spinner_row"
             android:layout_width="match_parent"
@@ -52,23 +52,47 @@
             android:gravity="center"
             android:weightSum="2">
 
-            <Spinner
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spinnerStatusFilter"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@android:color/white"
-                android:spinnerMode="dropdown" />
+                android:inputType="none"
+                android:background="@drawable/spinner_background"
+                android:textColor="@color/white"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingEnd="12dp"
+                android:dropDownVerticalOffset="-5dp"
+                android:drawableStart="@drawable/ic_filter"
+                android:drawablePadding="8dp"
+                android:popupBackground="@drawable/bg_dropdown_popup"
+                android:focusable="true"
+                android:clickable="true" />
 
-            <Spinner
-                android:id="@+id/spinnerStatusFiltro"
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/spinnerAnoFiltro"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
-                android:backgroundTint="@android:color/white"
-                android:spinnerMode="dropdown" />
+                android:inputType="none"
+                android:background="@drawable/spinner_background"
+                android:textColor="@color/white"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingEnd="12dp"
+                android:dropDownVerticalOffset="-5dp"
+                android:drawableStart="@drawable/ic_filter"
+                android:drawablePadding="8dp"
+                android:popupBackground="@drawable/bg_dropdown_popup"
+                android:focusable="true"
+                android:clickable="true" />
         </LinearLayout>
 
         <!-- Texto do filtro ativo -->
@@ -92,6 +116,5 @@
             tools:listitem="@layout/item_pilar"
             android:clipToPadding="false"
             android:paddingBottom="24dp" />
-
     </LinearLayout>
 </ScrollView>
