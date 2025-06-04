@@ -80,13 +80,15 @@
                 android:backgroundTint="@android:color/transparent" />
 
             <TextView
-                android:id="@+id/percentual"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0%"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp" />
+            android:id="@+id/percentual"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="0%"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginStart="8dp" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
