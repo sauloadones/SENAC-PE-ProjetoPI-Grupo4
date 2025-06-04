@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 
 class NotificacaoFragment : Fragment() {
 
@@ -17,6 +20,7 @@ class NotificacaoFragment : Fragment() {
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
   private lateinit var adapter: RequisicaoAdapter
   private var funcionarioIdAtual: Int? = null
+  private var modoSelecaoAtivo = false
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -27,6 +31,8 @@ class NotificacaoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
     val vazio = view.findViewById<TextView>(R.id.textVazioNotificacoes)
+    val trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
+
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
@@ -59,6 +65,7 @@ class NotificacaoFragment : Fragment() {
         }
       })
 
+      // Observação das notificações:
       if (modoCoordenador) {
         val pendentesLiveData = viewModel.getRequisicoesPendentes()
         val pessoaisLiveData = viewModel.getNotificacoesDoApoio(funcionarioId)
@@ -75,8 +82,10 @@ class NotificacaoFragment : Fragment() {
                 TipoRequisicao.RESPONSAVEL_ADICIONADO
               ) && it.solicitanteId == funcionarioId
             }
-            val listaFinal = (pendentes + notificacoesAuto).sortedBy { it.resolvida }
-              .sortedBy { it.resolvida } // opcional: coloca resolvidas por último
+            val listaFinal = (pendentes + notificacoesAuto)
+              .filter { !it.excluida }
+              .sortedBy { it.resolvida }
+
             if (adapter.currentList != listaFinal) {
               adapter.submitList(listaFinal)
             }
@@ -84,12 +93,14 @@ class NotificacaoFragment : Fragment() {
         }
       } else {
         viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
-          adapter.submitList(lista)
-          if (lista.isNotEmpty()) {
+          val listaFiltrada = lista.filter { !it.excluida }
+          adapter.submitList(listaFiltrada)
+
+          if (listaFiltrada.isNotEmpty()) {
             recyclerView.post {
               val notificationManager = NotificationManagerCompat.from(requireContext())
 
-              lista.filter {
+              listaFiltrada.filter {
                 it.tipo == TipoRequisicao.ATIVIDADE_VENCIDA && !it.foiVista && it.solicitanteId == funcionarioId
               }.forEach { requisicao ->
                 notificationManager.cancel(requisicao.id)
@@ -98,6 +109,43 @@ class NotificacaoFragment : Fragment() {
 
               viewModel.marcarTodasComoVistas(funcionarioId)
             }
+          }
+        }
+      }
+
+      // 🔴 Clique no botão da lixeira
+      trashIcon.setOnClickListener {
+        if (!modoSelecaoAtivo) {
+          modoSelecaoAtivo = true
+          adapter.modoSelecao = true
+          adapter.selecionadas.clear()
+          adapter.notifyDataSetChanged()
+          trashIcon.setImageResource(R.drawable.ic_delete)
+        } else {
+          if (adapter.selecionadas.isNotEmpty()) {
+            AlertDialog.Builder(requireContext())
+              .setTitle("Excluir notificações")
+              .setMessage("Tem certeza que deseja excluir ${adapter.selecionadas.size} notificações selecionadas?")
+              .setPositiveButton("Excluir") { dialog, _ ->
+                viewModel.excluirRequisicoes(adapter.selecionadas.toList())
+                Snackbar.make(view, "Notificações excluídas", Snackbar.LENGTH_SHORT).show()
+
+                modoSelecaoAtivo = false
+                adapter.modoSelecao = false
+                adapter.selecionadas.clear()
+                adapter.notifyDataSetChanged()
+                trashIcon.setImageResource(R.drawable.ic_delete)
+                dialog.dismiss()
+              }
+              .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+              }
+              .show()
+          } else {
+            modoSelecaoAtivo = false
+            adapter.modoSelecao = false
+            adapter.notifyDataSetChanged()
+            trashIcon.setImageResource(R.drawable.ic_delete)
           }
         }
       }
@@ -122,17 +170,18 @@ class NotificacaoFragment : Fragment() {
               TipoRequisicao.ATIVIDADE_CONCLUIDA,
               TipoRequisicao.RESPONSAVEL_REMOVIDO,
               TipoRequisicao.RESPONSAVEL_ADICIONADO,
-
             ) && it.solicitanteId == funcionarioId
           }
           val listaFinal = (pendentes + notificacoesDePrazoOuVencida)
+            .filter { !it.excluida }
             .sortedBy { it.resolvida }
+
           adapter.submitList(listaFinal)
         }
       }
     } else {
       viewModel.getNotificacoesDoApoio(funcionarioId).observe(viewLifecycleOwner) { lista ->
-        adapter.submitList(lista)
+        adapter.submitList(lista.filter { !it.excluida })
       }
     }
   }
