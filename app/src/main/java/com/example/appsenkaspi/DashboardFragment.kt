@@ -218,7 +218,7 @@ class DashboardFragment : Fragment() {
       setDrawValues(false)
       colors = listOf(
         Color.parseColor("#164773"), // Azul do progresso
-        Color.parseColor("#2B2B2B")  // Cinza escuro para o restante
+        Color.parseColor("#181818")  // Cinza escuro para o restante
       )
     }
 

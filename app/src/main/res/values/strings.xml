@@ -18,9 +18,9 @@
     </string-array>
 
     <string-array name="status_pilar_array">
-        <item>CONCLUIDO</item>
-        <item>EXCLUIDO</item>
-        <item>VENCIDO</item>
+        <item>Concluido</item>
+        <item>Excluido</item>
+        <item>Vencido</item>
     </string-array>
     <string name="tipo_relatorio">Tipo de Relatório:</string>
     <string name="relatorio_geral">Relatório Geral</string>

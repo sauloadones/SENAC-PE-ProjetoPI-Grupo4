@@ -41,7 +41,7 @@
                 android:layout_gravity="center" />
         </LinearLayout>
 
-        <!-- Spinners lado a lado com MaterialAutoCompleteTextView e drawableStart -->
+        <!-- Spinners lado a lado com labels -->
         <LinearLayout
             android:id="@+id/spinner_row"
             android:layout_width="match_parent"
@@ -49,62 +49,84 @@
             android:orientation="horizontal"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:weightSum="2">
+            android:weightSum="2"
+            android:gravity="center">
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/spinnerStatusFilter"
+            <!-- Coluna do Spinner de Status -->
+            <!-- Coluna do Spinner de Status -->
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginEnd="8dp"
-                android:inputType="none"
-                android:background="@drawable/spinner_background"
-                android:textColor="@color/white"
-                android:gravity="center_vertical|center_horizontal"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingEnd="12dp"
-                android:dropDownVerticalOffset="-5dp"
-                android:drawableStart="@drawable/ic_filter"
-                android:drawablePadding="8dp"
-                android:popupBackground="@drawable/bg_dropdown_popup"
-                android:focusable="true"
-                android:clickable="true" />
+                android:gravity="center_horizontal">
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/spinnerAnoFiltro"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filtrar por status"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/spinnerStatusFilter"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:inputType="none"
+                    android:background="@drawable/spinner_background"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="12dp"
+                    android:dropDownVerticalOffset="-5dp"
+                    android:drawableStart="@drawable/ic_filter"
+                    android:drawablePadding="8dp"
+                    android:popupBackground="@drawable/bg_dropdown_popup"
+                    android:focusable="true"
+                    android:clickable="true" />
+            </LinearLayout>
+
+            <!-- Coluna do Spinner de Ano -->
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_marginStart="8dp"
-                android:inputType="none"
-                android:background="@drawable/spinner_background"
-                android:textColor="@color/white"
-                android:gravity="center_vertical|center_horizontal"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingEnd="12dp"
-                android:dropDownVerticalOffset="-5dp"
-                android:drawableStart="@drawable/ic_filter"
-                android:drawablePadding="8dp"
-                android:popupBackground="@drawable/bg_dropdown_popup"
-                android:focusable="true"
-                android:clickable="true" />
-        </LinearLayout>
+                android:gravity="center_horizontal">
 
-        <!-- Texto do filtro ativo -->
-        <TextView
-            android:id="@+id/textoFiltroAtivo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Status: TODOS | Ano: TODOS"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="12dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filtrar por ano"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/spinnerAnoFiltro"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:inputType="none"
+                    android:background="@drawable/spinner_background"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="12dp"
+                    android:dropDownVerticalOffset="-5dp"
+                    android:drawableStart="@drawable/ic_filter"
+                    android:drawablePadding="8dp"
+                    android:popupBackground="@drawable/bg_dropdown_popup"
+                    android:focusable="true"
+                    android:clickable="true" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
