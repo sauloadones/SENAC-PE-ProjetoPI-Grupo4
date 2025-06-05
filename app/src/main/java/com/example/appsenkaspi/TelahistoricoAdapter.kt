@@ -67,56 +67,39 @@ class TelaHistoricoAdapter(
             holder.textTitulo.text = pilar.nome ?: "Sem título"
 
             val dataFormatada = formatarData(
-                when (pilar.status) {
-                    StatusPilar.EXCLUIDO -> pilar.dataExclusao
-                    StatusPilar.CONCLUIDO, StatusPilar.VENCIDO -> pilar.dataPrazo
-                    else -> null
-                }
-            )
-
-            when (pilar.status) {
-                StatusPilar.CONCLUIDO -> {
-                    holder.statusOverlay.visibility = View.VISIBLE
-                    holder.statusOverlay.setImageResource(R.drawable.bverde)
-                    holder.textStatus.text = "Concluído"
-                    holder.textData.text = dataFormatada?.let { "Concluído em: $it" } ?: ""
-                }
-                StatusPilar.EXCLUIDO -> {
-                    holder.statusOverlay.visibility = View.VISIBLE
-                    holder.statusOverlay.setImageResource(R.drawable.bvermelho)
-                    holder.textStatus.text = "Excluído"
-                    holder.textData.text = dataFormatada?.let { "Excluído em: $it" } ?: ""
-                }
-                StatusPilar.VENCIDO -> {
-                    holder.statusOverlay.visibility = View.VISIBLE
-                    holder.statusOverlay.setImageResource(R.drawable.blaranja)
-                    holder.textStatus.text = "Vencido"
-                    holder.textData.text = dataFormatada?.let { "Venceu em: $it" } ?: ""
-                }
-                else -> {
-                    holder.statusOverlay.visibility = View.GONE
-                    holder.textStatus.text = ""
-                    holder.textData.text = ""
-                }
-            }
-
-            // Inicializa barra de progresso zerada
-            holder.progressoPilar.progress = 0
-            holder.percentual.text = "0%"
-
-            // Atualiza progresso com coroutine
-            adapterScope.launch {
-                val progressoFloat = viewModel.calcularProgressoInterno(pilar.id)
-                val progresso = (progressoFloat * 100).toInt()
-                holder.progressoPilar.progress = progresso
-                holder.percentual.text = "$progresso%"
-            }
-
-            holder.itemView.setOnClickListener {
-                onClickPilar(pilar)
-            }
-        }
+    when (pilar.status) {
+        StatusPilar.EXCLUIDO -> pilar.dataExclusao
+        StatusPilar.CONCLUIDO -> pilar.dataConclusao
+        StatusPilar.VENCIDO -> pilar.dataPrazo
+        else -> null
     }
+)
+
+when (pilar.status) {
+    StatusPilar.CONCLUIDO -> {
+        holder.statusOverlay.visibility = View.VISIBLE
+        holder.statusOverlay.setImageResource(R.drawable.bverde)
+        holder.textStatus.text = "Concluído"
+        holder.textData.text = dataFormatada?.let { "Concluído em: $it" } ?: ""
+    }
+    StatusPilar.EXCLUIDO -> {
+        holder.statusOverlay.visibility = View.VISIBLE
+        holder.statusOverlay.setImageResource(R.drawable.bvermelho)
+        holder.textStatus.text = "Excluído"
+        holder.textData.text = dataFormatada?.let { "Excluído em: $it" } ?: ""
+    }
+    StatusPilar.VENCIDO -> {
+        holder.statusOverlay.visibility = View.VISIBLE
+        holder.statusOverlay.setImageResource(R.drawable.blaranja)
+        holder.textStatus.text = "Vencido"
+        holder.textData.text = dataFormatada?.let { "Venceu em: $it" } ?: ""
+    }
+    else -> {
+        holder.statusOverlay.visibility = View.GONE
+        holder.textStatus.text = ""
+        holder.textData.text = ""
+    }
+}
 
     fun atualizarLista(novaLista: List<PilarEntity>) {
         listaItens = agruparPorAno(novaLista)

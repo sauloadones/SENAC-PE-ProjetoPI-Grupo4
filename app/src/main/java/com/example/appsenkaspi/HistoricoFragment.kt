@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import kotlinx.coroutines.launch
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class HistoricoFragment : Fragment() {
 
@@ -26,6 +27,9 @@ class HistoricoFragment : Fragment() {
     private var textoFiltroAtivo: TextView? = null
     private var filtroStatusSelecionado: String = "STATUS"
     private var filtroAnoSelecionado: String = "ANOS"
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
+    private var filtroStatus: StatusPilar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +40,21 @@ class HistoricoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarBotaoVoltar(view)
+
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFiltroExclusao)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

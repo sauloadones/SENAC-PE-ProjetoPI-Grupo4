@@ -1,6 +1,5 @@
 package com.example.appsenkaspi
 
-
 import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -14,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.appsenkaspi.databinding.FragmentTelaAtividadeBinding
 import com.google.gson.Gson
@@ -42,6 +42,19 @@ class TelaAtividadeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = requisicaoViewModel
+        )
+      }
+    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       when (funcionario?.cargo) {
@@ -84,20 +97,11 @@ class TelaAtividadeFragment : Fragment() {
       }
     }
 
-    val checklistAdapter = ChecklistAdapter(
-      itens = emptyList(),
-      onItemCheckedChanged = { itemAtualizado, _ -> checklistViewModel.atualizar(itemAtualizado) },
-      onDeleteItem = { item -> checklistViewModel.deletar(item) }
-    )
 
-    binding.recyclerChecklist.apply {
-      adapter = checklistAdapter
-      layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-    }
 
-    checklistViewModel.getChecklist(atividadeId).observe(viewLifecycleOwner) { itens ->
-      checklistAdapter.atualizarLista(itens)
-    }
+
+
+
 
     binding.btnEditar.setOnClickListener {
       val args = Bundle().apply { putInt("atividadeId", atividadeId) }
@@ -105,6 +109,10 @@ class TelaAtividadeFragment : Fragment() {
         .replace(R.id.main_container, EditarAtividadeFragment::class.java, args)
         .addToBackStack(null)
         .commit()
+    }
+
+    binding.btnDeletar.setOnClickListener {
+      mostrarDialogoConfirmacao()
     }
 
     binding.cardConfirmarAtividade.setOnClickListener {
@@ -130,11 +138,6 @@ class TelaAtividadeFragment : Fragment() {
           parentFragmentManager.popBackStack()
         }
       }
-    }
-
-
-    binding.btnDeletar.setOnClickListener {
-      mostrarDialogoConfirmacao()
     }
 
     binding.cardPedirConfirmacao.setOnClickListener {

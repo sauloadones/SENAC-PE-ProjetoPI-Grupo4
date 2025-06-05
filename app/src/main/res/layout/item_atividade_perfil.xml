@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="80dp"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Linha de status e prioridade -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -38,14 +37,14 @@
                 android:layout_alignParentStart="true">
 
                 <View
-                    android:id="@+id/statusBolinha"
+                    android:id="@+id/statusBolinhaPerfil"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/status_nao_iniciado" />
 
                 <TextView
-                    android:id="@+id/textTitulo"
+                    android:id="@+id/textTituloPerfil"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Identificação dos Riscos"
@@ -55,7 +54,6 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Linha olho + relógio e data -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,7 +71,7 @@
                 app:tint="#FFFFFF" />
 
             <LinearLayout
-                android:id="@+id/containerData"
+                android:id="@+id/containerDataPerfil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -82,15 +80,15 @@
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:id="@+id/iconClock"
+                    android:id="@+id/iconClockPerfil"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_clock"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="4dp"
                     app:tint="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/textData"
+                    android:id="@+id/textDataPerfil"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="25 de abr., 16:00"
@@ -101,11 +99,11 @@
 
         <!-- Fotos dos responsáveis -->
         <LinearLayout
-            android:id="@+id/containerResponsaveis"
+            android:id="@+id/containerResponsaveisPerfil"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:orientation="horizontal"
-            android:gravity="end"
+            android:gravity="end|center_vertical"
             android:layout_marginTop="8dp"
             android:paddingEnd="8dp" />
 

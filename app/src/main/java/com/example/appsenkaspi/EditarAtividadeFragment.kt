@@ -15,14 +15,16 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class EditarAtividadeFragment : Fragment() {
 
   private var _binding: FragmentEditarAtividadeBinding? = null
   private val binding get() = _binding!!
-
+  private var dataPrazoAcao: Date? = null
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
   private val acaoViewModel: AcaoViewModel by activityViewModels()
@@ -35,6 +37,8 @@ class EditarAtividadeFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private var funcionariosOriginais: List<FuncionarioEntity> = emptyList()
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentEditarAtividadeBinding.inflate(inflater, container, false)
     return binding.root
@@ -42,6 +46,19 @@ class EditarAtividadeFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     // 🔁 Observa notificações (ex.: após alteração de prazo)
 
@@ -77,6 +94,21 @@ class EditarAtividadeFragment : Fragment() {
         funcionariosSelecionados.addAll(atividadeComFuncionarios.funcionarios)
         funcionariosOriginais = atividadeComFuncionarios.funcionarios
         preencherCampos(atividadeComFuncionarios)
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+          val acao = AppDatabase.getDatabase(requireContext())
+            .acaoDao()
+            .getAcaoPorId(atividadeOriginal.acaoId)
+
+          if (acao != null) {
+            dataPrazoAcao = acao.dataPrazo
+          } else {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(requireContext(), "Erro ao carregar prazo da ação associada.", Toast.LENGTH_SHORT).show()
+            }
+          }
+        }
+
       } else {
         Toast.makeText(requireContext(), "Atividade não encontrada", Toast.LENGTH_SHORT).show()
       }
@@ -108,6 +140,7 @@ class EditarAtividadeFragment : Fragment() {
       }
 
       viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+        if (!validarDatasComAcao()) return@launch
         val nomePilar = AppDatabase.getDatabase(requireContext())
           .pilarDao()
           .getNomePilarPorId(atividadeOriginal.acaoId) ?: "Indefinido"
@@ -169,17 +202,19 @@ class EditarAtividadeFragment : Fragment() {
       return
     }
 
-    val atividadeAtualizada = atividadeOriginal.copy(
-      nome = nome,
-      descricao = descricao,
-      dataInicio = dataInicio!!,
-      dataPrazo = dataFim!!,
-      prioridade = prioridadeSelecionada!!,
-      funcionarioId = funcionariosSelecionados.first().id,
-      status = atividadeOriginal.status
-    )
-
     viewLifecycleOwner.lifecycleScope.launch {
+      if (!validarDatasComAcao()) return@launch
+
+      val atividadeAtualizada = atividadeOriginal.copy(
+        nome = nome,
+        descricao = descricao,
+        dataInicio = dataInicio!!,
+        dataPrazo = dataFim!!,
+        prioridade = prioridadeSelecionada!!,
+        funcionarioId = funcionariosSelecionados.first().id,
+        status = atividadeOriginal.status
+      )
+
       val appDb = AppDatabase.getDatabase(requireContext())
       val atividadeDao = appDb.atividadeDao()
       val funcionarioDao = appDb.funcionarioDao()
@@ -224,6 +259,7 @@ class EditarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
     }
   }
+
 
 
 
@@ -321,6 +357,44 @@ class EditarAtividadeFragment : Fragment() {
       container.addView(imageView)
     }
   }
+  private fun validarDatasComAcao(): Boolean {
+    if (dataInicio == null || dataFim == null || dataPrazoAcao == null) {
+      Toast.makeText(requireContext(), "Erro ao validar datas: valores nulos.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    val inicio = truncarData(dataInicio!!)
+    val fim = truncarData(dataFim!!)
+    val prazoAcao = truncarData(dataPrazoAcao!!)
+
+    if (inicio.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo da ação.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (fim.before(inicio)) {
+      Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (fim.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo da ação.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
+  }
+
 
   override fun onDestroyView() {
     super.onDestroyView()

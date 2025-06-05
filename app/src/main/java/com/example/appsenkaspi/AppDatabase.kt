@@ -73,6 +73,18 @@ abstract class AppDatabase : RoomDatabase() {
                                         fotoBanner = ""
 
                                     ),
+                                  FuncionarioEntity(
+                                    nomeCompleto = "Usuario Teste",
+                                    email = "usuario.teste@example.com",
+                                    cargo = Cargo.COORDENADOR,
+                                    fotoPerfil = "https://i.pravatar.cc/150?img=1",
+                                    nomeUsuario = "teste",
+                                    senha = "senha123",
+                                    idAcesso = 5,
+                                    numeroTel = "(84)91191-9291",
+                                    fotoBanner = ""
+
+                                  ),
                                     FuncionarioEntity(
                                         nomeCompleto = "Fernanda Oliveira",
                                         email = "fernanda.oliveira@example.com",

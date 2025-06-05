@@ -29,6 +29,7 @@ class EditarAcaoFragment : Fragment() {
   private val acaoViewModel: AcaoViewModel by activityViewModels()
   private val acaoFuncionarioViewModel: AcaoFuncionarioViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
   private var dataPrazoSelecionada: Date? = null
   private val calendario = Calendar.getInstance()
@@ -40,10 +41,7 @@ class EditarAcaoFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private lateinit var adapterSelecionados: FuncionarioSelecionadoAdapter
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentEditarAcaoBinding.inflate(inflater, container, false)
     return binding.root
   }
@@ -52,9 +50,21 @@ class EditarAcaoFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
 
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
+
     adapterSelecionados = FuncionarioSelecionadoAdapter(funcionariosSelecionados)
-    binding.recyclerViewFuncionariosSelecionados.layoutManager =
-      LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+    binding.recyclerViewFuncionariosSelecionados.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
     binding.recyclerViewFuncionariosSelecionados.adapter = adapterSelecionados
 
     binding.buttonPickDateEdicao.setOnClickListener { abrirDatePicker() }
@@ -123,6 +133,7 @@ class EditarAcaoFragment : Fragment() {
     }
 
     lifecycleScope.launch(Dispatchers.IO) {
+      if (!validarPrazoEdicao()) return@launch
       val acao = AppDatabase.getDatabase(requireContext()).acaoDao().getAcaoPorIdDireto(acaoId) ?: return@launch
 
       val nomeAlvo = when {
@@ -177,6 +188,7 @@ class EditarAcaoFragment : Fragment() {
     }
 
     lifecycleScope.launch {
+      if (!validarPrazoEdicao()) return@launch
       val acaoExistente = acaoViewModel.getAcaoByIdNow(acaoId)
       if (acaoExistente != null) {
         if (acaoExistente.pilarId != null && acaoExistente.subpilarId != null) {
@@ -199,18 +211,41 @@ class EditarAcaoFragment : Fragment() {
     }
   }
 
-  private fun deletarAcao() {
-    lifecycleScope.launch {
-      val dao = AppDatabase.getDatabase(requireContext()).acaoDao()
-      val acao = dao.buscarAcaoPorId(acaoId)
-      if (acao != null) {
-        dao.deletarAcao(acao)
-        Toast.makeText(requireContext(), "Ação deletada com sucesso!", Toast.LENGTH_SHORT).show()
-        parentFragmentManager.popBackStack()
-      } else {
-        Toast.makeText(requireContext(), "Erro ao localizar a ação!", Toast.LENGTH_SHORT).show()
+  private suspend fun validarPrazoEdicao(): Boolean {
+    if (dataPrazoSelecionada == null) {
+      binding.buttonPickDateEdicao.error = "Selecione uma data de prazo"
+      return false
+    }
+
+    val dataLimite: Date? = when {
+      subpilarId != null -> acaoViewModel.buscarSubpilarPorId(subpilarId!!)?.dataPrazo
+      pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.dataPrazo
+      else -> null
+    }
+
+    dataLimite?.let {
+      val selecionada = truncarData(dataPrazoSelecionada!!)
+      val limite = truncarData(it)
+
+      if (selecionada.after(limite)) {
+        val nomeEstrutura = if (subpilarId != null) "subpilar" else "pilar"
+        val dataFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
+        Toast.makeText(requireContext(), "A nova data não pode ultrapassar o prazo do $nomeEstrutura ($dataFormatada).", Toast.LENGTH_LONG).show()
+        return false
       }
     }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
   }
 
   private fun abrirDatePicker() {
@@ -235,8 +270,8 @@ class EditarAcaoFragment : Fragment() {
   private fun exibirPopupMenu(anchor: View) {
     val popup = PopupMenu(requireContext(), anchor)
     popup.menuInflater.inflate(R.menu.menu_pilar, popup.menu)
-    popup.setOnMenuItemClickListener { item ->
-      when (item.itemId) {
+    popup.setOnMenuItemClickListener {
+      when (it.itemId) {
         R.id.action_deletar -> {
           exibirDialogoConfirmacao()
           true
@@ -254,6 +289,20 @@ class EditarAcaoFragment : Fragment() {
       .setPositiveButton("Deletar") { _, _ -> deletarAcao() }
       .setNegativeButton("Cancelar", null)
       .show()
+  }
+
+  private fun deletarAcao() {
+    lifecycleScope.launch {
+      val dao = AppDatabase.getDatabase(requireContext()).acaoDao()
+      val acao = dao.buscarAcaoPorId(acaoId)
+      if (acao != null) {
+        dao.deletarAcao(acao)
+        Toast.makeText(requireContext(), "Ação deletada com sucesso!", Toast.LENGTH_SHORT).show()
+        parentFragmentManager.popBackStack()
+      } else {
+        Toast.makeText(requireContext(), "Erro ao localizar a ação!", Toast.LENGTH_SHORT).show()
+      }
+    }
   }
 
   override fun onDestroyView() {
