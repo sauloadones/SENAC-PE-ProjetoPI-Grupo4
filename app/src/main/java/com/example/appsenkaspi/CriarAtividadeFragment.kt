@@ -3,6 +3,7 @@ package com.example.appsenkaspi
 import android.app.DatePickerDialog
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -15,15 +16,16 @@ import com.example.appsenkaspi.databinding.FragmentCriarAtividadeBinding
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.fragment.app.activityViewModels
 
 class CriarAtividadeFragment : Fragment() {
 
   private var _binding: FragmentCriarAtividadeBinding? = null
   private val binding get() = _binding!!
   private var dataPrazoPilar: Date? = null
+  private var dataPrazoAcao: Date? = null
 
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
@@ -36,7 +38,6 @@ class CriarAtividadeFragment : Fragment() {
   private var acaoId: Int = -1
 
   private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
-
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentCriarAtividadeBinding.inflate(inflater, container, false)
@@ -83,13 +84,12 @@ class CriarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
       return
     }
-    lifecycleScope.launch(Dispatchers.IO) {
-      val acao = acaoViewModel.buscarAcaoPorId(acaoId)
-      val pilar = acao?.pilarId?.let {
-        AppDatabase.getDatabase(requireContext()).pilarDao().getById(it)
+    viewLifecycleOwner.lifecycleScope.launch {
+      val acao = withContext(Dispatchers.IO) {
+        acaoViewModel.buscarAcaoPorId(acaoId)
       }
-
-      dataPrazoPilar = pilar?.dataPrazo
+      dataPrazoAcao = acao?.dataPrazo
+      Log.d("CriarAtividade", "Data prazo da ação carregada: $dataPrazoAcao")
     }
 
 
@@ -115,8 +115,7 @@ class CriarAtividadeFragment : Fragment() {
     binding.textDataFim.setOnClickListener { abrirDatePicker(false) }
 
     binding.botaoConfirmarAtividade.setOnClickListener {
-      if (!validarDatasComPilar()) return@setOnClickListener
-
+      if (!validarDatasComAcao()) return@setOnClickListener
       confirmarCriacaoAtividade()
     }
 
@@ -124,7 +123,7 @@ class CriarAtividadeFragment : Fragment() {
       val nome = binding.inputNomeAtividade.text.toString().trim()
       val descricao = binding.inputDescricao.text.toString().trim()
       val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
-      if (!validarDatasComPilar()) return@setOnClickListener
+      if (!validarDatasComAcao()) return@setOnClickListener
 
       when {
         nome.isEmpty() -> {
@@ -333,31 +332,44 @@ class CriarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
     }
   }
-  private fun validarDatasComPilar(): Boolean {
-    if (dataInicio == null || dataFim == null || dataPrazoPilar == null) {
+
+  private fun validarDatasComAcao(): Boolean {
+    if (dataInicio == null || dataFim == null || dataPrazoAcao == null) {
       Toast.makeText(requireContext(), "Erro ao validar datas: valores nulos.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (!dataInicio!!.before(dataPrazoPilar)) {
-      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo do pilar.", Toast.LENGTH_SHORT).show()
+    val inicio = truncarData(dataInicio!!)
+    val fim = truncarData(dataFim!!)
+    val prazoAcao = truncarData(dataPrazoAcao!!)
+
+    if (inicio.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo da ação.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (dataFim!!.before(dataInicio)) {
+    if (fim.before(inicio)) {
       Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
       return false
     }
 
-    if (dataFim!!.after(dataPrazoPilar)) {
-      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo do pilar.", Toast.LENGTH_SHORT).show()
+    if (fim.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo da ação.", Toast.LENGTH_SHORT).show()
       return false
     }
 
     return true
   }
 
-
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
+  }
 
   override fun onDestroyView() {
     super.onDestroyView()

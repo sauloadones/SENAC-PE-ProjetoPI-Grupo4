@@ -148,6 +148,9 @@ class PilarViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
+  suspend fun getDataPrazoDoPilar(id: Int): Date? {
+    return pilarDao.getById(id).dataPrazo
+  }
 
 
   fun atualizarStatusDeTodosOsPilares() = viewModelScope.launch(Dispatchers.IO) {

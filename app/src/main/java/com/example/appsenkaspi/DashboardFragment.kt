@@ -108,6 +108,8 @@ class DashboardFragment : Fragment() {
         var atividadesAndamento = 0
         var atividadesAtraso = 0
 
+        val listaProgresso = mutableListOf<Float>()
+
         for (pilar in pilares) {
           val possuiSubpilares = withContext(Dispatchers.IO) {
             pilarViewModel.temSubpilaresDireto(pilar.id)
@@ -123,12 +125,22 @@ class DashboardFragment : Fragment() {
             }
           }
 
+          val progresso = withContext(Dispatchers.IO) {
+            pilarViewModel.calcularProgressoInterno(pilar.id)
+          }
+
+          listaProgresso.add(progresso)
+
           totalAcoes += resumo.totalAcoes
           totalAtividades += resumo.totalAtividades
           atividadesConcluidas += resumo.atividadesConcluidas
           atividadesAndamento += resumo.atividadesAndamento
           atividadesAtraso += resumo.atividadesAtraso
         }
+
+        val mediaProgresso = if (listaProgresso.isNotEmpty()) {
+          listaProgresso.average().toFloat()
+        } else 0f
 
         val resumoGeral = ResumoDashboard(
           totalAcoes,
@@ -139,7 +151,7 @@ class DashboardFragment : Fragment() {
         )
 
         withContext(Dispatchers.Main) {
-          atualizarResumoEDonut(resumoGeral, "Progressão geral dos pilares")
+          atualizarResumoEDonut(resumoGeral, "Progressão geral dos pilares", mediaProgresso)
         }
 
       } else {
@@ -158,7 +170,6 @@ class DashboardFragment : Fragment() {
           }
         }
 
-        // Cálculo real do progresso para o gráfico de donut (progresso ponderado por atividades/subpilares)
         val progressoReal = withContext(Dispatchers.IO) {
           pilarViewModel.calcularProgressoInterno(pilarId)
         }
@@ -169,6 +180,7 @@ class DashboardFragment : Fragment() {
       }
     }
   }
+
 
 
 
@@ -195,15 +207,19 @@ class DashboardFragment : Fragment() {
 
   private fun atualizarDonutChart(progresso: Float) {
     val progressoPercentual = (progresso * 100f).coerceIn(0f, 100f)
+    val restante = 100f - progressoPercentual
 
     val entries = listOf(
-      PieEntry(progressoPercentual, "") // Só uma entrada visível
+      PieEntry(progressoPercentual),
+      PieEntry(restante)
     )
 
     val dataSet = PieDataSet(entries, "").apply {
-      setDrawValues(false) // remove os valores numéricos da borda
-      valueTextSize = 0f
-      colors = listOf(Color.parseColor("#164773")) // Azul original
+      setDrawValues(false)
+      colors = listOf(
+        Color.parseColor("#164773"), // Azul do progresso
+        Color.parseColor("#2B2B2B")  // Cinza escuro para o restante
+      )
     }
 
     val data = PieData(dataSet)
@@ -227,6 +243,7 @@ class DashboardFragment : Fragment() {
       animateY(800)
     }
   }
+
 
 
 

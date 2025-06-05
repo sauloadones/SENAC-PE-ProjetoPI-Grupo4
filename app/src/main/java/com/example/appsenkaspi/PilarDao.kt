@@ -75,5 +75,4 @@ interface PilarDao {
     @Query("SELECT * FROM pilares WHERE status = :status AND dataExclusao = :dataExclusao")
     fun listarPilaresPorStatusEData(status: StatusPilar, dataExclusao: String): LiveData<List<PilarEntity>>
 
-
 }

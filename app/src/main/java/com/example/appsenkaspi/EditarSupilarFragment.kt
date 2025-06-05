@@ -12,10 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.appsenkaspi.databinding.FragmentEditarSubpilarBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.fragment.app.activityViewModels
 
 class EditarSubpilarFragment : Fragment() {
 
@@ -23,12 +24,13 @@ class EditarSubpilarFragment : Fragment() {
   private val binding get() = _binding!!
 
   private val subpilarViewModel: SubpilarViewModel by activityViewModels()
+  private val pilarViewModel: PilarViewModel by activityViewModels()
   private var subpilarId: Int = -1
+  private var pilarId: Int = -1
   private var novaDataSelecionada: Date? = null
 
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
   private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
-
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +66,13 @@ class EditarSubpilarFragment : Fragment() {
 
     carregarDadosSubpilar(subpilarId)
     binding.buttonPickDateEdicao.setOnClickListener { abrirDatePicker() }
-    binding.confirmarButtonWrapperEdicao.setOnClickListener { confirmarEdicao() }
+    binding.confirmarButtonWrapperEdicao.setOnClickListener {
+      lifecycleScope.launch {
+        if (validarPrazoComPilar()) {
+          confirmarEdicao()
+        }
+      }
+    }
     binding.iconeMenuEdicao.setOnClickListener { exibirPopupMenu(it) }
   }
 
@@ -76,6 +84,7 @@ class EditarSubpilarFragment : Fragment() {
         binding.inputNomeEdicao.setText(subpilar.nome)
         binding.inputDescricaoEdicao.setText(subpilar.descricao)
         novaDataSelecionada = subpilar.dataPrazo
+        pilarId = subpilar.pilarId
         novaDataSelecionada?.let {
           val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
           binding.buttonPickDateEdicao.text = formato.format(it)
@@ -99,6 +108,49 @@ class EditarSubpilarFragment : Fragment() {
       calendario.get(Calendar.DAY_OF_MONTH)
     )
     datePicker.show()
+  }
+
+  private suspend fun validarPrazoComPilar(): Boolean {
+    if (novaDataSelecionada == null) {
+      binding.buttonPickDateEdicao.error = "Escolha um prazo"
+      return false
+    }
+
+    val dataLimite = pilarViewModel.getDataPrazoDoPilar(pilarId)
+
+    if (dataLimite == null) {
+      withContext(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "Erro ao buscar data do pilar.", Toast.LENGTH_SHORT).show()
+      }
+      return false
+    }
+
+    val selecionadaTruncada = truncarData(novaDataSelecionada!!)
+    val limiteTruncado = truncarData(dataLimite)
+
+    if (selecionadaTruncada.after(limiteTruncado)) {
+      val dataFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(limiteTruncado)
+      withContext(Dispatchers.Main) {
+        Toast.makeText(
+          requireContext(),
+          "A nova data não pode ultrapassar o prazo do pilar ($dataFormatada).",
+          Toast.LENGTH_LONG
+        ).show()
+      }
+      return false
+    }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
   }
 
   private fun confirmarEdicao() {
