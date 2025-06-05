@@ -2,7 +2,7 @@ package com.example.appsenkaspi
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,30 +11,29 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
-import android.graphics.drawable.LayerDrawable
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AtividadeAdapter(
+class AtividadePerfilAdapter(
     private val onItemClick: (AtividadeComFuncionarios) -> Unit
-) : ListAdapter<AtividadeComFuncionarios, AtividadeAdapter.ViewHolder>(AtividadeComFuncionariosDiffCallback()) {
+) : ListAdapter<AtividadeComFuncionarios, AtividadePerfilAdapter.ViewHolder>(AtividadeComFuncionariosDiffCallback()) {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titulo: TextView = view.findViewById(R.id.textTitulo)
-        val statusBolinha: View = view.findViewById(R.id.statusBolinha)
+        val titulo: TextView = view.findViewById(R.id.textTituloPerfil)
+        val statusBolinha: View = view.findViewById(R.id.statusBolinhaPerfil)
         val prioridadeQuadrado: View = view.findViewById(R.id.viewPrioridade)
-        val containerResponsaveis: LinearLayout = view.findViewById(R.id.containerResponsaveis)
-        val containerData: LinearLayout = view.findViewById(R.id.containerData)
-        val textData: TextView = view.findViewById(R.id.textData)
-        val iconClock: ImageView = view.findViewById(R.id.iconClock)
+        val containerResponsaveis: LinearLayout = view.findViewById(R.id.containerResponsaveisPerfil)
+        val containerData: LinearLayout = view.findViewById(R.id.containerDataPerfil)
+        val textData: TextView = view.findViewById(R.id.textDataPerfil)
+        val iconClock: ImageView = view.findViewById(R.id.iconClockPerfil)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val item = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_atividade, parent, false)
+            .inflate(R.layout.item_atividade_perfil, parent, false)
         return ViewHolder(item)
     }
 
@@ -44,24 +43,22 @@ class AtividadeAdapter(
 
         holder.titulo.text = atividade.nome
 
-        // 🎨 Cor da prioridade usando drawable com ícone "!"
+        val contexto = holder.itemView.context
+
+        // 🎨 Cor da prioridade com drawable em camada
         val corPrioridade = when (atividade.prioridade) {
             PrioridadeAtividade.BAIXA -> Color.parseColor("#2ECC40")
             PrioridadeAtividade.MEDIA -> Color.parseColor("#F1C40F")
             PrioridadeAtividade.ALTA -> Color.parseColor("#E74C3C")
         }
 
-        val contexto = holder.itemView.context
-        val layerDrawable = AppCompatResources.getDrawable(holder.itemView.context, R.drawable.bg_prioridade_layer) as? LayerDrawable
+        val layerDrawable = AppCompatResources.getDrawable(contexto, R.drawable.bg_prioridade_layer) as? LayerDrawable
         layerDrawable?.let {
-            // Pega a camada de fundo pelo ID definido no XML
             val fundo = it.findDrawableByLayerId(R.id.fundo)
             val wrappedFundo = DrawableCompat.wrap(fundo.mutate())
             DrawableCompat.setTint(wrappedFundo, corPrioridade)
-
             holder.prioridadeQuadrado.background = it
         }
-
 
         // 🔵 Cor da bolinha de status
         val corStatus = when (atividade.status) {
@@ -72,7 +69,7 @@ class AtividadeAdapter(
         val drawableStatus = holder.statusBolinha.background as? GradientDrawable
         drawableStatus?.setColor(corStatus)
 
-        // 📅 Datas e cores baseadas no prazo
+        // 📅 Data e cor do fundo
         val diasRestantes = diasParaPrazo(atividade.dataPrazo)
         val dataFormatada = SimpleDateFormat("dd 'de' MMM, HH:mm", Locale("pt", "BR")).format(atividade.dataPrazo)
         holder.textData.text = dataFormatada
@@ -97,7 +94,7 @@ class AtividadeAdapter(
         val dimensao = holder.itemView.resources.getDimensionPixelSize(R.dimen.tamanho_foto_responsavel)
 
         atividadeComFuncionarios.funcionarios.forEach { funcionario ->
-            val imageView = de.hdodenhof.circleimageview.CircleImageView(holder.itemView.context).apply {
+            val imageView = de.hdodenhof.circleimageview.CircleImageView(contexto).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(dimensao, dimensao).apply {
                     marginEnd = 12
                 }
@@ -111,7 +108,7 @@ class AtividadeAdapter(
             holder.containerResponsaveis.addView(imageView)
         }
 
-        // ✅ Clique no card redireciona para o fragmento de detalhes
+        // ✅ Clique no card
         holder.itemView.setOnClickListener {
             onItemClick(atividadeComFuncionarios)
         }

@@ -130,7 +130,7 @@ class PerfilFragment : Fragment() {
     TabLayoutMediator(tabLayout, viewPager) { tab, position ->
       tab.text = when (position) {
         0 -> "Detalhes"
-        1 -> "Trabalhos"
+        1 -> "Meus Trabalhos"
         else -> ""
       }
     }.attach()
