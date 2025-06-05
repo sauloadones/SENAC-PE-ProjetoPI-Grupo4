@@ -3,6 +3,7 @@ package com.example.appsenkaspi
 import com.example.appsenkaspi.utils.baixarArquivo
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,14 +15,15 @@ import com.example.appsenkaspi.utils.getMimeType
 import android.net.Uri
 
 class RelatorioAdapter(
-    private val lista: List<HistoricoRelatorio>
+    private val context: Context,
+    private val usuario: String,
+    private val lista: MutableList<HistoricoRelatorio>
 ) : RecyclerView.Adapter<RelatorioAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titulo: TextView = view.findViewById(R.id.txtTitulo)
         val data: TextView = view.findViewById(R.id.txtData)
-        val tipoArquivo: TextView =
-            view.findViewById(R.id.txtTipoArquivo)  // Novo TextView para tipo de arquivo
+        val tipoArquivo: TextView = view.findViewById(R.id.txtTipoArquivo)
         val setinha: View = view.findViewById(R.id.btnDetalhes)
     }
 
@@ -38,7 +40,6 @@ class RelatorioAdapter(
 
         holder.titulo.text = item.titulo ?: "Título não disponível"
         holder.data.text = item.data ?: "Data não disponível"
-
         holder.tipoArquivo.text = when (item.tipoArquivo?.lowercase()) {
             "pdf" -> "PDF"
             "xlsx" -> "Excel"
@@ -47,19 +48,22 @@ class RelatorioAdapter(
         }
 
         holder.setinha.setOnClickListener {
-            mostrarDialogDetalhes(holder.itemView, item)
+            mostrarDialogDetalhes(holder.itemView, item, position)
         }
     }
 
-    private fun mostrarDialogDetalhes(view: View, item: HistoricoRelatorio) {
-        val dialogBinding =
-            DialogDetalhesRelatorioBinding.inflate(LayoutInflater.from(view.context))
+    private fun removerItem(position: Int) {
+        lista.removeAt(position)
+        notifyItemRemoved(position)
+        HistoricoStorage.salvar(context, lista, usuario)
+    }
+
+    private fun mostrarDialogDetalhes(view: View, item: HistoricoRelatorio, position: Int) {
+        val dialogBinding = DialogDetalhesRelatorioBinding.inflate(LayoutInflater.from(view.context))
 
         dialogBinding.txtTitulo.text = item.titulo ?: "—"
         dialogBinding.txtPilar.text = item.pilarNome ?: "—"
         dialogBinding.txtData.text = item.data ?: "—"
-
-        // Aqui o ajuste para o tipo de arquivo:
         dialogBinding.txtTipoArquivo.text = when (item.tipoArquivo?.lowercase()) {
             "pdf" -> "PDF"
             "xlsx" -> "Excel"
@@ -80,8 +84,7 @@ class RelatorioAdapter(
 
         dialogBinding.btnBaixar.setOnClickListener {
             val url = item.urlArquivo
-            if (url != null && url.isNotEmpty()) {
-                // ajustar a extensão do nome do arquivo com base no tipo
+            if (!url.isNullOrEmpty()) {
                 val extensao = when (item.tipoArquivo?.lowercase()) {
                     "pdf" -> ".pdf"
                     "xlsx" -> ".xlsx"
@@ -92,40 +95,45 @@ class RelatorioAdapter(
                 val mimeType = getMimeType(nomeArquivo)
                 baixarArquivo(view.context, url, nomeArquivo, mimeType)
             } else {
-                Toast.makeText(view.context, "URL do arquivo indisponível.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(view.context, "URL do arquivo indisponível.", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
         }
 
         dialogBinding.btnAbrir.setOnClickListener {
             val caminho = item.caminhoArquivo
-
             if (caminho != null) {
                 try {
                     val uri = Uri.parse(caminho)
                     val mimeType = view.context.contentResolver.getType(uri) ?: "*/*"
-
                     val intent = Intent(Intent.ACTION_VIEW).apply {
                         setDataAndType(uri, mimeType)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-
                     view.context.startActivity(Intent.createChooser(intent, "Abrir com"))
                 } catch (e: Exception) {
-                    Toast.makeText(view.context, "Erro ao abrir o arquivo.", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(view.context, "Erro ao abrir o arquivo.", Toast.LENGTH_SHORT).show()
                     e.printStackTrace()
                 }
             } else {
                 Toast.makeText(view.context, "Arquivo não disponível.", Toast.LENGTH_SHORT).show()
             }
-
             dialog.dismiss()
         }
 
-        dialog.show()
+        dialogBinding.txtApagar.setOnClickListener {
+            AlertDialog.Builder(view.context)
+                .setTitle("Confirmar exclusão")
+                .setMessage("Deseja realmente apagar este item do histórico?")
+                .setPositiveButton("Sim") { _, _ ->
+                    removerItem(position) // remove e atualiza storage
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
 
+        dialog.show()
         dialog.window?.setLayout(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
