@@ -10,16 +10,17 @@
     <string name="relat_rio">Relatório</string>
     <string name="descricao_lista_pilares">Lista de pilares exibida na tela</string>
     <string name="historico_icon">Ícone de acesso ao histórico</string>
+
     <string-array name="tipos_arquivo">
         <item>PDF</item>
         <item>Excel</item>
         <item>Word</item>
     </string-array>
+
     <string-array name="status_pilar_array">
-        <item>Escolha os status de pilares</item>
-        <item>Concluído</item>
-        <item>Excluído</item>
-        <item>Vencido</item>
+        <item>CONCLUIDO</item>
+        <item>EXCLUIDO</item>
+        <item>VENCIDO</item>
     </string-array>
     <string name="tipo_relatorio">Tipo de Relatório:</string>
     <string name="relatorio_geral">Relatório Geral</string>
@@ -29,5 +30,4 @@
     <string name="gerar_relatorio">Gerar Relatório</string>
     <string name="historico_de_relatorios">Histórico de Relatórios</string>
     <string name="desc_limpar_historico">Limpar Histórico</string>
-
 </resources>

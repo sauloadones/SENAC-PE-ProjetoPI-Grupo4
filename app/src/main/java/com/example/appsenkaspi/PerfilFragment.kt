@@ -27,6 +27,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import androidx.fragment.app.activityViewModels
 
 class PerfilFragment : Fragment() {
 
@@ -39,8 +40,12 @@ class PerfilFragment : Fragment() {
   private var idFuncionarioLogado: Int = -1
   private lateinit var funcionarioDao: FuncionarioDao
 
+  private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
 
     val prefs = requireContext().getSharedPreferences("funcionario_prefs", Context.MODE_PRIVATE)
     idFuncionarioLogado = prefs.getInt("funcionario_id", -1)
@@ -106,6 +111,18 @@ class PerfilFragment : Fragment() {
     val view = inflater.inflate(R.layout.fragment_perfil, container, false)
     val nomeUsuarioTextView = view.findViewById<TextView>(R.id.user_name)
 
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
     val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
     val viewPager = view.findViewById<ViewPager2>(R.id.viewPager)
     viewPager.adapter = PerfilPagerAdapter(this)
@@ -113,7 +130,7 @@ class PerfilFragment : Fragment() {
     TabLayoutMediator(tabLayout, viewPager) { tab, position ->
       tab.text = when (position) {
         0 -> "Detalhes"
-        1 -> "Trabalhos"
+        1 -> "Meus Trabalhos"
         else -> ""
       }
     }.attach()

@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
+import androidx.fragment.app.activityViewModels
 import retrofit2.Response
 
 class RelatorioFragment : Fragment() {
@@ -37,6 +38,9 @@ class RelatorioFragment : Fragment() {
     private val apiService = RetrofitClient.apiService
     private val historicoRelatorios = mutableListOf<HistoricoRelatorio>()
     private lateinit var relatorioAdapter: RelatorioAdapter
+    private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
 
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
@@ -53,6 +57,19 @@ class RelatorioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         nomeUsuarioLogado = getFuncionarioNomeUsuario(requireContext())
 

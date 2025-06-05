@@ -41,7 +41,7 @@ class Converters {
   fun toStatusSubPilar(value: String): StatusSubPilar = try {
     StatusSubPilar.valueOf(value.uppercase())
   } catch (e: IllegalArgumentException) {
-    StatusSubPilar.PLANJEADA
+    StatusSubPilar.PLANEJADO
   }
 
     // StatusAcao

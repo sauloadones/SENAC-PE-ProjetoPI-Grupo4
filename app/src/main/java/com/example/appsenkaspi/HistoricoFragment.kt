@@ -4,14 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.Spinner
+import android.widget.TextView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import kotlinx.coroutines.launch
+import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class HistoricoFragment : Fragment() {
 
@@ -21,7 +24,11 @@ class HistoricoFragment : Fragment() {
     private var funcionarioLogadoId: Int = -1
     private var listaOriginal: List<PilarEntity> = emptyList()
 
-    // Filtro pelo status selecionado (null = todos os 3 do histórico)
+    private var textoFiltroAtivo: TextView? = null
+    private var filtroStatusSelecionado: String = "STATUS"
+    private var filtroAnoSelecionado: String = "ANOS"
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
     private var filtroStatus: StatusPilar? = null
 
     override fun onCreateView(
@@ -33,34 +40,47 @@ class HistoricoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        configurarBotaoVoltar(view)
+
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFiltroExclusao)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = TelaHistoricoAdapter(emptyList()) { pilar ->
+        // Passando o ViewModel para o adapter atualizado
+        adapter = TelaHistoricoAdapter(pilarViewModel, emptyList()) { pilar ->
             abrirTelaPilar(pilar)
         }
         recyclerView.adapter = adapter
 
-        val spinnerStatus = view.findViewById<Spinner>(R.id.spinnerStatusFiltro)
-        spinnerStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
-                filtroStatus = when (position) {
-                    1 -> StatusPilar.CONCLUIDO
-                    2 -> StatusPilar.EXCLUIDO
-                    3 -> StatusPilar.VENCIDO
-                    else -> null // "Todos"
-                }
-                aplicarFiltroStatus()
-            }
+        val spinnerStatusFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerStatusFilter)
+        val spinnerAnoFiltro = view.findViewById<MaterialAutoCompleteTextView>(R.id.spinnerAnoFiltro)
+        textoFiltroAtivo = view.findViewById(R.id.textoFiltroAtivo)
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                filtroStatus = null
-                aplicarFiltroStatus()
-            }
+        val itensStatus = resources.getStringArray(R.array.status_pilar_array).toMutableList()
+        if (!itensStatus.contains("STATUS")) {
+            itensStatus.add(0, "STATUS")
         }
+
+        val adapterStatus = ArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_item_white,
+            itensStatus
+        )
+        spinnerStatusFilter.setAdapter(adapterStatus)
+        spinnerStatusFilter.setText("STATUS", false)
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             funcionario?.let {
@@ -68,24 +88,85 @@ class HistoricoFragment : Fragment() {
             }
         }
 
-        // Aqui aplicamos o filtro de histórico diretamente
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
             listaOriginal = lista.filter { pilar ->
                 pilar.status == StatusPilar.CONCLUIDO ||
                         pilar.status == StatusPilar.EXCLUIDO ||
                         pilar.status == StatusPilar.VENCIDO
             }
-            aplicarFiltroStatus()
+
+            val anosSet = listaOriginal.mapNotNull {
+                extrairAno(it.dataPrazo) ?: extrairAno(it.dataExclusao)
+            }.toSet()
+
+            val listaAnos = anosSet.sortedDescending().map { it.toString() }.toMutableList()
+            if (!listaAnos.contains("ANOS")) {
+                listaAnos.add(0, "ANOS")
+            }
+
+            val adapterAno = ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_item_white,
+                listaAnos
+            )
+            spinnerAnoFiltro.setAdapter(adapterAno)
+            spinnerAnoFiltro.setText("ANOS", false)
+
+            filtroAnoSelecionado = "ANOS"
+            filtroStatusSelecionado = "STATUS"
+
+            aplicarFiltros()
+            atualizarTextoFiltro()
+        }
+
+        spinnerStatusFilter.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) spinnerStatusFilter.showDropDown()
+        }
+        spinnerStatusFilter.setOnClickListener {
+            spinnerStatusFilter.showDropDown()
+        }
+        spinnerAnoFiltro.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) spinnerAnoFiltro.showDropDown()
+        }
+        spinnerAnoFiltro.setOnClickListener {
+            spinnerAnoFiltro.showDropDown()
+        }
+
+        spinnerStatusFilter.setOnItemClickListener { parent, _, position, _ ->
+            filtroStatusSelecionado = parent.getItemAtPosition(position).toString()
+            aplicarFiltros()
+            atualizarTextoFiltro()
+        }
+
+        spinnerAnoFiltro.setOnItemClickListener { parent, _, position, _ ->
+            filtroAnoSelecionado = parent.getItemAtPosition(position).toString()
+            aplicarFiltros()
+            atualizarTextoFiltro()
         }
     }
 
-    private fun aplicarFiltroStatus() {
-        val filtrados = if (filtroStatus == null) {
-            listaOriginal
-        } else {
-            listaOriginal.filter { it.status == filtroStatus }
+    private fun aplicarFiltros() {
+        val filtrada = listaOriginal.filter { pilar ->
+            val statusOk = filtroStatusSelecionado == "STATUS" || pilar.status.name == filtroStatusSelecionado.uppercase()
+            val anoPilar = extrairAno(pilar.dataPrazo) ?: extrairAno(pilar.dataExclusao)
+            val anoOk = filtroAnoSelecionado == "ANOS" || anoPilar?.toString() == filtroAnoSelecionado
+
+            statusOk && anoOk
         }
-        adapter.atualizarLista(filtrados)
+        adapter.atualizarLista(filtrada)
+    }
+
+    private fun atualizarTextoFiltro() {
+        val statusTexto = if (filtroStatusSelecionado == "STATUS") "Todos" else filtroStatusSelecionado
+        val anoTexto = if (filtroAnoSelecionado == "ANOS") "Todos" else filtroAnoSelecionado
+        textoFiltroAtivo?.text = "Status: $statusTexto | Anos: $anoTexto"
+    }
+
+    private fun extrairAno(data: Date?): Int? {
+        data ?: return null
+        val cal = Calendar.getInstance()
+        cal.time = data
+        return cal.get(Calendar.YEAR)
     }
 
     private fun abrirTelaPilar(pilar: PilarEntity) {
@@ -94,7 +175,9 @@ class HistoricoFragment : Fragment() {
 
             val fragment = if (temSubpilares) {
                 TelaPilarComSubpilaresFragment().apply {
-                    arguments = Bundle().apply { putInt("pilarId", pilar.id) }
+                    arguments = Bundle().apply {
+                        putInt("pilarId", pilar.id)
+                    }
                 }
             } else {
                 TelaPilarFragment().apply {

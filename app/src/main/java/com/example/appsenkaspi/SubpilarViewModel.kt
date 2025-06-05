@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,6 +78,7 @@ class SubpilarViewModel(application: Application) : AndroidViewModel(application
   suspend fun inserirRetornandoId(subpilar: SubpilarEntity): Long {
     return AppDatabase.getDatabase(getApplication()).subpilarDao().inserirRetornandoId(subpilar)
   }
+
 
 
 }

@@ -18,7 +18,7 @@ class TrabalhosFragment : Fragment() {
 
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
 
-  private lateinit var adapter: AtividadeAdapter
+  private lateinit var adapter: AtividadePerfilAdapter
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -56,8 +56,8 @@ class TrabalhosFragment : Fragment() {
   }
 
   private fun configurarRecycler() {
-    adapter = AtividadeAdapter { atividadeComFuncionarios ->
-      val fragment = TelaAtividadeFragment().apply {
+    adapter = AtividadePerfilAdapter { atividadeComFuncionarios ->
+    val fragment = TelaAtividadeFragment().apply {
         arguments = Bundle().apply {
           putInt("atividadeId", atividadeComFuncionarios.atividade.id!!)
         }

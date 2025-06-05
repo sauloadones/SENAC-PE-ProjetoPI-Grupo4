@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.activityViewModels
 
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import java.text.SimpleDateFormat
@@ -25,6 +26,7 @@ class TelaAcaoFragment : Fragment() {
     private val acaoViewModel: AcaoViewModel by activityViewModels()
     private val atividadeViewModel: AtividadeViewModel by activityViewModels()
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
+    private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
     private var acaoId: Int = -1
     private lateinit var atividadeAdapter: AtividadeAdapter
@@ -41,6 +43,19 @@ class TelaAcaoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configurarBotaoVoltar(view)
+
+        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+            funcionario?.let {
+                configurarNotificacaoBadge(
+                    rootView = view,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = parentFragmentManager,
+                    funcionarioId = it.id,
+                    cargo = it.cargo,
+                    viewModel = notificacaoViewModel
+                )
+            }
+        }
 
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {

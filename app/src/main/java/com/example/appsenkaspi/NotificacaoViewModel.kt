@@ -23,7 +23,8 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
   private val acaoFuncionarioDao = db.acaoFuncionarioDao()
   private val atividadeFuncionarioDao = db.atividadeFuncionarioDao()
 
-  fun getRequisicoesPendentes(): LiveData<List<RequisicaoEntity>> = requisicaoDao.getRequisicoesPendentes()
+  fun getRequisicoesPendentes(): LiveData<List<RequisicaoEntity>> =
+    requisicaoDao.getRequisicoesPendentes()
 
   fun getRequisicaoPorId(id: Int): LiveData<RequisicaoEntity> {
     val result = MutableLiveData<RequisicaoEntity>()
@@ -64,8 +65,18 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       if (!aceitar) return@launch
 
       when (requisicao.tipo) {
-        TipoRequisicao.CRIAR_ATIVIDADE -> salvarAtividade(context, requisicao.atividadeJson!!, isEdicao = false)
-        TipoRequisicao.EDITAR_ATIVIDADE -> salvarAtividade(context, requisicao.atividadeJson!!, isEdicao = true)
+        TipoRequisicao.CRIAR_ATIVIDADE -> salvarAtividade(
+          context,
+          requisicao.atividadeJson!!,
+          isEdicao = false
+        )
+
+        TipoRequisicao.EDITAR_ATIVIDADE -> salvarAtividade(
+          context,
+          requisicao.atividadeJson!!,
+          isEdicao = true
+        )
+
         TipoRequisicao.COMPLETAR_ATIVIDADE -> completarAtividade(context, requisicao)
         TipoRequisicao.CRIAR_ACAO -> salvarAcao(requisicao.acaoJson!!, isEdicao = false)
         TipoRequisicao.EDITAR_ACAO -> salvarAcao(requisicao.acaoJson!!, isEdicao = true)
@@ -142,11 +153,14 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       val removidosEntities = funcionarioDao.getByIds(removidos)
 
 
-      atividadeRepository.notificarMudancaResponsaveis(atualizada, adicionadosEntities, removidosEntities)
+      atividadeRepository.notificarMudancaResponsaveis(
+        atualizada,
+        adicionadosEntities,
+        removidosEntities
+      )
 
     }
   }
-
 
 
   private suspend fun completarAtividade(context: Context, requisicao: RequisicaoEntity) {
@@ -201,7 +215,8 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
     val acaoJson = Gson().fromJson(json, AcaoJson::class.java)
 
     val acao = AcaoEntity(
-      id = if (isEdicao) acaoJson.id ?: throw IllegalStateException("ID da ação ausente para edição") else null,
+      id = if (isEdicao) acaoJson.id
+        ?: throw IllegalStateException("ID da ação ausente para edição") else null,
       nome = acaoJson.nome,
       descricao = acaoJson.descricao,
       dataInicio = acaoJson.dataInicio,
@@ -266,5 +281,18 @@ class NotificacaoViewModel(application: Application) : AndroidViewModel(applicat
       return requisicaoDao.getNotificacoesDoFuncionario(id)
         .distinctUntilChanged()  // <- força atualização mesmo se for a "mesma lista"
     }
+
+
+    // ...outros métodos
   }
+
+
+  fun excluirRequisicoes(lista: List<RequisicaoEntity>) {
+    viewModelScope.launch {
+      val ids = lista.map { it.id }
+      requisicaoDao.marcarComoExcluidas(ids)
+    }
+  }
+
+
 }

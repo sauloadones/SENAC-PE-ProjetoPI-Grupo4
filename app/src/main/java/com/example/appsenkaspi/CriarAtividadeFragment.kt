@@ -3,6 +3,7 @@ package com.example.appsenkaspi
 import android.app.DatePickerDialog
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -15,6 +16,7 @@ import com.example.appsenkaspi.databinding.FragmentCriarAtividadeBinding
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,6 +24,8 @@ class CriarAtividadeFragment : Fragment() {
 
   private var _binding: FragmentCriarAtividadeBinding? = null
   private val binding get() = _binding!!
+  private var dataPrazoPilar: Date? = null
+  private var dataPrazoAcao: Date? = null
 
   private val atividadeViewModel: AtividadeViewModel by activityViewModels()
   private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
@@ -33,6 +37,8 @@ class CriarAtividadeFragment : Fragment() {
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private var acaoId: Int = -1
 
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     _binding = FragmentCriarAtividadeBinding.inflate(inflater, container, false)
     return binding.root
@@ -41,6 +47,19 @@ class CriarAtividadeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       when (funcionario?.cargo) {
@@ -65,6 +84,14 @@ class CriarAtividadeFragment : Fragment() {
       parentFragmentManager.popBackStack()
       return
     }
+    viewLifecycleOwner.lifecycleScope.launch {
+      val acao = withContext(Dispatchers.IO) {
+        acaoViewModel.buscarAcaoPorId(acaoId)
+      }
+      dataPrazoAcao = acao?.dataPrazo
+      Log.d("CriarAtividade", "Data prazo da ação carregada: $dataPrazoAcao")
+    }
+
 
     parentFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
       val selecionados = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: return@setFragmentResultListener
@@ -88,6 +115,7 @@ class CriarAtividadeFragment : Fragment() {
     binding.textDataFim.setOnClickListener { abrirDatePicker(false) }
 
     binding.botaoConfirmarAtividade.setOnClickListener {
+      if (!validarDatasComAcao()) return@setOnClickListener
       confirmarCriacaoAtividade()
     }
 
@@ -95,6 +123,7 @@ class CriarAtividadeFragment : Fragment() {
       val nome = binding.inputNomeAtividade.text.toString().trim()
       val descricao = binding.inputDescricao.text.toString().trim()
       val funcionarioCriador = funcionarioViewModel.funcionarioLogado.value
+      if (!validarDatasComAcao()) return@setOnClickListener
 
       when {
         nome.isEmpty() -> {
@@ -302,6 +331,44 @@ class CriarAtividadeFragment : Fragment() {
       Toast.makeText(requireContext(), "Atividade criada com sucesso!", Toast.LENGTH_SHORT).show()
       parentFragmentManager.popBackStack()
     }
+  }
+
+  private fun validarDatasComAcao(): Boolean {
+    if (dataInicio == null || dataFim == null || dataPrazoAcao == null) {
+      Toast.makeText(requireContext(), "Erro ao validar datas: valores nulos.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    val inicio = truncarData(dataInicio!!)
+    val fim = truncarData(dataFim!!)
+    val prazoAcao = truncarData(dataPrazoAcao!!)
+
+    if (inicio.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de início deve ser antes do prazo da ação.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (fim.before(inicio)) {
+      Toast.makeText(requireContext(), "A data de término deve ser igual ou depois da data de início.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    if (fim.after(prazoAcao)) {
+      Toast.makeText(requireContext(), "A data de término deve ser no máximo até o prazo da ação.", Toast.LENGTH_SHORT).show()
+      return false
+    }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    return Calendar.getInstance().apply {
+      time = data
+      set(Calendar.HOUR_OF_DAY, 0)
+      set(Calendar.MINUTE, 0)
+      set(Calendar.SECOND, 0)
+      set(Calendar.MILLISECOND, 0)
+    }.time
   }
 
   override fun onDestroyView() {

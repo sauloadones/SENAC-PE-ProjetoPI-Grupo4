@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -18,10 +19,14 @@ class RequisicaoAdapter(
   var onItemClick: (RequisicaoEntity) -> Unit = {}
 ) : ListAdapter<RequisicaoEntity, RequisicaoAdapter.ViewHolder>(DIFF_CALLBACK) {
 
+  var modoSelecao = false
+  val selecionadas = mutableSetOf<RequisicaoEntity>()
+
   inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val iconStatus: ImageView = itemView.findViewById(R.id.iconStatus)
     val textoTitulo: TextView = itemView.findViewById(R.id.textoTitulo)
     val textoMensagem: TextView = itemView.findViewById(R.id.textoMensagem)
+    val checkBox: CheckBox = itemView.findViewById(R.id.checkboxSelecionar)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,9 +56,10 @@ class RequisicaoAdapter(
         holder.textoTitulo.text = "✔ $tituloResolvido"
         holder.textoMensagem.text = requisicao.mensagemResposta ?: "Esta notificação foi resolvida."
         holder.iconStatus.setImageResource(R.drawable.ic_check_circle)
-        holder.iconStatus.setColorFilter(Color.parseColor("#9E9E9E")) // cinza claro
+        holder.iconStatus.setColorFilter(Color.parseColor("#9E9E9E"))
         holder.itemView.alpha = 0.6f
         holder.itemView.setOnClickListener(null)
+        holder.checkBox.visibility = View.GONE
         return
       }
 
@@ -68,19 +74,18 @@ class RequisicaoAdapter(
           "Prazo Alterado", R.drawable.ic_update, "#FF9800", "A data de prazo da atividade foi modificada."
         )
         TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
-          "Atividade Concluida", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluida"
+          "Atividade Concluída", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluída."
         )
         TipoRequisicao.RESPONSAVEL_ADICIONADO -> Quadruple(
-          "Responsavel Adicionado", R.drawable.ic_warning, "#FF9800", "Responsavel Adicionado"
+          "Responsável Adicionado", R.drawable.ic_warning, "#FF9800", "Responsável adicionado."
         )
         TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
-          "Responsavel Removido", R.drawable.ic_warning, "#FF9800", "Responsavel Removido"
+          "Responsável Removido", R.drawable.ic_warning, "#FF9800", "Responsável removido."
         )
         else -> Quadruple(
           "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
         )
       }
-
 
       val (titulo, icone, corHex, mensagemPadrao) = tipoInfo
 
@@ -90,44 +95,64 @@ class RequisicaoAdapter(
       holder.iconStatus.setColorFilter(Color.parseColor(corHex))
       holder.itemView.alpha = 1f
       holder.itemView.setOnClickListener(null)
-      return
-    }
-
-    // 🔧 Requisições formais: criar, editar, completar ações/atividades
-    val titulo = when (requisicao.tipo) {
-      TipoRequisicao.CRIAR_ATIVIDADE -> "Criação de Atividade"
-      TipoRequisicao.EDITAR_ATIVIDADE -> "Edição de Atividade"
-      TipoRequisicao.COMPLETAR_ATIVIDADE -> "Conclusão de Atividade"
-      TipoRequisicao.CRIAR_ACAO -> "Criação de Ação"
-      TipoRequisicao.EDITAR_ACAO -> "Edição de Ação"
-      else -> "Requisição"
-    }
-
-    holder.textoTitulo.text = titulo
-
-    if (modoCoordenador) {
-      holder.iconStatus.setImageResource(R.drawable.ic_help)
-      holder.iconStatus.setColorFilter(Color.parseColor("#FFC107"))
-      holder.textoMensagem.text = requisicao.mensagemResposta?.takeIf { it.isNotBlank() }
-        ?: "Solicitação pendente de aprovação"
-      holder.itemView.setOnClickListener { onItemClick(requisicao) }
     } else {
-      val (icone, cor) = when (requisicao.status) {
-        StatusRequisicao.ACEITA -> R.drawable.ic_check_circle to "#4CAF50"
-        StatusRequisicao.RECUSADA -> R.drawable.ic_cancel to "#F44336"
-        StatusRequisicao.PENDENTE -> R.drawable.ic_help to "#FFC107"
+      // 🔧 Requisições formais: criar, editar, completar ações/atividades
+      val titulo = when (requisicao.tipo) {
+        TipoRequisicao.CRIAR_ATIVIDADE -> "Criação de Atividade"
+        TipoRequisicao.EDITAR_ATIVIDADE -> "Edição de Atividade"
+        TipoRequisicao.COMPLETAR_ATIVIDADE -> "Conclusão de Atividade"
+        TipoRequisicao.CRIAR_ACAO -> "Criação de Ação"
+        TipoRequisicao.EDITAR_ACAO -> "Edição de Ação"
+        else -> "Requisição"
       }
 
-      val mensagem = requisicao.mensagemResposta?.takeIf { it.isNotBlank() } ?: when (requisicao.status) {
-        StatusRequisicao.ACEITA -> "Sua solicitação foi aprovada pelo coordenador."
-        StatusRequisicao.RECUSADA -> "Sua solicitação foi recusada pelo coordenador."
-        StatusRequisicao.PENDENTE -> "Sua solicitação está aguardando aprovação."
-      }
+      holder.textoTitulo.text = titulo
 
-      holder.iconStatus.setImageResource(icone)
-      holder.iconStatus.setColorFilter(Color.parseColor(cor))
-      holder.textoMensagem.text = mensagem
-      holder.itemView.setOnClickListener(null)
+      if (modoCoordenador) {
+        holder.iconStatus.setImageResource(R.drawable.ic_help)
+        holder.iconStatus.setColorFilter(Color.parseColor("#FFC107"))
+        holder.textoMensagem.text = requisicao.mensagemResposta?.takeIf { it.isNotBlank() }
+          ?: "Solicitação pendente de aprovação"
+      } else {
+        val (icone, cor) = when (requisicao.status) {
+          StatusRequisicao.ACEITA -> R.drawable.ic_check_circle to "#4CAF50"
+          StatusRequisicao.RECUSADA -> R.drawable.ic_cancel to "#F44336"
+          StatusRequisicao.PENDENTE -> R.drawable.ic_help to "#FFC107"
+        }
+
+        val mensagem = requisicao.mensagemResposta?.takeIf { it.isNotBlank() } ?: when (requisicao.status) {
+          StatusRequisicao.ACEITA -> "Sua solicitação foi aprovada pelo coordenador."
+          StatusRequisicao.RECUSADA -> "Sua solicitação foi recusada pelo coordenador."
+          StatusRequisicao.PENDENTE -> "Sua solicitação está aguardando aprovação."
+        }
+
+        holder.iconStatus.setImageResource(icone)
+        holder.iconStatus.setColorFilter(Color.parseColor(cor))
+        holder.textoMensagem.text = mensagem
+      }
+    }
+
+    // === Checkbox de seleção ===
+    holder.checkBox.visibility = if (modoSelecao) View.VISIBLE else View.GONE
+    holder.checkBox.setOnCheckedChangeListener(null)
+    holder.checkBox.isChecked = selecionadas.contains(requisicao)
+
+    holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        selecionadas.add(requisicao)
+      } else {
+        selecionadas.remove(requisicao)
+      }
+    }
+
+    // Clique no item para selecionar no modo de seleção
+    holder.itemView.setOnClickListener {
+      if (modoSelecao) {
+        val novoEstado = !holder.checkBox.isChecked
+        holder.checkBox.isChecked = novoEstado
+      } else {
+        onItemClick(requisicao)
+      }
     }
   }
 

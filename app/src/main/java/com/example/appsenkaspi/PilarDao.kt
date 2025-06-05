@@ -23,6 +23,9 @@ interface PilarDao {
     @Update
     suspend fun atualizarPilar(pilar: PilarEntity)
 
+  @Update
+  suspend fun atualizarPilarTeste(pilar: PilarEntity): Int
+
     @Delete
     suspend fun deletarPilar(pilar: PilarEntity)
 
@@ -57,13 +60,19 @@ interface PilarDao {
   @Query("SELECT * FROM pilares WHERE status IN (:statusList)")
   suspend fun getPilaresPorStatus(statusList: List<StatusPilar>): List<PilarEntity>
 
+  @Query("UPDATE pilares SET status = :novoStatus, dataConclusao = :dataConclusao WHERE id = :pilarId")
+  suspend fun atualizarStatusEDataConclusao(
+    pilarId: Int,
+    novoStatus: StatusPilar, // ✅ tipo correto com TypeConverter
+    dataConclusao: Date
+  ): Int
 
 
-    @Query("SELECT * FROM pilares WHERE status = :status")
+
+  @Query("SELECT * FROM pilares WHERE status = :status")
     fun listarPilaresPorStatus(status: StatusPilar): LiveData<List<PilarEntity>>
 
     @Query("SELECT * FROM pilares WHERE status = :status AND dataExclusao = :dataExclusao")
     fun listarPilaresPorStatusEData(status: StatusPilar, dataExclusao: String): LiveData<List<PilarEntity>>
-
 
 }

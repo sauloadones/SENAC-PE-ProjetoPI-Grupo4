@@ -35,8 +35,7 @@
       android:layout_height="wrap_content"
       android:src="@drawable/ic_arrow_drop_down"
       android:contentDescription="Possui Subpilares"
-      android:visibility="gone"
-      card_view:tint="@color/white" />
+      android:visibility="gone" />
   </LinearLayout>
 
 </androidx.cardview.widget.CardView>

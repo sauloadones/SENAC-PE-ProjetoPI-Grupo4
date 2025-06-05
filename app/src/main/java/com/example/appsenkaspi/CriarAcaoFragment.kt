@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.fragment.app.activityViewModels
 
 class CriarAcaoFragment : Fragment() {
 
@@ -32,6 +33,7 @@ class CriarAcaoFragment : Fragment() {
   private var pilarId: Int? = null
   private val funcionariosSelecionados = mutableListOf<FuncionarioEntity>()
   private lateinit var adapterSelecionados: FuncionarioSelecionadoAdapter
+  private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +46,19 @@ class CriarAcaoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     configurarBotaoVoltar(view)
+
+    funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
+      funcionario?.let {
+        configurarNotificacaoBadge(
+          rootView = view,
+          lifecycleOwner = viewLifecycleOwner,
+          fragmentManager = parentFragmentManager,
+          funcionarioId = it.id,
+          cargo = it.cargo,
+          viewModel = notificacaoViewModel
+        )
+      }
+    }
 
     // Recuperar IDs passados por argumento
     pilarId = arguments?.getInt("pilarId")?.takeIf { it > 0 }
@@ -93,6 +108,7 @@ class CriarAcaoFragment : Fragment() {
       }
 
       viewLifecycleOwner.lifecycleScope.launch {
+        if (!validarPrazoAcao()) return@launch
         val nomeEstrutura = when {
           subpilarId != null -> acaoViewModel.buscarNomeSubpilarPorId(subpilarId!!) ?: "Subpilar"
           pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.nome ?: "Pilar"
@@ -130,8 +146,13 @@ class CriarAcaoFragment : Fragment() {
       }
     }
 
+    binding.buttonConfirmacaoAcao.setOnClickListener {
+      viewLifecycleOwner.lifecycleScope.launch {
+        if (!validarPrazoAcao()) return@launch
+        confirmarCriacaoAcao()
+      }
+    }
 
-    binding.buttonConfirmacaoAcao.setOnClickListener { confirmarCriacaoAcao() }
 
     childFragmentManager.setFragmentResultListener("funcionariosSelecionados", viewLifecycleOwner) { _, bundle ->
       val lista = bundle.getParcelableArrayList<FuncionarioEntity>("listaFuncionarios") ?: arrayListOf()
@@ -213,6 +234,48 @@ class CriarAcaoFragment : Fragment() {
       }
     }
   }
+  private suspend fun validarPrazoAcao(): Boolean {
+    if (dataPrazoSelecionada == null) {
+      binding.buttonPickDateAcao.error = "Selecione uma data de prazo"
+      return false
+    }
+
+    val dataLimite: Date? = when {
+      subpilarId != null -> acaoViewModel.buscarSubpilarPorId(subpilarId!!)?.dataPrazo
+      pilarId != null -> acaoViewModel.buscarPilarPorId(pilarId!!)?.dataPrazo
+      else -> null
+    }
+
+    dataLimite?.let {
+      val selecionadaTruncada = truncarData(dataPrazoSelecionada!!)
+      val limiteTruncado = truncarData(it)
+
+      if (selecionadaTruncada.after(limiteTruncado)) {
+        val nomeEstrutura = if (subpilarId != null) "subpilar" else "pilar"
+        val dataFormatada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(limiteTruncado)
+        Toast.makeText(
+          requireContext(),
+          "A data da ação não pode ultrapassar o prazo do $nomeEstrutura ($dataFormatada).",
+          Toast.LENGTH_LONG
+        ).show()
+        return false
+      }
+    }
+
+    return true
+  }
+
+  private fun truncarData(data: Date): Date {
+    val cal = Calendar.getInstance()
+    cal.time = data
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    return cal.time
+  }
+
+
 
   companion object {
     fun newInstance(pilarId: Int? = null, subpilarId: Int? = null): CriarAcaoFragment {
