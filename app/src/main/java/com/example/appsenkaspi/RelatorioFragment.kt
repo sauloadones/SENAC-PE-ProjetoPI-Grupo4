@@ -321,7 +321,23 @@ class RelatorioFragment : Fragment() {
                             return@launch
                         }
 
-// 🚨 Aqui é a parte crucial:
+                        val acoesCount = listaDTO.sumOf { pilar -> pilar.acoes.size }
+                        val atividadesCount = listaDTO.sumOf { pilar -> pilar.acoes.sumOf { acao -> acao.atividades.size } }
+
+                        val statusGeral = if (listaDTO.all { pilar -> pilar.acoes.all { acao -> acao.status == "CONCLUIDO" } }) {
+                            "Concluído"
+                        } else {
+                            "Em andamento"
+                        }
+
+                        val responsaveisSet = listaDTO.flatMap { pilar ->
+                            pilar.acoes.flatMap { acao ->
+                                acao.atividades.map { it.responsavel }
+                            }
+                        }.toSet()
+
+                        val responsaveis = responsaveisSet.joinToString(", ")
+
                         val urlArquivo = "${BASE_URL_DOWNLOAD}${nomeArquivoServidor}"
                         println("DEBUG: URL para download: $urlArquivo")
 
