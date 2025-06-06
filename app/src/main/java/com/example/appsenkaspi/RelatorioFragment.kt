@@ -41,11 +41,14 @@ class RelatorioFragment : Fragment() {
     private val funcionarioViewModel: FuncionarioViewModel by activityViewModels()
     private val notificacaoViewModel: NotificacaoViewModel by activityViewModels()
 
-
     private var listaPilares: List<PilarEntity> = emptyList()
     private lateinit var pilarAdapter: ArrayAdapter<String>
     private var isGeral: Boolean = true
     private var nomeUsuarioLogado: String? = null
+
+    companion object {
+        const val BASE_URL_DOWNLOAD = "https://matheusmoura19.pythonanywhere.com/relatorio/download/"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,7 +81,7 @@ class RelatorioFragment : Fragment() {
         carregarPilares()
 
         binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
-        relatorioAdapter = RelatorioAdapter(requireContext(), nomeUsuarioLogado!!, historicoRelatorios)
+        relatorioAdapter = RelatorioAdapter(requireContext(), nomeUsuarioLogado!!, historicoRelatorios, viewLifecycleOwner)
         binding.recyclerHistorico.adapter = relatorioAdapter
 
         val divider = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
@@ -159,8 +162,8 @@ class RelatorioFragment : Fragment() {
                 mostrarDialogConfirmacaoLimpeza()
             }
         }
-
     }
+
     private fun animateLayoutChange(root: ViewGroup) {
         val transition = AutoTransition()
         transition.duration = 300
@@ -304,7 +307,14 @@ class RelatorioFragment : Fragment() {
 
                 response?.let {
                     if (it.isSuccessful) {
-                        val caminhoDoArquivoSalvo = salvarArquivo(it.body(), "relatorio.$tipo")
+                        // Captura o nome do arquivo do cabeçalho Content-Disposition (se disponível)
+                        val contentDisposition = it.headers()["Content-Disposition"]
+                        val nomeArquivoServidor = contentDisposition?.let { header ->
+                            Regex("""filename="?([^\";]+)"?""").find(header)?.groupValues?.get(1)
+                        } ?: "relatorio.$tipo"
+
+// Salva o arquivo com o nome real
+                        val caminhoDoArquivoSalvo = salvarArquivo(it.body(), nomeArquivoServidor)
                         if (caminhoDoArquivoSalvo == null) {
                             Toast.makeText(requireContext(), "Falha ao salvar o arquivo", Toast.LENGTH_SHORT).show()
                             binding.progressBar.visibility = View.GONE
@@ -328,17 +338,20 @@ class RelatorioFragment : Fragment() {
 
                         val responsaveis = responsaveisSet.joinToString(", ")
 
-                        val nomePilar = if (!isGeral) listaDTO.firstOrNull()?.nome else null
+                        val urlArquivo = "${BASE_URL_DOWNLOAD}${nomeArquivoServidor}"
+                        println("DEBUG: URL para download: $urlArquivo")
 
                         val titulo = if (isGeral) "Relatório Geral" else "Relatório por Pilar"
                         val dataAtual = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault()).format(Date())
+                        val nomePilar = if (!isGeral) listaDTO.firstOrNull()?.nome else null
 
                         val novoHistorico = HistoricoRelatorio(
                             titulo = titulo,
                             data = dataAtual,
                             tipoArquivo = tipo,
                             pilarNome = nomePilar,
-                            caminhoArquivo = caminhoDoArquivoSalvo
+                            caminhoArquivo = caminhoDoArquivoSalvo,
+                            urlArquivo = urlArquivo
                         )
 
                         historicoRelatorios.add(0, novoHistorico)

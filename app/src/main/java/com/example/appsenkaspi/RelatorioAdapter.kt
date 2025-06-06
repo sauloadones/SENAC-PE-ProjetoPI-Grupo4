@@ -4,20 +4,25 @@ import com.example.appsenkaspi.utils.baixarArquivo
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.Context
+import androidx.lifecycle.lifecycleScope
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.coroutines.launch
+import com.example.appsenkaspi.utils.baixarArquivoComOkHttp
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appsenkaspi.databinding.DialogDetalhesRelatorioBinding
 import com.example.appsenkaspi.utils.getMimeType
 import android.net.Uri
+import com.example.appsenkaspi.utils.baixarArquivoComOkHttp
 
 class RelatorioAdapter(
     private val context: Context,
     private val usuario: String,
-    private val lista: MutableList<HistoricoRelatorio>
+    private val lista: MutableList<HistoricoRelatorio>,
+    private val lifecycleOwner: androidx.lifecycle.LifecycleOwner
 ) : RecyclerView.Adapter<RelatorioAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -93,7 +98,17 @@ class RelatorioAdapter(
                 }
                 val nomeArquivo = item.titulo?.replace(" ", "_") + extensao
                 val mimeType = getMimeType(nomeArquivo)
-                baixarArquivo(view.context, url, nomeArquivo, mimeType)
+
+                println("DEBUG: URL para reinstalar: $url")
+
+                lifecycleOwner.lifecycleScope.launch {
+                    val caminho = baixarArquivoComOkHttp(view.context, url, nomeArquivo, mimeType)
+                    if (caminho != null) {
+                        Toast.makeText(view.context, "Arquivo reinstalado com sucesso!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(view.context, "Falha ao reinstalar o arquivo.", Toast.LENGTH_SHORT).show()
+                    }
+                }
             } else {
                 Toast.makeText(view.context, "URL do arquivo indisponível.", Toast.LENGTH_SHORT).show()
             }

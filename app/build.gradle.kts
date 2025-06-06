@@ -54,10 +54,13 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.9.0") // ou versão mais recente
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
 
 
 
-  // Room
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
