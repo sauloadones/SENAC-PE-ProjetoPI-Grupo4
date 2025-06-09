@@ -38,9 +38,9 @@ class BottomNavFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.navRelatorio.setOnClickListener {
-            updateIndicator(R.id.nav_relatorio)
-            navigateTo(RelatorioFragment(), R.id.nav_relatorio)
+        binding.navHome.setOnClickListener {
+            updateIndicator(R.id.nav_home)
+            navigateTo(HomeFragment(), R.id.nav_home)
         }
 
         binding.navDashboard.setOnClickListener {
@@ -48,9 +48,9 @@ class BottomNavFragment : Fragment() {
             navigateTo(DashboardFragment(), R.id.nav_dashboard)
         }
 
-        binding.navHome.setOnClickListener {
-            updateIndicator(R.id.nav_home)
-            navigateTo(HomeFragment(), R.id.nav_home)
+        binding.navRelatorio.setOnClickListener {
+            updateIndicator(R.id.nav_relatorio)
+            navigateTo(RelatorioFragment(), R.id.nav_relatorio)
         }
 
         binding.navPerfil.setOnClickListener {
@@ -94,9 +94,9 @@ class BottomNavFragment : Fragment() {
         if (selectedId == currentSelectedId) return
 
         val orderMap = mapOf(
-            R.id.nav_relatorio to 0,
+            R.id.nav_home to 0,
             R.id.nav_dashboard to 1,
-            R.id.nav_home to 2,
+            R.id.nav_relatorio to 2,
             R.id.nav_perfil to 3
         )
 

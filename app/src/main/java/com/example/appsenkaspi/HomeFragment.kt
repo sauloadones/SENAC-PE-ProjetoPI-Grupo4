@@ -1,18 +1,20 @@
+
 package com.example.appsenkaspi
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.cardview.widget.CardView
 import com.example.appsenkaspi.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 
@@ -43,12 +45,12 @@ class HomeFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-
+    val shakeAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.shake)
+    val scaleAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.button_scale)
 
     funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
       funcionario?.let {
         funcionarioLogadoId = it.id
-
 
         configurarNotificacaoBadge(
           rootView = view,
@@ -65,33 +67,6 @@ class HomeFragment : Fragment() {
         recyclerView = binding.recyclerViewPilares
         cardAdicionarPilar = binding.cardAdicionarPilar
 
-        // Notificação e badge (se tiver)
-
-        // Configura badge de notificação
-        funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { f ->
-          f?.let { func ->
-            configurarNotificacaoBadge(
-              rootView = view,
-              lifecycleOwner = viewLifecycleOwner,
-              fragmentManager = parentFragmentManager,
-              funcionarioId = func.id,
-              cargo = func.cargo,
-              viewModel = notificacaoViewModel
-            )
-          }
-        }
-
-        // Controle de visibilidade do botão "Adicionar Pilar"
-        binding.cardAdicionarPilar.visibility = when (it.cargo) {
-          Cargo.COORDENADOR -> View.VISIBLE
-          else -> View.GONE
-        }
-
-        // RecyclerView de pilares
-        recyclerView = view.findViewById(R.id.recyclerViewPilares)
-        cardAdicionarPilar = view.findViewById(R.id.cardAdicionarPilar)
-
-
         adapter = PilarAdapter(
           onClickPilar = { pilar -> abrirTelaPilar(pilar) },
           verificarSubpilares = { pilarId -> pilarViewModel.temSubpilaresDireto(pilarId) }
@@ -100,52 +75,61 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-
-        // Atualiza os status antes de observar os pilares
         lifecycleScope.launch {
           pilarViewModel.atualizarStatusDeTodosOsPilares()
         }
 
-        // Observa apenas pilares ativos
-        pilarViewModel.listarPilaresAtivos().observe(viewLifecycleOwner) { lista ->
-          adapter.submitList(lista)
-        }
-
-
-        // Filtrar só planejados e em andamento
         pilarViewModel.listarTodosPilares().observe(viewLifecycleOwner) { lista ->
-          val listaFiltrada = lista.filter { pilar ->
-            pilar.status == StatusPilar.PLANEJADO || pilar.status == StatusPilar.EM_ANDAMENTO
+          val listaFiltrada = lista.filter {
+            it.status == StatusPilar.PLANEJADO || it.status == StatusPilar.EM_ANDAMENTO
           }
           adapter.submitList(listaFiltrada)
         }
 
-        // Botão para criar novo pilar
-
+        // Clique curto com animação + navegação
         cardAdicionarPilar.setOnClickListener {
-          val fragment = CriarPilarFragment().apply {
-            arguments = Bundle().apply {
-              putInt("funcionarioId", funcionarioLogadoId)
+          it.startAnimation(scaleAnim)
+          it.postDelayed({
+            val fragment = CriarPilarFragment().apply {
+              arguments = Bundle().apply {
+                putInt("funcionarioId", funcionarioLogadoId)
+              }
             }
-          }
-          parentFragmentManager.beginTransaction()
-            .replace(R.id.main_container, fragment)
-            .addToBackStack(null)
-            .commit()
+            parentFragmentManager.beginTransaction()
+              .setCustomAnimations(
+                R.anim.pull_fade_in,
+                R.anim.pull_fade_out,
+                R.anim.pull_fade_in,
+                R.anim.pull_fade_out
+              )
+              .replace(R.id.main_container, fragment)
+              .addToBackStack(null)
+              .commit()
+          }, 200)
         }
 
+        // Clique longo: shake + scale
+        cardAdicionarPilar.setOnLongClickListener {
+          it.startAnimation(shakeAnim)
+          it.startAnimation(scaleAnim)
+          true
+        }
 
-        // Botão histórico (box_historico)
+        // Botão de histórico com animação
         val boxHistorico = view.findViewById<View>(R.id.box_historico)
         boxHistorico.setOnClickListener {
           val historicoFragment = HistoricoFragment()
           parentFragmentManager.beginTransaction()
+            .setCustomAnimations(
+              R.anim.pull_fade_in,
+              R.anim.pull_fade_out,
+              R.anim.pull_fade_in,
+              R.anim.pull_fade_out
+            )
             .replace(R.id.main_container, historicoFragment)
             .addToBackStack(null)
             .commit()
         }
-
-        // Cor da barra de status do Android
 
         requireActivity().window.statusBarColor =
           ContextCompat.getColor(requireContext(), R.color.graybar)
@@ -171,6 +155,12 @@ class HomeFragment : Fragment() {
       }
 
       parentFragmentManager.beginTransaction()
+        .setCustomAnimations(
+          R.anim.pull_fade_in,
+          R.anim.pull_fade_out,
+          R.anim.pull_fade_in,
+          R.anim.pull_fade_out
+        )
         .replace(R.id.main_container, fragment)
         .addToBackStack(null)
         .commit()

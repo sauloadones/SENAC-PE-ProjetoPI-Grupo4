@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape>
-            <solid android:color="#3CA6A6" /> <!-- Fundo verde água -->
-            <stroke
-                android:width="2dp"
-                android:color="#000000" /> <!-- Borda preta -->
-            <corners android:radius="24dp" />
-        </shape>
-    </item>
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#3CA6A6" /> <!-- Fundo verde água -->
+    <stroke
+        android:width="2dp"
+        android:color="#000000" /> <!-- Borda preta -->
+    <corners android:radius="24dp" />
+</shape>

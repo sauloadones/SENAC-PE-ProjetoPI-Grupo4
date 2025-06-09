@@ -11,8 +11,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.fragment.app.activityViewModels
-
 import com.example.appsenkaspi.databinding.FragmentTelaAcaoBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,41 +58,27 @@ class TelaAcaoFragment : Fragment() {
         funcionarioViewModel.funcionarioLogado.observe(viewLifecycleOwner) { funcionario ->
             when (funcionario?.cargo) {
                 Cargo.APOIO -> {
-
                     binding.cardEditarAcao.visibility = View.VISIBLE
                     binding.cardAdicionarAtividade.visibility = View.VISIBLE
-
                 }
-
                 Cargo.COORDENADOR -> {
                     binding.cardAdicionarAtividade.visibility = View.VISIBLE
-
                     binding.cardEditarAcao.visibility = View.VISIBLE
-
-
                 }
                 Cargo.GESTOR -> {
                     binding.cardAdicionarAtividade.visibility = View.GONE
-
                     binding.cardEditarAcao.visibility = View.GONE
-
-
-
-
                 }
-
                 else -> {
                     binding.cardAdicionarAtividade.visibility = View.GONE
-
                     binding.cardEditarAcao.visibility = View.GONE
-
                 }
             }
         }
 
         acaoId = arguments?.getInt("acaoId") ?: -1
         if (acaoId == -1) {
-            Toast.makeText(requireContext(), "Acao Invalida!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Ação Inválida!", Toast.LENGTH_SHORT).show()
             parentFragmentManager.popBackStack()
             return
         }
@@ -112,7 +96,6 @@ class TelaAcaoFragment : Fragment() {
         binding.iconeMenu.setOnClickListener { toggleSobre() }
         observarAtividades()
         acaoViewModel.atualizarStatusAcaoAutomaticamente(acaoId)
-
     }
 
     private fun preencherCamposComAcao(acao: AcaoEntity) {
@@ -122,14 +105,17 @@ class TelaAcaoFragment : Fragment() {
         binding.dataPrazoPilar.text = "Prazo: ${sdf.format(acao.dataPrazo)}"
 
         binding.textoSobre.text = acao.descricao.ifBlank { "Nenhuma descrição adicionada." }
-
-        // Removido: atualizarProgressoAcao()
-        // A atualização agora ocorre automaticamente com base no observer das atividades
     }
 
     private fun configurarBotoes() {
         binding.cardEditarAcao.setOnClickListener {
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_fade_in_right,
+                    R.anim.slide_fade_out_left,
+                    R.anim.slide_fade_in_left,
+                    R.anim.slide_fade_out_right
+                )
                 .replace(
                     R.id.main_container,
                     EditarAcaoFragment().apply {
@@ -142,6 +128,12 @@ class TelaAcaoFragment : Fragment() {
 
         binding.cardAdicionarAtividade.setOnClickListener {
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_fade_in_right,
+                    R.anim.slide_fade_out_left,
+                    R.anim.slide_fade_in_left,
+                    R.anim.slide_fade_out_right
+                )
                 .replace(
                     R.id.main_container,
                     CriarAtividadeFragment().apply {
@@ -187,6 +179,12 @@ class TelaAcaoFragment : Fragment() {
             }
 
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_fade_in_right,
+                    R.anim.slide_fade_out_left,
+                    R.anim.slide_fade_in_left,
+                    R.anim.slide_fade_out_right
+                )
                 .replace(R.id.main_container, fragment)
                 .addToBackStack(null)
                 .commit()
@@ -206,7 +204,6 @@ class TelaAcaoFragment : Fragment() {
                     emptyView.visibility = View.GONE
                     atividadeAdapter.submitList(atividades)
 
-                    // 🎯 Calcular progresso da barra da tela
                     val total = atividades.size
                     val concluidas = atividades.count { it.atividade.status.name == "CONCLUIDA" }
                     val progresso = if (total > 0) (concluidas * 100 / total) else 0

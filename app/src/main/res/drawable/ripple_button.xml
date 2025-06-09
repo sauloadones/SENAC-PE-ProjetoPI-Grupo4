@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#2E7D7D"> <!-- Cor mais escura que combina com o fundo -->
+
+    <item android:drawable="@drawable/bg_botao_add_home" />
+</ripple>

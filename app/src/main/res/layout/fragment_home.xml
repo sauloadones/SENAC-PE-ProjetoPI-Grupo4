@@ -92,7 +92,8 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_botao_add_home">
+            android:background="@drawable/ripple_button"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <ImageView
                 android:id="@+id/iconPlus"
