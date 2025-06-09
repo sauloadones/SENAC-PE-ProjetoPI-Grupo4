@@ -21,6 +21,8 @@ class NotificacaoFragment : Fragment() {
   private lateinit var adapter: RequisicaoAdapter
   private var funcionarioIdAtual: Int? = null
   private var modoSelecaoAtivo = false
+  private lateinit var trashIcon: ImageView
+  private var iconeAtual: Int = R.drawable.ic_delete
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -31,7 +33,7 @@ class NotificacaoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
     val vazio = view.findViewById<TextView>(R.id.textVazioNotificacoes)
-    val trashIcon = view.findViewById<ImageView>(R.id.trashIcon)
+    trashIcon = view.findViewById(R.id.trashIcon)
 
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -43,17 +45,29 @@ class NotificacaoFragment : Fragment() {
       adapter = RequisicaoAdapter(
         funcionarioIdLogado = funcionarioId,
         modoCoordenador = modoCoordenador
-      ) { requisicao ->
-        if (modoCoordenador && requisicao.tipo != TipoRequisicao.ATIVIDADE_PARA_VENCER && requisicao.tipo != TipoRequisicao.ATIVIDADE_VENCIDA) {
-          val fragment = DetalheNotificacaoFragment().apply {
-            arguments = Bundle().apply {
-              putInt("requisicaoId", requisicao.id)
+      ).apply {
+        onItemClick = { requisicao ->
+          if (modoCoordenador && requisicao.tipo !in listOf(
+              TipoRequisicao.ATIVIDADE_PARA_VENCER,
+              TipoRequisicao.ATIVIDADE_VENCIDA,
+              TipoRequisicao.PRAZO_ALTERADO,
+              TipoRequisicao.RESPONSAVEL_ADICIONADO,
+              TipoRequisicao.ATIVIDADE_CONCLUIDA
+            )
+          ) {
+            val fragment = DetalheNotificacaoFragment().apply {
+              arguments = Bundle().apply {
+                putInt("requisicaoId", requisicao.id)
+              }
             }
+            requireActivity().supportFragmentManager.beginTransaction()
+              .replace(R.id.main_container, fragment)
+              .addToBackStack(null)
+              .commit()
           }
-          requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, fragment)
-            .addToBackStack(null)
-            .commit()
+        }
+        onSelecaoMudou = {
+          atualizarIconeLixeira()
         }
       }
 
@@ -65,7 +79,6 @@ class NotificacaoFragment : Fragment() {
         }
       })
 
-      // Observação das notificações:
       if (modoCoordenador) {
         val pendentesLiveData = viewModel.getRequisicoesPendentes()
         val pessoaisLiveData = viewModel.getNotificacoesDoApoio(funcionarioId)
@@ -80,7 +93,7 @@ class NotificacaoFragment : Fragment() {
                 TipoRequisicao.ATIVIDADE_CONCLUIDA,
                 TipoRequisicao.RESPONSAVEL_REMOVIDO,
                 TipoRequisicao.RESPONSAVEL_ADICIONADO
-              ) && it.solicitanteId == funcionarioId
+              ) && it.solicitanteId == funcionarioId && !it.excluida
             }
             val listaFinal = (pendentes + notificacoesAuto)
               .filter { !it.excluida }
@@ -113,14 +126,13 @@ class NotificacaoFragment : Fragment() {
         }
       }
 
-      // 🔴 Clique no botão da lixeira
       trashIcon.setOnClickListener {
         if (!modoSelecaoAtivo) {
           modoSelecaoAtivo = true
           adapter.modoSelecao = true
           adapter.selecionadas.clear()
           adapter.notifyDataSetChanged()
-          trashIcon.setImageResource(R.drawable.ic_delete)
+          atualizarIconeLixeira()
         } else {
           if (adapter.selecionadas.isNotEmpty()) {
             AlertDialog.Builder(requireContext())
@@ -134,7 +146,7 @@ class NotificacaoFragment : Fragment() {
                 adapter.modoSelecao = false
                 adapter.selecionadas.clear()
                 adapter.notifyDataSetChanged()
-                trashIcon.setImageResource(R.drawable.ic_delete)
+                atualizarIconeLixeira()
                 dialog.dismiss()
               }
               .setNegativeButton("Cancelar") { dialog, _ ->
@@ -145,7 +157,7 @@ class NotificacaoFragment : Fragment() {
             modoSelecaoAtivo = false
             adapter.modoSelecao = false
             adapter.notifyDataSetChanged()
-            trashIcon.setImageResource(R.drawable.ic_delete)
+            atualizarIconeLixeira()
           }
         }
       }
@@ -170,7 +182,7 @@ class NotificacaoFragment : Fragment() {
               TipoRequisicao.ATIVIDADE_CONCLUIDA,
               TipoRequisicao.RESPONSAVEL_REMOVIDO,
               TipoRequisicao.RESPONSAVEL_ADICIONADO,
-            ) && it.solicitanteId == funcionarioId
+            ) && it.solicitanteId == funcionarioId && !it.excluida
           }
           val listaFinal = (pendentes + notificacoesDePrazoOuVencida)
             .filter { !it.excluida }
@@ -184,6 +196,26 @@ class NotificacaoFragment : Fragment() {
         adapter.submitList(lista.filter { !it.excluida })
       }
     }
+  }
+
+  fun atualizarIconeLixeira() {
+    val novaImagem = when {
+      !modoSelecaoAtivo -> R.drawable.ic_delete
+      adapter.selecionadas.isEmpty() -> R.drawable.ic_delete_x
+      else -> R.drawable.ic_delete_confirm
+    }
+
+    if (novaImagem == iconeAtual) return
+
+    iconeAtual = novaImagem
+    trashIcon.animate()
+      .alpha(0f)
+      .setDuration(150)
+      .withEndAction {
+        trashIcon.setImageResource(novaImagem)
+        trashIcon.animate().alpha(1f).setDuration(150).start()
+      }
+      .start()
   }
 
   override fun onStop() {

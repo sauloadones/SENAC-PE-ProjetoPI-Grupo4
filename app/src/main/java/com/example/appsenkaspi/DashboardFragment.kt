@@ -271,6 +271,10 @@ class DashboardFragment : Fragment() {
 
   private fun carregarGraficoDeBarrasVisaoGeral() {
     lifecycleScope.launch {
+      withContext(Dispatchers.Main) {
+        binding.labelBarChart.text = "Progresso de Cada Pilar"
+      }
+
       val pilares = withContext(Dispatchers.IO) {
         pilarViewModel.getPilaresParaDashboard()
       }
@@ -344,6 +348,7 @@ class DashboardFragment : Fragment() {
 
   private fun carregarGraficoDeBarrasPorAcoes(pilarId: Int) {
     lifecycleScope.launch {
+      binding.labelBarChart.text = "Progresso de Cada Ação"
       val progressoAcoes = withContext(Dispatchers.IO) {
         AppDatabase.getDatabase(requireContext())
           .acaoDao()
@@ -413,6 +418,7 @@ class DashboardFragment : Fragment() {
   
   private fun carregarGraficoDeBarrasPorSubpilares(pilarId: Int) {
     lifecycleScope.launch {
+      binding.labelBarChart.text = "Progresso de Cada Subpilar"
       val progressoSubpilares = withContext(Dispatchers.IO) {
         pilarViewModel.calcularProgressoDosSubpilares(pilarId)
       }

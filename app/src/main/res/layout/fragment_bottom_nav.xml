@@ -19,9 +19,9 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="12dp">
 
-        <!-- Relatório -->
+        <!-- Home -->
         <LinearLayout
-            android:id="@+id/nav_relatorio"
+            android:id="@+id/nav_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -32,19 +32,19 @@
             android:background="@android:color/transparent">
 
             <ImageView
-                android:id="@+id/icon_relatorio"
+                android:id="@+id/icon_home"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/nav_relatorio_icon"
-                android:contentDescription="Relatório"
+                android:src="@drawable/nav_home_icon"
+                android:contentDescription="Início"
                 app:tint="@color/nav_text_selector" />
 
             <TextView
-                android:id="@+id/text_relatorio"
+                android:id="@+id/text_home"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Relatório"
+                android:text="Início"
                 android:textColor="@color/nav_text_selector"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -79,9 +79,9 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- Home -->
+        <!-- Relatório -->
         <LinearLayout
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_relatorio"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -92,19 +92,19 @@
             android:background="@android:color/transparent">
 
             <ImageView
-                android:id="@+id/icon_home"
+                android:id="@+id/icon_relatorio"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/nav_home_icon"
-                android:contentDescription="Início"
+                android:src="@drawable/nav_relatorio_icon"
+                android:contentDescription="Relatório"
                 app:tint="@color/nav_text_selector" />
 
             <TextView
-                android:id="@+id/text_home"
+                android:id="@+id/text_relatorio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Início"
+                android:text="Relatório"
                 android:textColor="@color/nav_text_selector"
                 android:textSize="13sp" />
         </LinearLayout>

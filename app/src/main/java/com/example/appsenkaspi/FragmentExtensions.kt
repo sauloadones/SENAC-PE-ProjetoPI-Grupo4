@@ -47,6 +47,12 @@ fun configurarNotificacaoBadge(
 
   notificationIcon?.setOnClickListener {
     fragmentManager.beginTransaction()
+      .setCustomAnimations(
+        R.anim.pull_fade_in,     // animação de entrada
+        R.anim.pull_fade_out,    // animação de saída
+        R.anim.pull_fade_in,     // animação de retorno ao voltar
+        R.anim.pull_fade_out     // animação de saída ao voltar
+      )
       .replace(R.id.main_container, NotificacaoFragment())
       .addToBackStack(null)
       .commit()

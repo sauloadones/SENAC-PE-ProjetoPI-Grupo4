@@ -16,6 +16,7 @@ data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val 
 class RequisicaoAdapter(
   private val funcionarioIdLogado: Int,
   var modoCoordenador: Boolean,
+  var onSelecaoMudou: (() -> Unit)? = null,
   var onItemClick: (RequisicaoEntity) -> Unit = {}
 ) : ListAdapter<RequisicaoEntity, RequisicaoAdapter.ViewHolder>(DIFF_CALLBACK) {
 
@@ -37,9 +38,24 @@ class RequisicaoAdapter(
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val requisicao = getItem(position)
+    val isNotificacaoAutomatica = requisicao.tipo in listOf(
+      TipoRequisicao.ATIVIDADE_PARA_VENCER,
+      TipoRequisicao.ATIVIDADE_VENCIDA,
+      TipoRequisicao.PRAZO_ALTERADO,
+      TipoRequisicao.ATIVIDADE_CONCLUIDA,
+      TipoRequisicao.RESPONSAVEL_ADICIONADO,
+      TipoRequisicao.RESPONSAVEL_REMOVIDO
+    )
 
-    // 🔔 Notificações automáticas de prazo
-    if (requisicao.tipo == TipoRequisicao.ATIVIDADE_PARA_VENCER || requisicao.tipo == TipoRequisicao.ATIVIDADE_VENCIDA || requisicao.tipo == TipoRequisicao.PRAZO_ALTERADO || requisicao.tipo == TipoRequisicao.ATIVIDADE_CONCLUIDA || requisicao.tipo == TipoRequisicao.RESPONSAVEL_ADICIONADO || requisicao.tipo == TipoRequisicao.RESPONSAVEL_REMOVIDO) {
+    holder.itemView.clearAnimation()
+    holder.itemView.alpha = 1f
+    holder.itemView.visibility = View.VISIBLE
+    holder.checkBox.visibility = View.GONE
+    holder.checkBox.alpha = 1f
+    holder.checkBox.setOnCheckedChangeListener(null)
+    holder.checkBox.isChecked = false
+
+    if (isNotificacaoAutomatica) {
       if (requisicao.solicitanteId != funcionarioIdLogado) {
         holder.itemView.visibility = View.GONE
         holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
@@ -57,46 +73,43 @@ class RequisicaoAdapter(
         holder.textoMensagem.text = requisicao.mensagemResposta ?: "Esta notificação foi resolvida."
         holder.iconStatus.setImageResource(R.drawable.ic_check_circle)
         holder.iconStatus.setColorFilter(Color.parseColor("#9E9E9E"))
-        holder.itemView.alpha = 0.6f
+
         holder.itemView.setOnClickListener(null)
         holder.checkBox.visibility = View.GONE
-        return
+      } else {
+        val tipoInfo = when (requisicao.tipo) {
+          TipoRequisicao.ATIVIDADE_PARA_VENCER -> Quadruple(
+            "Prazo Próximo", R.drawable.ic_info, "#2196F3", "A atividade está próxima do prazo final."
+          )
+          TipoRequisicao.ATIVIDADE_VENCIDA -> Quadruple(
+            "Atividade Vencida", R.drawable.ic_warning, "#F44336", "A atividade ultrapassou o prazo."
+          )
+          TipoRequisicao.PRAZO_ALTERADO -> Quadruple(
+            "Prazo Alterado", R.drawable.ic_update, "#FF9800", "A data de prazo da atividade foi modificada."
+          )
+          TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
+            "Atividade Concluída", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluída."
+          )
+          TipoRequisicao.RESPONSAVEL_ADICIONADO -> Quadruple(
+            "Responsável Adicionado", R.drawable.ic_warning, "#FF9800", "Responsável adicionado."
+          )
+          TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
+            "Responsável Removido", R.drawable.ic_warning, "#FF9800", "Responsável removido."
+          )
+          else -> Quadruple(
+            "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
+          )
+        }
+
+        val (titulo, icone, corHex, mensagemPadrao) = tipoInfo
+
+        holder.textoTitulo.text = titulo
+        holder.textoMensagem.text = requisicao.mensagemResposta ?: mensagemPadrao
+        holder.iconStatus.setImageResource(icone)
+        holder.iconStatus.setColorFilter(Color.parseColor(corHex))
+        holder.itemView.setOnClickListener(null)
       }
-
-      val tipoInfo = when (requisicao.tipo) {
-        TipoRequisicao.ATIVIDADE_PARA_VENCER -> Quadruple(
-          "Prazo Próximo", R.drawable.ic_info, "#2196F3", "A atividade está próxima do prazo final."
-        )
-        TipoRequisicao.ATIVIDADE_VENCIDA -> Quadruple(
-          "Atividade Vencida", R.drawable.ic_warning, "#F44336", "A atividade ultrapassou o prazo."
-        )
-        TipoRequisicao.PRAZO_ALTERADO -> Quadruple(
-          "Prazo Alterado", R.drawable.ic_update, "#FF9800", "A data de prazo da atividade foi modificada."
-        )
-        TipoRequisicao.ATIVIDADE_CONCLUIDA -> Quadruple(
-          "Atividade Concluída", R.drawable.ic_check_circle, "#4CAF50", "A atividade foi concluída."
-        )
-        TipoRequisicao.RESPONSAVEL_ADICIONADO -> Quadruple(
-          "Responsável Adicionado", R.drawable.ic_warning, "#FF9800", "Responsável adicionado."
-        )
-        TipoRequisicao.RESPONSAVEL_REMOVIDO -> Quadruple(
-          "Responsável Removido", R.drawable.ic_warning, "#FF9800", "Responsável removido."
-        )
-        else -> Quadruple(
-          "Notificação", R.drawable.ic_info, "#607D8B", "Notificação automática."
-        )
-      }
-
-      val (titulo, icone, corHex, mensagemPadrao) = tipoInfo
-
-      holder.textoTitulo.text = titulo
-      holder.textoMensagem.text = requisicao.mensagemResposta ?: mensagemPadrao
-      holder.iconStatus.setImageResource(icone)
-      holder.iconStatus.setColorFilter(Color.parseColor(corHex))
-      holder.itemView.alpha = 1f
-      holder.itemView.setOnClickListener(null)
     } else {
-      // 🔧 Requisições formais: criar, editar, completar ações/atividades
       val titulo = when (requisicao.tipo) {
         TipoRequisicao.CRIAR_ATIVIDADE -> "Criação de Atividade"
         TipoRequisicao.EDITAR_ATIVIDADE -> "Edição de Atividade"
@@ -133,7 +146,16 @@ class RequisicaoAdapter(
     }
 
     // === Checkbox de seleção ===
-    holder.checkBox.visibility = if (modoSelecao) View.VISIBLE else View.GONE
+    if (modoSelecao) {
+      holder.checkBox.alpha = 0f
+      holder.checkBox.visibility = View.VISIBLE
+      holder.checkBox.animate().alpha(1f).setDuration(200).start()
+    } else {
+      holder.checkBox.animate().alpha(0f).setDuration(200).withEndAction {
+        holder.checkBox.visibility = View.GONE
+      }.start()
+    }
+
     holder.checkBox.setOnCheckedChangeListener(null)
     holder.checkBox.isChecked = selecionadas.contains(requisicao)
 
@@ -143,9 +165,10 @@ class RequisicaoAdapter(
       } else {
         selecionadas.remove(requisicao)
       }
+      onSelecaoMudou?.invoke()
     }
 
-    // Clique no item para selecionar no modo de seleção
+    // === Clique no item ===
     holder.itemView.setOnClickListener {
       if (modoSelecao) {
         val novoEstado = !holder.checkBox.isChecked
@@ -154,6 +177,15 @@ class RequisicaoAdapter(
         onItemClick(requisicao)
       }
     }
+
+    // === Animação de entrada com alpha ajustado ===
+    holder.itemView.translationY = 20f
+    val targetAlpha = if (isNotificacaoAutomatica && requisicao.resolvida) 0.6f else 1f
+    holder.itemView.animate()
+      .translationY(0f)
+      .alpha(targetAlpha)
+      .setDuration(250)
+      .start()
   }
 
   companion object {

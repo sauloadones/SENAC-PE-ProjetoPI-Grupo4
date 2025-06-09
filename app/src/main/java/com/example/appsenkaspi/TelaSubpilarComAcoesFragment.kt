@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.example.appsenkaspi.databinding.FragmentTelaSubpilarBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -82,11 +81,10 @@ class TelaSubpilarComAcoesFragment : Fragment() {
             binding.cardEditarSubpilar.visibility = View.GONE
             binding.cardAdicionarAcoes.visibility = View.GONE
           }
-
           else -> {
-          binding.cardEditarSubpilar.visibility = View.GONE
-          binding.cardAdicionarAcoes.visibility = View.GONE
-        }
+            binding.cardEditarSubpilar.visibility = View.GONE
+            binding.cardAdicionarAcoes.visibility = View.GONE
+          }
         }
       }
     }
@@ -147,6 +145,12 @@ class TelaSubpilarComAcoesFragment : Fragment() {
   private fun configurarBotoes() {
     binding.cardEditarSubpilar.setOnClickListener {
       parentFragmentManager.beginTransaction()
+        .setCustomAnimations(
+          R.anim.slide_fade_in_right,
+          R.anim.slide_fade_out_left,
+          R.anim.slide_fade_in_left,
+          R.anim.slide_fade_out_right
+        )
         .replace(R.id.main_container, EditarSubpilarFragment().apply {
           arguments = Bundle().apply { putInt("subpilarId", subpilarId) }
         })
@@ -156,6 +160,12 @@ class TelaSubpilarComAcoesFragment : Fragment() {
 
     binding.cardAdicionarAcoes.setOnClickListener {
       parentFragmentManager.beginTransaction()
+        .setCustomAnimations(
+          R.anim.slide_fade_in_right,
+          R.anim.slide_fade_out_left,
+          R.anim.slide_fade_in_left,
+          R.anim.slide_fade_out_right
+        )
         .replace(R.id.main_container, CriarAcaoFragment().apply {
           arguments = Bundle().apply { putInt("subpilarId", subpilarId) }
         })
@@ -169,6 +179,12 @@ class TelaSubpilarComAcoesFragment : Fragment() {
       arguments = Bundle().apply { putInt("acaoId", acao.id!!) }
     }
     parentFragmentManager.beginTransaction()
+      .setCustomAnimations(
+        R.anim.slide_fade_in_right,
+        R.anim.slide_fade_out_left,
+        R.anim.slide_fade_in_left,
+        R.anim.slide_fade_out_right
+      )
       .replace(R.id.main_container, fragment)
       .addToBackStack(null)
       .commit()
