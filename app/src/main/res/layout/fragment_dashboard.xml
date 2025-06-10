@@ -68,19 +68,19 @@
         android:id="@+id/iconeFiltro"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginStart="140dp"
+        android:layout_marginStart="100dp"
         android:layout_marginEnd="0dp"
         android:src="@drawable/ic_filter"
         app:layout_constraintStart_toStartOf="@id/fundoFiltro"
         app:layout_constraintTop_toTopOf="@id/fundoFiltro"
         app:layout_constraintBottom_toBottomOf="@id/fundoFiltro" />
 
-    <!-- Spinner -->
     <Spinner
         android:id="@+id/spinnerFiltro"
-        android:layout_width="100dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
+        android:dropDownSelector="@drawable/spinner_dropdown_background"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         android:textAlignment="center"
@@ -95,7 +95,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginStart="0dp"
-        android:layout_marginEnd="140dp"
+        android:layout_marginEnd="100dp"
         android:src="@drawable/ic_arrow_drop_down"
         app:layout_constraintEnd_toEndOf="@id/fundoFiltro"
         app:layout_constraintTop_toTopOf="@id/fundoFiltro"
