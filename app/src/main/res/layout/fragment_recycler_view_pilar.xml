@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2C2C2C"
-    tools:context=".RecyclerViewPilar">
+    tools:context=".ui.pilar.RecyclerViewPilar">
 
     <!-- RecyclerView para exibir os Pilares -->
     <androidx.recyclerview.widget.RecyclerView

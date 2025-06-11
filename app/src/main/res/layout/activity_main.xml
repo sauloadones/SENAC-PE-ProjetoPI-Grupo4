@@ -8,7 +8,7 @@
     android:background="@drawable/background"
     android:clipChildren="false"
     android:clipToPadding="false"
-    tools:context=".MainActivity">
+    tools:context=".ui.main.MainActivity">
 
     <!-- Logo centralizada no topo -->
     <ImageView
@@ -23,7 +23,7 @@
         android:layout_marginTop="60dp" />
 
     <!-- RippleTouchView deve ser o último para estar por cima -->
-    <com.example.appsenkaspi.RippleTouchView
+    <com.example.appsenkaspi.animations.RippleTouchView
         android:id="@+id/rippleView"
         android:layout_width="0dp"
         android:layout_height="0dp"
