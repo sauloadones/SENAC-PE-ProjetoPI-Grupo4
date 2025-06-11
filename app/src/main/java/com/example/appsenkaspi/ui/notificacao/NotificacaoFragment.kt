@@ -17,6 +17,7 @@ import com.example.appsenkaspi.viewmodel.NotificacaoViewModel
 import com.example.appsenkaspi.R
 import com.example.appsenkaspi.ui.requisicao.RequisicaoAdapter
 import com.example.appsenkaspi.data.local.enums.TipoRequisicao
+import com.example.appsenkaspi.extensions.configurarBotaoVoltar
 import com.example.appsenkaspi.viewmodel.FuncionarioViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -40,6 +41,7 @@ class NotificacaoFragment : Fragment() {
     val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewNotificacoes)
     val vazio = view.findViewById<TextView>(R.id.textVazioNotificacoes)
     trashIcon = view.findViewById(R.id.trashIcon)
+    configurarBotaoVoltar(view)
 
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
