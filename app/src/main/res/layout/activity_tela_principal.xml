@@ -20,7 +20,7 @@
     <!-- Menu fixo no fundo -->
     <fragment
         android:id="@+id/customBottomNavFragment"
-        android:name="com.example.appsenkaspi.BottomNavFragment"
+        android:name="com.example.appsenkaspi.ui.menu.BottomNavFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

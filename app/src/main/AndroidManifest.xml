@@ -25,7 +25,7 @@
 
         <!-- Activity principal que inicia o app -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
 
         <!-- Tela principal após login -->
       <activity
-          android:name=".TelaPrincipalActivity"
+          android:name=".ui.principal.TelaPrincipalActivity"
           android:theme="@style/Theme.AppSenkasPI"
           android:windowSoftInputMode="adjustPan"
           android:exported="true" />
