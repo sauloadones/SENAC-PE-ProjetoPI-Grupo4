@@ -1,4 +1,4 @@
-## 🏢 AppSenKaspi - Projeto Compliance Senac
+## 🏢 SENKAS - Projeto de Auditoria e Compliance Senac
 Este projeto é um sistema Android desenvolvido para o gerenciamento de pilares e atividades no contexto do Compliance do Senac. Ele facilita a criação, acompanhamento e automação de processos com funcionalidades como geração de relatórios, controle de progresso e perfis com permissões distintas.
 
 ## 📝 Visão Geral
