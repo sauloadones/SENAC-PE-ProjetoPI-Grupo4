@@ -28,7 +28,7 @@ Persistência: Room + TypeConverters personalizados
 
 Concorrência: Kotlin Coroutines
 
-API: Python (a definir detalhes do backend)
+API: Python (Hospedada no Python Anywhere)
 
 ## 🗃️ Banco de Dados
 O banco de dados local (appsenkaspi.db) é criado automaticamente ao iniciar o app, com dados pré-populados por meio de um RoomDatabase.Callback.
@@ -43,6 +43,138 @@ Entidades relacionais: AcaoFuncionarioEntity, AtividadeFuncionarioEntity
 ChecklistItemEntity, RequisicaoEntity
 
 O acesso aos dados é realizado por meio de DAOs (Data Access Objects) para garantir separação de responsabilidades e acesso seguro às operações de CRUD.
+
+Claro! Abaixo está uma **documentação técnica** estruturada para você colar diretamente no seu `README.md`, descrevendo a API de geração de relatórios:
+
+
+# 📊 API de Geração de Relatórios
+
+Esta API fornece endpoints para gerar relatórios nos formatos **PDF**, **Word** e **Excel**, com base em dados de pilares, ações e atividades de um sistema de gestão. A API suporta relatórios gerais e por pilar.
+
+## 🚀 Endpoints
+
+### `GET /`
+
+Retorna uma mensagem de status indicando que a API está online.
+
+**Resposta:**
+
+```json
+{
+  "mensagem": "API SENKAS rodando com sucesso!"
+}
+```
+
+### `POST /relatorio/pdf`
+
+Gera e retorna um relatório em **PDF** com base nos dados enviados.
+
+**Corpo da requisição (JSON):**
+
+```json
+{
+  "tipoRelatorio": "geral" | "pilar",
+  "pilares": [...],
+  "pilarId": "123" // apenas se tipoRelatorio for "pilar"
+}
+```
+
+**Resposta:** Arquivo `.pdf` para download.
+
+---
+
+### `POST /relatorio/word`
+
+Gera e retorna um relatório em **Word (.docx)** com os mesmos dados da rota anterior.
+
+**Corpo da requisição (JSON):** igual ao endpoint `/relatorio/pdf`
+
+**Resposta:** Arquivo `.docx` para download.
+
+
+### `POST /relatorio/excel`
+
+Gera e retorna um relatório em **Excel (.xlsx)**.
+
+**Corpo da requisição (JSON):** igual ao endpoint `/relatorio/pdf`
+
+**Resposta:** Arquivo `.xlsx` para download.
+
+
+### `GET /relatorio/download/<nome_arquivo>`
+
+Permite o download de arquivos já gerados anteriormente, localizados na pasta `relatorios`.
+
+**Parâmetros de URL:**
+
+* `nome_arquivo`: nome do arquivo a ser baixado.
+
+**Resposta:** Arquivo solicitado como download.
+
+## 📁 Estrutura Esperada dos Dados
+
+Exemplo de entrada para `tipoRelatorio: "geral"`:
+
+```json
+{
+  "tipoRelatorio": "geral",
+  "pilares": [
+    {
+      "id": "1",
+      "nome": "Governança",
+      "descricao": "Descrição do pilar",
+      "dataInicio": "2024-01-01",
+      "dataPrazo": "2024-12-31",
+      "status": "Em andamento",
+      "criadoPor": "Administrador",
+      "acoes": [
+        {
+          "nome": "Planejamento Estratégico",
+          "descricao": "Descrição da ação",
+          "status": "Ativa",
+          "atividades": [
+            {
+              "nome": "Análise de Riscos",
+              "status": "Concluida",
+              "responsavel": "João"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Para `tipoRelatorio: "pilar"`, envie apenas um pilar no array `pilares` e informe também `pilarId`.
+
+## 📄 Formatos de Relatório
+
+* **PDF**: Contém informações dos pilares, ações e atividades, com gráficos de status (pizza e barras).
+* **Word**: Documento estruturado com tabelas, seções e gráficos embutidos.
+* **Excel**:
+  
+  * `geral`: lista os pilares com dados resumidos.
+  * `pilar`: lista as ações e atividades detalhadamente.
+
+## 🛠️ Bibliotecas Utilizadas
+
+* **Flask**: Framework web.
+* **FPDF**: Geração de PDFs.
+* **python-docx**: Geração de documentos Word.
+* **pandas + openpyxl**: Manipulação de planilhas Excel.
+* **matplotlib**: Geração de gráficos.
+
+## 📂 Diretórios Importantes
+
+* `relatorios/`: Arquivos de saída (.pdf, .docx, .xlsx)
+* `graficos/`: Imagens dos gráficos gerados (usadas nos relatórios)
+
+## ✅ Validações e Regras
+
+* `"tipoRelatorio"` deve ser `"geral"` ou `"pilar"`.
+* Se `"pilar"`, é obrigatório fornecer `pilarId` e um único item no array `pilares`.
+* Geração de gráficos ocorre apenas quando há dados válidos para isso.
 
 ## 🚀 Como Executar o Projeto
 Clone o repositório:
@@ -60,7 +192,7 @@ Execute em um emulador Android ou dispositivo físico.
 
 ## 📦 Requisitos do Sistema
 
-Dependência 1: A definir (API externa)
+Dependência 1: API externa em Python
 
 Dependência 2: Banco de dados SQLite (Room)
 
