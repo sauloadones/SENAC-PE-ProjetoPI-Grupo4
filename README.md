@@ -79,6 +79,8 @@ Lucas – Responsável pela criação das telas iniciais do escopo do projeto.
 
 Vitor – Responsável pela criação das telas iniciais do escopo do projeto.
 
+Carlos - Responsável por revisar e atualizar a documentação do projeto.
+
 ## Links
 [Notion](https://www.notion.so/Sistema-de-Ouvidoria-do-SENAC-1a6cf81c640d8080b6d3f4cd051740fa?pvs=4) - Documentação de Requisitos
 
